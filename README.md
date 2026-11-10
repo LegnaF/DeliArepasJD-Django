@@ -1,1 +1,1 @@
-# DeliArepasJD-Django-Versi-n-
+# DeliArepasJD-Django
