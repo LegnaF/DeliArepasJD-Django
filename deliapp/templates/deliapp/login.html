@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Deliarepas JD</title>
+    <!-- Vinculamos el CSS adaptado para Django -->
+    <link rel="stylesheet" href="{% static 'deliapp/css/auth.css' %}">
+</head>
+<body>
+
+    <div class="splitContainer">
+        <!-- LADO IZQUIERDO: BANNER PUBLICITARIO -->
+        <div class="brandSide" style="background-image: url('{% static 'deliapp/img/inicio.jpg' %}');">
+            <div class="brandOverlay"></div>
+            <div class="brandContent">
+                <div class="badgeSabor">Sabor 100% Auténtico</div>
+
+                <div class="bannerFooter">
+                    <h1 class="bannerTitle">
+                        Las arepas más <br>
+                        calientitas y sabrosas.
+                    </h1>
+                    <p class="bannerText">
+                        Inicia sesión para pedir tu arepa favorita directo a casa en minutos. 
+                        Acumula puntos Deli, obtén envíos gratis y consiéntete con el auténtico sabor latino.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- LADO DERECHO: VISTAS Y FORMULARIOS -->
+        <div class="formSide">
+            <!-- NAVEGACIÓN SUPERIOR -->
+            <header class="loginNav">
+                <div class="loginBrand">
+                    <img 
+                        src="{% static 'deliapp/img/logo.jpg' %}" 
+                        alt="Deli Arepas Logo" 
+                        class="loginBrandLogo" 
+                    />
+                    <span>Deliarepas JD</span>
+                </div>
+                <a href="{% url 'inicio' %}" class="btnVolverInicio">
+                    Volver al inicio →
+                </a>
+            </header>
+
+            <!-- TARJETA DINÁMICA DE FORMULARIOS -->
+            <div class="card">
+                <div class="header">
+                    <h2 class="title">Iniciar Sesión</h2>
+                    <p class="subtitle">
+                        ¡Qué bueno verte de nuevo! Ingresa tus credenciales para disfrutar de tus arepas favoritas.
+                    </p>
+                </div>
+
+                <!-- Mensajes de error o éxito de Django -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Formulario de Django -->
+                <form method="POST" action="" class="authForm">
+                    {% csrf_token %}
+                    
+                    {{ form.non_field_errors }}
+
+                    {% for field in form %}
+                        <div class="formGroup">
+                            <label class="formLabel" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <span class="errorText">{{ field.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btnSubmit">
+                        Iniciar Sesión
+                    </button>
+                </form>
+
+                <!-- Enlaces para alternar vistas (Registro / Recuperar contraseña) -->
+                <div class="authLinks">
+                    <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+                    <p>¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate aquí</a></p>
+                </div>
+            </div>
+
+            <!-- PIE DE PÁGINA DE LA SECCIÓN -->
+            <footer class="footerCopy">
+                © 2026 Deliarepas JD. Todos los derechos reservados. Hecho con sabor de nuestra tierra.
+            </footer>
+        </div>
+    </div>
+
+</body>
+</html>

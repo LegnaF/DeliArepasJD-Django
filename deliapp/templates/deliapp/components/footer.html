@@ -1,0 +1,100 @@
+
+{% load static %}
+
+<footer class="footer">
+    <div class="footer-contenido">
+
+        <!-- SECCIÓN SUPERIOR -->
+        <div class="footer-top">
+
+            <!-- LOGO Y DESCRIPCIÓN -->
+            <div class="footer-brand">
+                <div class="footer-brand-header">
+
+                    <img
+                        src="{% static 'deliapp/img/logo.jpeg' %}"
+                        alt="Deli Arepas JD Logo"
+                        width="36"
+                        height="36"
+                        class="footer-logo"
+                    >
+
+                    <h3 class="footer-titulo">
+                        Deli Arepas JD
+                    </h3>
+
+                </div>
+
+                <p class="footer-subtitulo">
+                    Tradición y sabor en cada arepa.
+                    Recetas artesanales transmitidas de generación en generación.
+                </p>
+            </div>
+
+            <!-- HORARIOS -->
+            <div class="footer-horarios">
+
+                <h4 class="footer-horarios-titulo">
+                    HORARIOS
+                </h4>
+
+                <p class="footer-horarios-texto">
+                    Lunes a Viernes: 4:00 PM - 10:00 PM
+                </p>
+
+                <p class="footer-horarios-texto">
+                    Sábados y Domingos: 12:00 PM - 11:00 PM
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <!-- SECCIÓN INFERIOR -->
+        <div class="footer-bottom">
+
+            <p class="footer-copy">
+                © {% now "Y" %} Deli Arepas JD.
+                Todos los derechos reservados.
+            </p>
+
+            <div class="footer-redes">
+
+                <a
+                    href="https://facebook.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Facebook"
+                    class="footer-red-icon"
+                >
+                    ⓕ
+                </a>
+
+                <a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram"
+                    class="footer-red-icon"
+                >
+                    📷
+                </a>
+
+                <a
+                    href="https://twitter.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Twitter"
+                    class="footer-red-icon"
+                >
+                    𝕏
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</footer>

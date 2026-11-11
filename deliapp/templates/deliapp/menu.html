@@ -1,0 +1,468 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú - Deli Arepas JD</title>
+
+    <!-- Estilos globales (Navbar, Footer, Reset) -->
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+    
+    <!-- Estilos específicos del Menú y Carrito -->
+    <link rel="stylesheet" href="{% static 'deliapp/css/menu.css' %}">
+</head>
+<body>
+
+    <div class="menu-page">
+        {% include 'deliapp/components/navbar.html' %}
+
+        <main class="menu-container">
+            <!-- Encabezado -->
+            <header class="menu-header">
+                <h1>Nuestro Menú</h1>
+                <p class="menu-subtitulo">
+                    Arepas artesanales hechas con amor y los mejores ingredientes
+                </p>
+            </header>
+
+            <!-- Toast Notificación -->
+            <div id="toast-notificacion" class="menu-toast-notificacion" style="display: none;">
+                <span>✓</span>
+                <span id="toast-mensaje"></span>
+            </div>
+
+            <!-- Buscador -->
+            <div class="menu-toolbar">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">⌕</span>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Buscar arepas, bebidas, combos..." 
+                        oninput="filtrarProductos()"
+                    />
+                    <button 
+                        type="button" 
+                        id="btn-clear-search" 
+                        class="btn-clear-search" 
+                        style="display: none;" 
+                        onclick="limpiarBusqueda()"
+                    >
+                        ×
+                    </button>
+                </div>
+            </div>
+
+            <!-- Categorías -->
+            <div class="menu-categorias">
+                {% for cat in categorias %}
+                    <button 
+                        type="button" 
+                        class="cat-chip {% if cat == 'Todos' %}activo{% endif %}" 
+                        onclick="seleccionarCategoria('{{ cat }}', this)"
+                    >
+                        {{ cat }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <!-- Estado sin productos -->
+            <div id="menu-vacio" class="menu-vacio" style="display: none;">
+                <p>No encontramos productos en esta categoría o búsqueda.</p>
+                <button type="button" onclick="limpiarFiltros()" class="btn-limpiar-filtros">
+                    Ver todo el menú
+                </button>
+            </div>
+
+            <!-- Grid de Productos -->
+            <div id="menu-grid" class="menu-grid">
+                {% for prod in productos %}
+                    <div 
+                        class="menu-card" 
+                        data-id="{{ prod.id }}" 
+                        data-nombre="{{ prod.nombre|lower }}" 
+                        data-descripcion="{{ prod.descripcion|lower }}" 
+                        data-categoria="{{ prod.categoria }}"
+                        data-precio="{{ prod.precio }}"
+                        data-descuento="{{ prod.descuento }}"
+                        data-stock="{{ prod.stock }}"
+                        data-imagen="{% if prod.imagen %}{{ prod.imagen }}{% else %}/arepa3.jpg{% endif %}"
+                    >
+                        <!-- Imagen -->
+                        <div class="menu-card-imagen">
+                            <img 
+                                src="{% if prod.imagen %}{{ prod.imagen }}{% else %}/arepa3.jpg{% endif %}" 
+                                alt="{{ prod.nombre }}"
+                                onerror="this.src='/arepa3.jpg'"
+                            />
+                            {% if prod.descuento > 0 %}
+                                <span class="menu-badge-descuento">-{{ prod.descuento }}%</span>
+                            {% endif %}
+                            {% if prod.stock <= 0 %}
+                                <span class="menu-badge-agotado">Agotado</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Información -->
+                        <div class="menu-card-info">
+                            <h3>{{ prod.nombre }}</h3>
+                            <p class="menu-card-descripcion">
+                                {{ prod.descripcion|default:"Arepa artesanal recién preparada." }}
+                            </p>
+
+                            <div class="menu-card-footer">
+                                <div class="menu-card-precio">
+                                    {% if prod.descuento > 0 %}
+                                        <span class="precio-original">${{ prod.precio|floatformat:0 }}</span>
+                                    {% endif %}
+                                    <span class="precio-final" id="precio-calc-{{ prod.id }}"></span>
+                                </div>
+
+                                <button 
+                                    type="button" 
+                                    class="btn-agregar" 
+                                    {% if prod.stock <= 0 %}disabled{% endif %}
+                                    onclick="agregarAlCarrito({{ prod.id }})"
+                                >
+                                    {% if prod.stock <= 0 %}Agotado{% else %}+ Agregar{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </main>
+
+        <!-- Botón Flotante Carrito -->
+        <button type="button" class="btn-cart-float" onclick="abrirCarrito()" aria-label="Ver Carrito">
+            <span class="cart-icon">🛒</span>
+            <span class="cart-badge" id="cart-badge-count">0</span>
+        </button>
+
+        <!-- Drawer del Carrito -->
+        <div id="cart-overlay" class="cart-overlay" style="display: none;" onclick="cerrarCarritoAfuera(event)">
+            <div class="cart-drawer">
+                <div class="cart-header">
+                    <h2 id="cart-drawer-title">Tu Pedido (0)</h2>
+                    <button type="button" class="cart-close" onclick="cerrarCarrito()">×</button>
+                </div>
+
+                <!-- Pedido Exitoso -->
+                <div id="cart-success-body" class="cart-empty-body" style="display: none;">
+                    <span class="cart-empty-icon" style="color: #10b981;">✓</span>
+                    <h3 id="success-cliente-nombre">¡Gracias por tu compra!</h3>
+                    <p>Tu pedido <strong id="success-pedido-id">#0</strong> se ha registrado exitosamente.</p>
+                    <p style="margin-top: 8px; font-weight: bold;" id="success-pedido-total">Total: $0</p>
+                    <button type="button" class="btn-limpiar-filtros" style="margin-top: 20px;" onclick="cerrarCarrito()">
+                        Continuar comprando
+                    </button>
+                </div>
+
+                <!-- Carrito Vacío -->
+                <div id="cart-empty-body" class="cart-empty-body">
+                    <span class="cart-empty-icon">🛒</span>
+                    <p>Tu carrito está vacío</p>
+                    <button type="button" class="btn-limpiar-filtros" onclick="cerrarCarrito()">
+                        Explorar menú
+                    </button>
+                </div>
+
+                <!-- Lista de Productos y Checkout -->
+                <div id="cart-active-content" style="display: none;">
+                    <div id="cart-items-list" class="cart-items-list"></div>
+
+                    <div class="cart-checkout-section">
+                        <div class="cart-summary-row">
+                            <span>Total:</span>
+                            <strong id="cart-total-val">$0</strong>
+                        </div>
+
+                        {% csrf_token %}
+                        <div class="cart-form-fields">
+                            <input type="text" id="cliente-nombre" placeholder="Tu Nombre completo *" required />
+                            <input type="text" id="cliente-telefono" placeholder="Teléfono / Celular" />
+                            <input type="text" id="cliente-direccion" placeholder="Dirección de entrega *" required />
+                            <textarea id="cliente-observaciones" placeholder="Notas adicionales (Ej: Sin cebolla, extra salsa...)" rows="2"></textarea>
+                        </div>
+
+                        <button type="button" id="btn-confirmar-pedido" class="btn-confirmar-pedido" onclick="procesarPedido()">
+                            Confirmar Pedido
+                        </button>
+                        <button type="button" id="btn-vaciar" class="btn-vaciar" onclick="vaciarCarrito()">
+                            Vaciar Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include 'deliapp/components/footer.html' %}
+    </div>
+
+    <!-- Script de Carrito y Filtros -->
+    <script>
+        let categoriaActiva = "Todos";
+        let carrito = [];
+
+        const dineroCOP = new Intl.NumberFormat("es-CO", {
+            style: "currency",
+            currency: "COP",
+            maximumFractionDigits: 0,
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            inicializarPrecios();
+            cargarCarritoStorage();
+            filtrarProductos();
+        });
+
+        function inicializarPrecios() {
+            document.querySelectorAll(".menu-card").forEach(card => {
+                const precio = parseFloat(card.dataset.precio);
+                const descuento = parseFloat(card.dataset.descuento);
+                let final = precio;
+
+                if (descuento > 0) {
+                    final = Math.round(precio * (1 - descuento / 100));
+                }
+
+                const elem = document.getElementById(`precio-calc-${card.dataset.id}`);
+                if (elem) elem.innerText = dineroCOP.format(final);
+            });
+        }
+
+        function seleccionarCategoria(cat, btn) {
+            categoriaActiva = cat;
+            document.querySelectorAll(".cat-chip").forEach(b => b.classList.remove("activo"));
+            btn.classList.add("activo");
+            filtrarProductos();
+        }
+
+        function filtrarProductos() {
+            const busqueda = document.getElementById("search-input").value.trim().toLowerCase();
+            document.getElementById("btn-clear-search").style.display = busqueda ? "inline-block" : "none";
+
+            let visibles = 0;
+            document.querySelectorAll(".menu-card").forEach(card => {
+                const cat = card.dataset.categoria;
+                const nombre = card.dataset.nombre;
+                const desc = card.dataset.descripcion;
+
+                const coincideCat = (categoriaActiva === "Todos" || cat === categoriaActiva);
+                const coincideBusqueda = !busqueda || nombre.includes(busqueda) || desc.includes(busqueda);
+
+                if (coincideCat && coincideBusqueda) {
+                    card.style.display = "flex";
+                    visibles++;
+                } else {
+                    card.style.display = "none";
+                }
+            });
+
+            document.getElementById("menu-vacio").style.display = (visibles === 0) ? "block" : "none";
+        }
+
+        function limpiarBusqueda() {
+            document.getElementById("search-input").value = "";
+            filtrarProductos();
+        }
+
+        function limpiarFiltros() {
+            document.getElementById("search-input").value = "";
+            categoriaActiva = "Todos";
+            document.querySelectorAll(".cat-chip").forEach(b => {
+                b.classList.toggle("activo", b.innerText.trim() === "Todos");
+            });
+            filtrarProductos();
+        }
+
+        function cargarCarritoStorage() {
+            const guardado = localStorage.getItem("deli_arepas_cart");
+            if (guardado) {
+                try { carrito = JSON.parse(guardado); } catch (e) { carrito = []; }
+            }
+            actualizarCarritoUI();
+        }
+
+        function guardarCarritoStorage() {
+            localStorage.setItem("deli_arepas_cart", JSON.stringify(carrito));
+            actualizarCarritoUI();
+        }
+
+        function agregarAlCarrito(id) {
+            const card = document.querySelector(`.menu-card[data-id="${id}"]`);
+            if (!card) return;
+
+            const stock = parseInt(card.dataset.stock);
+            if (stock <= 0) return;
+
+            const nombre = card.querySelector("h3").innerText;
+            const precio = parseFloat(card.dataset.precio);
+            const descuento = parseFloat(card.dataset.descuento);
+            const imagen = card.dataset.imagen;
+
+            let precioUnitario = precio;
+            if (descuento > 0) {
+                precioUnitario = Math.round(precio * (1 - descuento / 100));
+            }
+
+            const indice = carrito.findIndex(item => item.id === id);
+            if (indice > -1) {
+                carrito[indice].cantidad += 1;
+            } else {
+                carrito.push({ id, nombre, precioUnitario, imagen, cantidad: 1 });
+            }
+
+            guardarCarritoStorage();
+            mostrarToast(`¡${nombre} añadido al carrito!`);
+        }
+
+        function cambiarCantidad(id, delta) {
+            const idx = carrito.findIndex(i => i.id === id);
+            if (idx > -1) {
+                carrito[idx].cantidad += delta;
+                if (carrito[idx].cantidad <= 0) {
+                    carrito.splice(idx, 1);
+                }
+                guardarCarritoStorage();
+            }
+        }
+
+        function removerDelCarrito(id) {
+            carrito = carrito.filter(i => i.id !== id);
+            guardarCarritoStorage();
+        }
+
+        function vaciarCarrito() {
+            carrito = [];
+            guardarCarritoStorage();
+        }
+
+        function actualizarCarritoUI() {
+            const totalCount = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            const subtotal = carrito.reduce((sum, item) => sum + (item.precioUnitario * item.cantidad), 0);
+
+            document.getElementById("cart-badge-count").innerText = totalCount;
+            document.getElementById("cart-drawer-title").innerText = `Tu Pedido (${totalCount})`;
+            document.getElementById("cart-total-val").innerText = dineroCOP.format(subtotal);
+
+            const activeContent = document.getElementById("cart-active-content");
+            const emptyBody = document.getElementById("cart-empty-body");
+            const successBody = document.getElementById("cart-success-body");
+
+            if (successBody.style.display !== "none") return;
+
+            if (carrito.length === 0) {
+                activeContent.style.display = "none";
+                emptyBody.style.display = "flex";
+            } else {
+                emptyBody.style.display = "none";
+                activeContent.style.display = "block";
+
+                const listContainer = document.getElementById("cart-items-list");
+                listContainer.innerHTML = carrito.map(item => `
+                    <div class="cart-item">
+                        <img src="${item.imagen}" alt="${item.nombre}" class="cart-item-img" onerror="this.src='/arepa3.jpg'" />
+                        <div class="cart-item-details">
+                            <h4>${item.nombre}</h4>
+                            <span class="cart-item-price">${dineroCOP.format(item.precioUnitario * item.cantidad)}</span>
+                            <div class="cart-item-controls">
+                                <button type="button" onclick="cambiarCantidad(${item.id}, -1)">-</button>
+                                <span>${item.cantidad}</span>
+                                <button type="button" onclick="cambiarCantidad(${item.id}, 1)">+</button>
+                            </div>
+                        </div>
+                        <button type="button" class="cart-remove-btn" onclick="removerDelCarrito(${item.id})" title="Eliminar producto">🗑</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function abrirCarrito() {
+            document.getElementById("cart-success-body").style.display = "none";
+            actualizarCarritoUI();
+            document.getElementById("cart-overlay").style.display = "flex";
+        }
+
+        function cerrarCarrito() {
+            document.getElementById("cart-overlay").style.display = "none";
+            document.getElementById("cart-success-body").style.display = "none";
+        }
+
+        function cerrarCarritoAfuera(e) {
+            if (e.target === e.currentTarget) cerrarCarrito();
+        }
+
+        function mostrarToast(msg) {
+            const toast = document.getElementById("toast-notificacion");
+            document.getElementById("toast-mensaje").innerText = msg;
+            toast.style.display = "flex";
+            setTimeout(() => { toast.style.display = "none"; }, 2500);
+        }
+
+        async function procesarPedido() {
+            if (carrito.length === 0) return;
+
+            const nombre = document.getElementById("cliente-nombre").value.trim();
+            const telefono = document.getElementById("cliente-telefono").value.trim();
+            const direccion = document.getElementById("cliente-direccion").value.trim();
+            const observaciones = document.getElementById("cliente-observaciones").value.trim();
+            const btnConfirmar = document.getElementById("btn-confirmar-pedido");
+
+            if (!nombre || !direccion) {
+                alert("Por favor ingresa tu nombre y dirección de entrega.");
+                return;
+            }
+
+            try {
+                btnConfirmar.disabled = true;
+                btnConfirmar.innerText = "Procesando...";
+
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                const res = await fetch("{% url 'crear_pedido' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({
+                        clienteNombre: nombre,
+                        telefono: telefono,
+                        direccion: direccion,
+                        observaciones: observaciones,
+                        items: carrito.map(item => ({
+                            productoId: item.id,
+                            cantidad: item.cantidad,
+                            precioUnitario: item.precioUnitario
+                        }))
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Error al registrar el pedido.");
+
+                document.getElementById("cart-active-content").style.display = "none";
+                document.getElementById("cart-empty-body").style.display = "none";
+                document.getElementById("success-cliente-nombre").innerText = `¡Gracias por tu compra, ${data.cliente}!`;
+                document.getElementById("success-pedido-id").innerText = `#${data.id}`;
+                document.getElementById("success-pedido-total").innerText = `Total: ${dineroCOP.format(data.total)}`;
+                document.getElementById("cart-success-body").style.display = "flex";
+
+                vaciarCarrito();
+                document.getElementById("cliente-nombre").value = "";
+                document.getElementById("cliente-telefono").value = "";
+                document.getElementById("cliente-direccion").value = "";
+                document.getElementById("cliente-observaciones").value = "";
+
+            } catch (err) {
+                alert(err.message || "No se pudo registrar el pedido.");
+            } finally {
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerText = "Confirmar Pedido";
+            }
+        }
+    </script>
+</body>
+</html>

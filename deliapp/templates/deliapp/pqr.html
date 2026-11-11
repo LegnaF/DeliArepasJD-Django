@@ -1,0 +1,329 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de PQRS - Deli Arepas JD</title>
+    <link rel="stylesheet" href="{% static 'deliapp/css/pqr.css' %}">
+</head>
+<body>
+
+    <div class="pqr-page">
+        {% include 'deliapp/components/navbar.html' %}
+
+        <main class="pqr-main">
+            <!-- SECCIÓN HERO -->
+            <section class="pqr-hero">
+                <div class="pqr-hero-content">
+                    <div class="pqr-title-area">
+                        <span class="pqr-eyebrow">CENTRO DE ATENCIÓN</span>
+                        <h1>Gestión de PQRS</h1>
+                        <p>Administra las peticiones, quejas, reclamos y sugerencias recibidas por Deli Arepas JD.</p>
+                    </div>
+
+                    <button type="button" class="pqr-refresh-btn" onclick="window.location.reload()">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 11a8.1 8.1 0 0 0-14.9-3.9L3 10" />
+                            <path d="M3 5v5h5" />
+                            <path d="M4 13a8.1 8.1 0 0 0 14.9 3.9L21 14" />
+                            <path d="M21 19v-5h-5" />
+                        </svg>
+                        <span>Actualizar lista</span>
+                    </button>
+                </div>
+
+                <div class="pqr-hero-decoration">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </section>
+
+            <!-- ESTADÍSTICAS -->
+            <section class="pqr-stats">
+                <article class="pqr-stat-card">
+                    <div class="pqr-stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.7 8.7 0 0 1-3.4-.7L4 20l1.7-4.1A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="pqr-stat-label">Solicitudes registradas</span>
+                        <strong>{{ total_count }}</strong>
+                    </div>
+                </article>
+
+                <article class="pqr-stat-card pqr-stat-card-green">
+                    <div class="pqr-stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 3v18" />
+                            <path d="M3 12h18" />
+                            <path d="M5 5l14 14" />
+                            <path d="M19 5 5 19" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="pqr-stat-label">Recibidas últimos 7 días</span>
+                        <strong>{{ recientes_count }}</strong>
+                    </div>
+                </article>
+
+                <article class="pqr-stat-card pqr-stat-card-orange">
+                    <div class="pqr-stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="8" />
+                            <path d="M12 8v4l2.5 2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="pqr-stat-label">Gestión disponible</span>
+                        <strong>Activa</strong>
+                    </div>
+                </article>
+            </section>
+
+            <!-- TABLA DE REGISTROS O ESTADO VACÍO -->
+            {% if not pqrs %}
+                <section class="pqr-empty">
+                    <div class="pqr-empty-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.7 8.7 0 0 1-3.4-.7L4 20l1.7-4.1A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5Z" />
+                        </svg>
+                    </div>
+                    <span class="pqr-eyebrow">SIN REGISTROS</span>
+                    <h2>No hay solicitudes de PQRS</h2>
+                    <p>Actualmente no existen peticiones, quejas, reclamos o sugerencias registradas en el sistema.</p>
+                    <button type="button" class="pqr-empty-button" onclick="window.location.reload()">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 11a8.1 8.1 0 0 0-14.9-3.9L3 10" />
+                            <path d="M3 5v5h5" />
+                            <path d="M4 13a8.1 8.1 0 0 0 14.9 3.9L21 14" />
+                            <path d="M21 19v-5h-5" />
+                        </svg>
+                        Actualizar
+                    </button>
+                </section>
+            {% else %}
+                <section class="pqr-table-section">
+                    <div class="pqr-table-header">
+                        <div>
+                            <span class="pqr-section-label">REGISTROS</span>
+                            <h2>Solicitudes recibidas</h2>
+                            <p>Consulta y administra cada solicitud registrada.</p>
+                        </div>
+                        <div class="pqr-count">
+                            <strong>{{ total_count }}</strong>
+                            <span>{% if total_count == 1 %}registro{% else %}registros{% endif %}</span>
+                        </div>
+                    </div>
+
+                    <div class="pqr-table-wrapper">
+                        <table class="pqr-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Contacto</th>
+                                    <th>Mensaje</th>
+                                    <th class="pqr-actions-heading">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in pqrs %}
+                                    <tr id="pqr-row-{{ item.id }}">
+                                        <td>
+                                            <span class="pqr-id">#{{ item.id }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="pqr-date">
+                                                <strong>{{ item.createdAt|date:"d M Y" }}</strong>
+                                                <span>{{ item.createdAt|date:"H:i" }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="pqr-client">
+                                                <div class="pqr-avatar">
+                                                    {{ item.nombre|slice:":1"|upper }}
+                                                </div>
+                                                <div>
+                                                    <strong id="pqr-nombre-val-{{ item.id }}">{{ item.nombre }}</strong>
+                                                    <span>Cliente</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="pqr-contact" id="pqr-contacto-val-{{ item.id }}">{{ item.contacto }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="pqr-message" id="pqr-mensaje-val-{{ item.id }}">{{ item.mensaje }}</div>
+                                        </td>
+                                        <td class="pqr-actions">
+                                            <button type="button" class="pqr-action-btn pqr-edit-btn" onclick="abrirModalEditar({{ item.id }})" title="Editar PQR">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" /></svg>
+                                                <span>Editar</span>
+                                            </button>
+                                            <button type="button" class="pqr-action-btn pqr-delete-btn" onclick="eliminarPqr({{ item.id }})" title="Eliminar PQR">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13h10l1-13" /><path d="M9 7V4h6v3" /></svg>
+                                                <span>Eliminar</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% endif %}
+
+            <div class="pqr-bottom-info">
+                <span class="pqr-bottom-dot"></span>
+                Sistema de gestión de PQRS · Deli Arepas JD
+            </div>
+        </main>
+
+        <!-- MODAL DE EDICIÓN -->
+        <div id="pqr-modal-backdrop" class="pqr-modal-backdrop" style="display: none;" onmousedown="cerrarModalAfuera(event)">
+            <section class="pqr-modal" role="dialog" aria-modal="true" aria-labelledby="pqr-modal-title">
+                <div class="pqr-modal-header">
+                    <div>
+                        <span class="pqr-section-label">ACTUALIZACIÓN</span>
+                        <h2 id="pqr-modal-title">Editar solicitud</h2>
+                        <p>Modifica la información registrada por el cliente.</p>
+                    </div>
+                    <button type="button" class="pqr-modal-close" onclick="cerrarModalEditar()" aria-label="Cerrar">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12" /><path d="m18 6-12 12" /></svg>
+                    </button>
+                </div>
+
+                <form id="pqr-edit-form" onsubmit="guardarEdicionPqr(event)" class="pqr-form">
+                    {% csrf_token %}
+                    <input type="hidden" id="edit-pqr-id" value="">
+
+                    <div class="pqr-form-grid">
+                        <label class="pqr-field">
+                            <span>Nombre completo</span>
+                            <input type="text" id="edit-pqr-nombre" required />
+                        </label>
+
+                        <label class="pqr-field">
+                            <span>Contacto</span>
+                            <input type="text" id="edit-pqr-contacto" required />
+                        </label>
+                    </div>
+
+                    <label class="pqr-field">
+                        <span>Mensaje de la solicitud</span>
+                        <textarea id="edit-pqr-mensaje" rows="4" required></textarea>
+                    </label>
+
+                    <div class="pqr-modal-footer">
+                        <button type="button" class="pqr-cancel-btn" onclick="cerrarModalEditar()">Cancelar</button>
+                        <button type="submit" id="edit-pqr-submit-btn" class="pqr-save-btn">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h12l2 2v14H5Z" /><path d="M8 4v6h8V4" /><path d="M8 20v-6h8v6" /></svg>
+                            <span id="edit-btn-text">Guardar cambios</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        {% include 'deliapp/components/footer.html' %}
+    </div>
+
+    <!-- SCRIPTS DE INTERACCIÓN -->
+    <script>
+        function getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+
+        function abrirModalEditar(id) {
+            const nombre = document.getElementById(`pqr-nombre-val-${id}`).innerText.trim();
+            const contacto = document.getElementById(`pqr-contacto-val-${id}`).innerText.trim();
+            const mensaje = document.getElementById(`pqr-mensaje-val-${id}`).innerText.trim();
+
+            document.getElementById('edit-pqr-id').value = id;
+            document.getElementById('edit-pqr-nombre').value = nombre;
+            document.getElementById('edit-pqr-contacto').value = contacto;
+            document.getElementById('edit-pqr-mensaje').value = mensaje;
+
+            document.getElementById('pqr-modal-title').innerText = `Editar solicitud #${id}`;
+            document.getElementById('pqr-modal-backdrop').style.display = 'flex';
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById('pqr-modal-backdrop').style.display = 'none';
+        }
+
+        function cerrarModalAfuera(event) {
+            if (event.target === event.currentTarget) {
+                cerrarModalEditar();
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                cerrarModalEditar();
+            }
+        });
+
+        async function guardarEdicionPqr(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-pqr-id').value;
+            const nombre = document.getElementById('edit-pqr-nombre').value;
+            const contacto = document.getElementById('edit-pqr-contacto').value;
+            const mensaje = document.getElementById('edit-pqr-mensaje').value;
+            const btnText = document.getElementById('edit-btn-text');
+            const submitBtn = document.getElementById('edit-pqr-submit-btn');
+
+            try {
+                btnText.innerText = 'Guardando...';
+                submitBtn.disabled = true;
+
+                const res = await fetch(`/gestion-pqr/editar/${id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify({ nombre, contacto, mensaje })
+                });
+
+                if (!res.ok) throw new Error('Error al actualizar la PQR');
+
+                document.getElementById(`pqr-nombre-val-${id}`).innerText = nombre;
+                document.getElementById(`pqr-contacto-val-${id}`).innerText = contacto;
+                document.getElementById(`pqr-mensaje-val-${id}`).innerText = mensaje;
+
+                cerrarModalEditar();
+            } catch (err) {
+                alert(err.message || 'Error al actualizar');
+            } finally {
+                btnText.innerText = 'Guardar cambios';
+                submitBtn.disabled = false;
+            }
+        }
+
+        async function eliminarPqr(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este PQR?')) return;
+
+            try {
+                const res = await fetch(`/gestion-pqr/eliminar/${id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                });
+
+                if (!res.ok) throw new Error('No se pudo eliminar el registro');
+
+                const row = document.getElementById(`pqr-row-${id}`);
+                if (row) row.remove();
+            } catch (err) {
+                alert(err.message || 'Error al eliminar');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deli Arepas - Artesanal y Delicioso</title>
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+</head>
+<body>
+
+    <!-- NAVBAR MOVIDO A COMPONENTES -->
+    <header>
+        {% include 'deliapp/components/navbar.html' %}
+    </header>
+
+    <main class="main">
+        <!-- SECCIÓN HERO -->
+        <section class="hero">
+            <div class="glassCard">
+                <span class="badge">100% Maíz Seleccionado</span>
+                <h1 class="title">DELI AREPAS</h1>
+                <h2 class="subtitle">Artesanal y Delicioso</h2>
+                <p class="description">
+                    Disfruta de la auténtica tradición colombiana con arepas doradas,
+                    crujientes por fuera y generosamente rellenas por dentro. Hechas a
+                    mano con amor y el mejor maíz.
+                </p>
+
+                <div class="heroButtons">
+                    <a href="{% url 'menu' %}" class="btnPrimary">Ver Productos</a>
+                    <a href="#nuestra-historia" class="btnSecondary">Nuestra Historia</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN NUESTROS CIMIENTOS -->
+        <section class="cimientosSection" id="nuestra-historia">
+            <div class="subtag">Nuestros Cimientos</div>
+            <h2 class="sectionTitle">Tradición y Compromiso</h2>
+
+            <div class="cardsGrid">
+                <div class="infoCard">
+                    <div class="cardHeader">
+                        <div class="iconContainer">◎</div>
+                        <h3 class="cardTitle">Misión</h3>
+                    </div>
+                    <p class="cardText">
+                        Ofrecer productos de excelente calidad, brindando a nuestros
+                        clientes una experiencia deliciosa y un servicio confiable.
+                    </p>
+                </div>
+
+                <div class="infoCard">
+                    <div class="cardHeader">
+                        <div class="iconContainer">👁</div>
+                        <h3 class="cardTitle">Visión</h3>
+                    </div>
+                    <p class="cardText">
+                        Ser reconocidos por nuestro sabor, calidad y excelente atención,
+                        creciendo junto a nuestros clientes para llevar la arepa a nuevos
+                        horizontes.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN PETICIONES, QUEJAS Y RECLAMOS (PQRS) -->
+        <section class="pqrSection" id="pqr">
+            <div class="pqrContainer">
+                <!-- LADO IZQUIERDO: INFORMACIÓN -->
+                <div class="pqrInfo">
+                    <div class="pqrTag">Peticiones, Quejas y Reclamos</div>
+                    <h2 class="pqrTitle">Contáctanos</h2>
+                    <p class="pqrDesc">
+                        Comunícate con nosotros para realizar tus pedidos, cotizar eventos especiales o hacer cualquier queja o reclamo que tengas con cualquiera de nuestros productos.
+                    </p>
+
+                    <div class="contactoItem">
+                        <div class="contactoIcono">📞</div>
+                        <div>
+                            <p class="contactoLabel">Llámanos o escríbenos</p>
+                            <p class="contactoValor">+57 312 456 7890</p>
+                        </div>
+                    </div>
+
+                    <div class="contactoItem">
+                        <div class="contactoIcono">📍</div>
+                        <div>
+                            <p class="contactoLabel">Dirección Principal</p>
+                            <p class="contactoValor">Calle 45 # 12 - 34, Soacha, Cundinamarca</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LADO DERECHO: FORMULARIO -->
+                <div class="pqrCard">
+                    <h3 class="formTitle">Envíanos un mensaje</h3>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div style="padding: 10px; background: {% if message.tags == 'success' %}#dcfce7{% else %}#fee2e2{% endif %}; color: {% if message.tags == 'success' %}#16a34a{% else %}#dc2626{% endif %}; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem;">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'inicio' %}#pqr" class="pqrForm">
+                        {% csrf_token %}
+
+                        <div class="formGroup">
+                            <label class="formLabel" for="{{ form.nombre.id_for_label }}">Nombre Completo</label>
+                            {{ form.nombre }}
+                        </div>
+
+                        <div class="formGroup">
+                            <label class="formLabel" for="{{ form.contacto.id_for_label }}">Correo Electrónico o Celular</label>
+                            {{ form.contacto }}
+                        </div>
+
+                        <div class="formGroup">
+                            <label class="formLabel" for="{{ form.mensaje.id_for_label }}">¿Cómo podemos ayudarte?</label>
+                            {{ form.mensaje }}
+                        </div>
+
+                        <button type="submit" class="btnContactar">
+                            Contactar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER MOVIDO A COMPONENTES -->
+    <footer>
+        {% include 'deliapp/components/footer.html' %}
+    </footer>
+
+</body>
+</html>
