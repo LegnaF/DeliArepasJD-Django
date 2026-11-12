@@ -99,7 +99,7 @@
 
                     {% if messages %}
                         {% for message in messages %}
-                            <div style="padding: 10px; background: {% if message.tags == 'success' %}#dcfce7{% else %}#fee2e2{% endif %}; color: {% if message.tags == 'success' %}#16a34a{% else %}#dc2626{% endif %}; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem;">
+                            <div class="alerta-pqr {% if message.tags == 'success' %}alerta-exito{% else %}alerta-error{% endif %}">
                                 {{ message }}
                             </div>
                         {% endfor %}

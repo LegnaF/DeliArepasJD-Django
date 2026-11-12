@@ -1,0 +1,195 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#482817">
+
+    <title>Crear cuenta | Deliarepas JD</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'deliapp/css/login.css' %}">
+</head>
+<body>
+
+<main class="authPage">
+
+    <section class="authVisual">
+        <div class="visualBackground"></div>
+        <div class="visualOverlay"></div>
+
+        <a href="{% url 'inicio' %}" class="visualLogo">
+            <img src="{% static 'deliapp/img/logo.jpeg' %}"
+                 alt="Logo Deliarepas JD"
+                 class="brandLogo">
+            <span class="logoFallback">JD</span>
+            <span class="brandName">
+                <strong>Deliarepas</strong>
+                <small>JD · SABOR AUTÉNTICO</small>
+            </span>
+        </a>
+
+        <div class="visualContent">
+            <span class="visualEyebrow">UNA MESA PARA TODOS</span>
+
+            <h1>
+                Tu próxima experiencia comienza
+                <span>aquí.</span>
+            </h1>
+
+            <p>
+                Forma parte de Deliarepas JD.
+                Queremos acompañarte con preparaciones
+                llenas de tradición y sabor.
+            </p>
+
+            <div class="visualDecoration">
+                <span></span><span></span><span></span>
+            </div>
+
+            <div class="visualFeature">
+                <span class="featureIcon">JD</span>
+                <div>
+                    <strong>Bienvenido a nuestra familia</strong>
+                    <small>Un lugar creado para disfrutar.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualFooter">
+            <span>DELIAREPAS JD</span>
+            <span>Tradición en cada preparación</span>
+        </div>
+    </section>
+
+    <section class="authFormSection">
+        <div class="authFormContainer">
+
+            <a href="{% url 'login' %}" class="backLink">
+                <span>←</span> Volver a iniciar sesión
+            </a>
+
+            <div class="formHeading">
+                <span class="formEyebrow">ÚNETE A NOSOTROS</span>
+                <h2>Crea tu cuenta</h2>
+                <p>Completa tus datos para formar parte de Deliarepas JD.</p>
+            </div>
+
+            {% if messages %}
+                <div class="messagesContainer">
+                    {% for message in messages %}
+                        <div class="message message-{{ message.tags }}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST"
+                  action="{% url 'register' %}"
+                  class="authForm">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="message message-error">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="formGroup">
+                    <label for="{{ form.username.id_for_label }}">
+                        Nombre de usuario
+                    </label>
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                    {% if form.username.help_text %}
+                        <div class="fieldHelp">{{ form.username.help_text|safe }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="formGroup">
+                    <label for="{{ form.email.id_for_label }}">
+                        Correo electrónico
+                    </label>
+                    {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="formGroup">
+                    <label for="{{ form.password1.id_for_label }}">
+                        Contraseña
+                    </label>
+
+                    <div class="passwordWrapper">
+                        {{ form.password1 }}
+
+                        <button type="button"
+                                class="togglePassword"
+                                data-target="{{ form.password1.id_for_label }}"
+                                aria-label="Mostrar contraseña"
+                                aria-pressed="false">
+                        </button>
+                    </div>
+
+                    {{ form.password1.errors }}
+
+                    {% if form.password1.help_text %}
+                        <div class="fieldHelp">
+                            {{ form.password1.help_text|safe }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="formGroup">
+                    <label for="{{ form.password2.id_for_label }}">
+                        Confirmar contraseña
+                    </label>
+
+                    <div class="passwordWrapper">
+                        {{ form.password2 }}
+
+                        <button type="button"
+                                class="togglePassword"
+                                data-target="{{ form.password2.id_for_label }}"
+                                aria-label="Mostrar contraseña"
+                                aria-pressed="false">
+                        </button>
+                    </div>
+
+                    {{ form.password2.errors }}
+                </div>
+
+                <button type="submit" class="submitButton">
+                    <span>Crear mi cuenta</span>
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12h14M13 6l6 6-6 6"></path>
+                    </svg>
+                </button>
+            </form>
+
+            <div class="registerPrompt">
+                <span>¿Ya tienes una cuenta?</span>
+                <a href="{% url 'login' %}">Iniciar sesión</a>
+            </div>
+
+            <div class="formBottom">
+                <div class="bottomBrand">
+                    <span class="bottomBrandMark">JD</span>
+                    DELIAREPAS JD
+                </div>
+                <span>Calidad y tradición</span>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+<script src="{% static 'deliapp/js/login.js' %}" defer></script>
+</body>
+</html>

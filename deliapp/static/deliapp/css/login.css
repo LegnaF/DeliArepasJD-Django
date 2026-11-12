@@ -1,0 +1,924 @@
+
+/* =====================================================
+   DELIAREPAS JD — AUTENTICACIÓN
+   Login | Registro | Recuperación
+===================================================== */
+
+:root {
+    --jd-coffee: #482817;
+    --jd-dark: #28160d;
+    --jd-orange: #e87519;
+    --jd-orange-dark: #c9570d;
+    --jd-yellow: #f5bd42;
+    --jd-cream: #fff8eb;
+    --jd-white: #ffffff;
+    --jd-text: #38291f;
+    --jd-muted: #8c8176;
+    --jd-border: #e9dfd1;
+    --jd-green: #4f7d32;
+    --jd-danger: #b52f36;
+    --jd-shadow: 0 25px 80px rgba(52, 31, 17, .12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    font-family: "DM Sans", sans-serif;
+    color: var(--jd-text);
+    background: var(--jd-cream);
+    -webkit-font-smoothing: antialiased;
+}
+
+.authPage button,
+.authPage input {
+    font: inherit;
+}
+
+.authPage a {
+    text-decoration: none;
+}
+
+/* =====================================================
+   CONTENEDOR PRINCIPAL
+===================================================== */
+
+.authPage {
+    width: 100%;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1.03fr .97fr;
+    background: var(--jd-white);
+}
+
+/* =====================================================
+   PANEL IZQUIERDO
+===================================================== */
+
+.authVisual {
+    position: relative;
+    min-width: 0;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    isolation: isolate;
+    padding: 42px clamp(30px, 5vw, 75px);
+    color: white;
+    background: var(--jd-dark);
+}
+
+.visualBackground {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(35, 19, 10, .91),
+            rgba(74, 44, 26, .77),
+            rgba(35, 19, 10, .88)
+        ),
+        url("/static/deliapp/img/inicio.jpg") center / cover no-repeat;
+    transform: scale(1.02);
+}
+
+.visualOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(
+            circle at 85% 18%,
+            rgba(245, 189, 66, .2),
+            transparent 32%
+        ),
+        linear-gradient(
+            0deg,
+            rgba(25, 15, 9, .55),
+            transparent 65%
+        );
+}
+
+.authVisual::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 420px;
+    height: 420px;
+    top: -230px;
+    right: -180px;
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 35px rgba(255,255,255,.035),
+        0 0 0 75px rgba(255,255,255,.02);
+    pointer-events: none;
+}
+
+.authVisual::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 300px;
+    height: 300px;
+    bottom: -180px;
+    left: -140px;
+    border-radius: 50%;
+    background: rgba(232, 117, 25, .2);
+    filter: blur(35px);
+    pointer-events: none;
+}
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.visualLogo {
+    position: relative;
+    z-index: 2;
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.brandLogo {
+    width: 76px;
+    height: 76px;
+    display: block;
+    padding: 4px;
+    object-fit: contain;
+    border: 2px solid rgba(245, 189, 66, .8);
+    border-radius: 20px;
+    background: white;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
+    transition: transform .3s ease;
+}
+
+.visualLogo:hover .brandLogo {
+    transform: rotate(-3deg) scale(1.04);
+}
+
+.logoFallback {
+    display: none;
+    width: 76px;
+    height: 76px;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--jd-yellow);
+    border-radius: 20px;
+    background: var(--jd-orange);
+    color: white;
+    font-family: "Playfair Display", serif;
+    font-size: 27px;
+    font-weight: 800;
+}
+
+.visualLogo.logoMissing .brandLogo {
+    display: none;
+}
+
+.visualLogo.logoMissing .logoFallback {
+    display: flex;
+}
+
+.brandName {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.brandName strong {
+    font-family: "Playfair Display", serif;
+    font-size: 24px;
+    line-height: 1.1;
+}
+
+.brandName small {
+    color: var(--jd-yellow);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+/* =====================================================
+   CONTENIDO DEL PANEL VISUAL
+===================================================== */
+
+.visualContent {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 560px;
+    margin: auto 0;
+    padding: 55px 0;
+    animation: jdAppear .7s ease both;
+}
+
+.visualEyebrow,
+.formEyebrow {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.visualEyebrow {
+    margin-bottom: 24px;
+    color: var(--jd-yellow);
+}
+
+.visualEyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 26px;
+    height: 2px;
+    margin: 0 10px 3px 0;
+    background: var(--jd-orange);
+}
+
+.visualContent h1 {
+    max-width: 570px;
+    margin: 0;
+    color: white;
+    font-family: "Playfair Display", serif;
+    font-size: clamp(39px, 4.5vw, 65px);
+    line-height: 1.12;
+    letter-spacing: -1.2px;
+}
+
+.visualContent h1 span {
+    display: block;
+    color: var(--jd-yellow);
+}
+
+.visualContent p {
+    max-width: 430px;
+    margin: 22px 0 0;
+    color: rgba(255, 255, 255, .82);
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+.visualDecoration {
+    display: flex;
+    gap: 7px;
+    margin-top: 30px;
+}
+
+.visualDecoration span {
+    width: 27px;
+    height: 5px;
+    border-radius: 10px;
+    background: var(--jd-orange);
+}
+
+.visualDecoration span:nth-child(2) {
+    width: 13px;
+    background: var(--jd-yellow);
+}
+
+.visualDecoration span:nth-child(3) {
+    width: 7px;
+    background: var(--jd-green);
+}
+
+/* Elemento complementario */
+
+.visualFeature {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-top: 35px;
+}
+
+.featureIcon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(245, 189, 66, .5);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .09);
+    color: var(--jd-yellow);
+    font-family: "Playfair Display", serif;
+    font-weight: 800;
+}
+
+.visualFeature div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.visualFeature strong {
+    color: white;
+    font-size: 12px;
+}
+
+.visualFeature small {
+    color: rgba(255, 255, 255, .68);
+    font-size: 10px;
+}
+
+.visualFooter {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, .2);
+    color: rgba(255, 255, 255, .7);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* =====================================================
+   PANEL DERECHO
+===================================================== */
+
+.authFormSection {
+    min-width: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 45px clamp(25px, 5vw, 75px);
+    background:
+        radial-gradient(
+            circle at 100% 0%,
+            rgba(245, 189, 66, .13),
+            transparent 30%
+        ),
+        white;
+}
+
+.authFormContainer {
+    width: 100%;
+    max-width: 440px;
+    margin: auto;
+    animation: jdAppear .65s ease both;
+}
+
+/* Volver */
+
+.backLink {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 38px;
+    color: var(--jd-muted);
+    font-size: 12px;
+    font-weight: 700;
+    transition: color .2s, transform .2s;
+}
+
+.backLink:hover {
+    color: var(--jd-orange-dark);
+    transform: translateX(-3px);
+}
+
+.backLink span {
+    font-size: 20px;
+}
+
+/* Encabezado */
+
+.formHeading {
+    margin-bottom: 28px;
+}
+
+.formEyebrow {
+    margin-bottom: 12px;
+    color: var(--jd-orange-dark);
+}
+
+.formHeading h2 {
+    margin: 0 0 12px;
+    color: var(--jd-coffee);
+    font-family: "Playfair Display", serif;
+    font-size: clamp(32px, 3.3vw, 43px);
+    line-height: 1.12;
+    letter-spacing: -.8px;
+}
+
+.formHeading p {
+    margin: 0;
+    color: var(--jd-muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* =====================================================
+   MENSAJES Y VALIDACIONES
+===================================================== */
+
+.messagesContainer {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 13px 15px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.message-success {
+    color: #287345;
+    background: #edf7ef;
+    border-color: #cfe8d4;
+}
+
+.message-error {
+    color: #b52f36;
+    background: #fff0ef;
+    border-color: #f1d1d0;
+}
+
+.message-warning {
+    color: #8b641c;
+    background: #fff8e9;
+    border-color: #f0dfb9;
+}
+
+.message-info {
+    color: #345c78;
+    background: #edf5fa;
+    border-color: #d4e5f0;
+}
+
+.errorlist {
+    margin: 5px 0 0;
+    padding: 10px 12px 10px 28px;
+    border: 1px solid #f1d1d0;
+    border-radius: 10px;
+    background: #fff0ef;
+    color: var(--jd-danger);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.fieldHelp,
+.helptext {
+    display: block;
+    margin-top: 7px;
+    color: var(--jd-muted);
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.fieldHelp ul,
+.helptext ul {
+    padding-left: 18px;
+}
+
+/* =====================================================
+   FORMULARIOS
+===================================================== */
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 19px;
+}
+
+.formGroup {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formGroup label {
+    color: var(--jd-coffee);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* Todos los campos Django */
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    width: 100%;
+    min-height: 54px;
+    padding: 0 15px;
+    border: 1px solid var(--jd-border);
+    border-radius: 13px;
+    outline: none;
+    background: #fff;
+    color: var(--jd-text);
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+.formGroup input:hover,
+.formGroup select:hover,
+.formGroup textarea:hover {
+    border-color: #d8b78e;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+    border-color: var(--jd-orange);
+    box-shadow: 0 0 0 4px rgba(232, 117, 25, .11);
+    background: #fff;
+}
+
+.formGroup input::placeholder {
+    color: #b5aa9e;
+}
+
+.formGroup textarea {
+    min-height: 110px;
+    padding-top: 13px;
+    resize: vertical;
+}
+
+/* Contenedor con icono */
+
+.inputWrapper,
+.passwordWrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.inputWrapper input,
+.passwordWrapper input {
+    min-width: 0;
+    padding-left: 47px;
+}
+
+.passwordWrapper input {
+    padding-right: 55px;
+}
+
+.inputIcon {
+    position: absolute;
+    z-index: 1;
+    left: 15px;
+    width: 19px;
+    height: 19px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a18d7b;
+    pointer-events: none;
+}
+
+.inputIcon svg {
+    width: 19px;
+    height: 19px;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* =====================================================
+   ETIQUETAS Y RECUPERACIÓN
+===================================================== */
+
+.labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.forgotLink {
+    color: var(--jd-orange-dark);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.forgotLink:hover {
+    color: var(--jd-coffee);
+    text-decoration: underline;
+}
+
+/* =====================================================
+   MOSTRAR / OCULTAR CONTRASEÑA
+===================================================== */
+
+.togglePassword {
+    position: absolute;
+    z-index: 5;
+    top: 50%;
+    right: 8px;
+    width: 39px;
+    height: 39px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #8c8178;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: color .2s, background .2s;
+}
+
+.togglePassword:hover {
+    color: var(--jd-orange-dark);
+    background: #fff2e4;
+}
+
+.togglePassword:focus-visible {
+    outline: 2px solid var(--jd-orange);
+    outline-offset: 2px;
+}
+
+.togglePassword svg {
+    width: 21px;
+    height: 21px;
+    display: block;
+    pointer-events: none;
+}
+
+/* =====================================================
+   BOTÓN PRINCIPAL
+===================================================== */
+
+.submitButton {
+    width: 100%;
+    min-height: 56px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 13px;
+    margin-top: 5px;
+    padding: 14px 20px;
+    border: 0;
+    border-radius: 13px;
+    background: linear-gradient(110deg, #ed8428, #c9570d);
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 10px 24px rgba(201, 87, 13, .2);
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s, filter .2s;
+}
+
+.submitButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 28px rgba(201, 87, 13, .28);
+    filter: brightness(1.05);
+}
+
+.submitButton:active {
+    transform: translateY(0);
+}
+
+.submitButton svg {
+    width: 19px;
+    height: 19px;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform .2s;
+}
+
+.submitButton:hover svg {
+    transform: translateX(4px);
+}
+
+/* =====================================================
+   REGISTRO Y PIE
+===================================================== */
+
+.registerPrompt {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 25px;
+    color: var(--jd-muted);
+    font-size: 11px;
+    text-align: center;
+}
+
+.registerPrompt a {
+    color: var(--jd-orange-dark);
+    font-weight: 800;
+}
+
+.registerPrompt a:hover {
+    text-decoration: underline;
+}
+
+.formBottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 38px;
+    padding-top: 19px;
+    border-top: 1px solid var(--jd-border);
+    color: #a39a91;
+    font-size: 9px;
+}
+
+.bottomBrand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--jd-coffee);
+    font-weight: 800;
+    letter-spacing: .7px;
+}
+
+.bottomBrandMark {
+    width: 29px;
+    height: 29px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--jd-orange);
+    color: white;
+    font-family: "Playfair Display", serif;
+    font-weight: 800;
+}
+
+/* =====================================================
+   ANIMACIONES
+===================================================== */
+
+@keyframes jdAppear {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 1050px) {
+    .authPage {
+        grid-template-columns: .9fr 1.1fr;
+    }
+
+    .authVisual {
+        padding: 35px 7%;
+    }
+
+    .authFormSection {
+        padding: 35px 6%;
+    }
+
+    .visualContent h1 {
+        font-size: clamp(36px, 4.5vw, 52px);
+    }
+}
+
+/* =====================================================
+   MÓVIL
+===================================================== */
+
+@media (max-width: 760px) {
+    .authPage {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .authVisual {
+        min-height: 310px;
+        height: auto;
+        padding: 24px 7%;
+    }
+
+    .brandLogo,
+    .logoFallback {
+        width: 59px;
+        height: 59px;
+        border-radius: 15px;
+    }
+
+    .brandName strong {
+        font-size: 20px;
+    }
+
+    .brandName small {
+        font-size: 8px;
+    }
+
+    .visualContent {
+        padding: 30px 0;
+    }
+
+    .visualEyebrow {
+        margin-bottom: 15px;
+    }
+
+    .visualContent h1 {
+        font-size: clamp(34px, 8vw, 46px);
+    }
+
+    .visualContent p {
+        margin-top: 14px;
+        font-size: 12px;
+    }
+
+    .visualFeature {
+        margin-top: 22px;
+    }
+
+    .visualFooter {
+        padding-top: 15px;
+        font-size: 8px;
+    }
+
+    .authFormSection {
+        min-height: auto;
+        padding: 38px 7% 45px;
+    }
+
+    .authFormContainer {
+        max-width: 490px;
+    }
+
+    .backLink {
+        margin-bottom: 28px;
+    }
+
+    .formHeading h2 {
+        font-size: 35px;
+    }
+
+    .formBottom {
+        margin-top: 30px;
+    }
+}
+
+/* =====================================================
+   MÓVILES PEQUEÑOS
+===================================================== */
+
+@media (max-width: 390px) {
+    .visualFooter,
+    .formBottom {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .labelRow {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .authFormSection {
+        padding-right: 22px;
+        padding-left: 22px;
+    }
+}
+
+/* =====================================================
+   ACCESIBILIDAD
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .authPage *,
+    .authPage *::before,
+    .authPage *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}

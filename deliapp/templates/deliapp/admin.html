@@ -1,0 +1,481 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Deli Arepas JD</title>
+
+    <!-- Estilos globales (Navbar y Footer) -->
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+    <!-- Estilos específicos del Panel Administrativo -->
+    <link rel="stylesheet" href="{% static 'deliapp/css/admin.css' %}">
+</head>
+<body>
+
+    <div id="admin-layout" class="admin-layout theme-light">
+        {% include 'deliapp/components/navbar.html' %}
+
+        <div class="admin-shell">
+            <main class="admin-main">
+                <!-- HEADER -->
+                <header class="admin-top-header">
+                    <div class="admin-heading">
+                        <div class="admin-eyebrow-wrap">
+                            <span class="admin-eyebrow">PANEL ADMINISTRATIVO</span>
+                            <span class="eyebrow-line"></span>
+                        </div>
+
+                        <h1>
+                            Panel de Control<span class="title-dot">.</span>
+                        </h1>
+
+                        <p>
+                            Supervisa la operación de <strong>Deli Arepas JD</strong> desde un solo lugar.
+                        </p>
+                    </div>
+
+                    <div class="admin-header-right">
+                        <!-- BOTÓN ACTUALIZAR -->
+                        <button
+                            type="button"
+                            id="btn-refresh"
+                            class="refresh-button"
+                            onclick="actualizarPanel()"
+                        >
+                            <span id="refresh-icon" class="refresh-icon">↻</span>
+                            <span id="refresh-text">Actualizar</span>
+                        </button>
+
+                        <!-- BOTÓN TEMA DÍA / NOCHE -->
+                        <button
+                            type="button"
+                            class="theme-toggle"
+                            onclick="alternarTema()"
+                        >
+                            <span id="theme-circle" class="theme-toggle-circle">☾</span>
+                            <span id="theme-label">Modo noche</span>
+                        </button>
+
+                        <!-- PERFIL DE USUARIO -->
+                        <div class="admin-user-area">
+                            <button
+                                type="button"
+                                id="btn-user-menu"
+                                class="admin-user"
+                                onclick="alternarPerfil()"
+                                aria-expanded="false"
+                            >
+                                <div class="admin-user-avatar">
+                                    {{ request.user.username|first|upper|default:"A" }}
+                                </div>
+
+                                <div class="admin-user-data">
+                                    <span>Administrador</span>
+                                    <strong>{{ request.user.get_full_name|default:request.user.username|default:"Administrador" }}</strong>
+                                </div>
+
+                                <span class="user-chevron">⌄</span>
+                            </button>
+
+                            <div id="admin-profile-menu" class="admin-profile-menu" style="display: none;">
+                                <div class="profile-menu-top">
+                                    <div class="profile-menu-avatar">
+                                        {{ request.user.username|first|upper|default:"A" }}
+                                    </div>
+
+                                    <div>
+                                        <strong>{{ request.user.get_full_name|default:request.user.username|default:"Administrador" }}</strong>
+                                        <span>Administrador</span>
+                                    </div>
+                                </div>
+
+                                <div class="profile-divider"></div>
+
+                                <form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="profile-logout">
+                                        <span>↪</span>
+                                        Cerrar sesión
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- ESTADÍSTICAS -->
+                <section class="admin-stat-section">
+                    <div class="admin-section-title">
+                        <div>
+                            <span>RESUMEN GENERAL</span>
+                            <h2>Vista general</h2>
+                        </div>
+
+                        <div class="system-status">
+                            <i></i>
+                            Sistema activo
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-grid">
+                        <!-- USUARIOS -->
+                        <article class="admin-stat">
+                            <div class="stat-glow"></div>
+
+                            <div class="stat-top-row">
+                                <div class="stat-icon">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <circle cx="9" cy="8" r="3" />
+                                        <path d="M3.5 20c.5-4 2.4-6 5.5-6s5 2 5.5 6" />
+                                        <path d="M16 5.5a3 3 0 0 1 0 5.8" />
+                                        <path d="M17 14c2.2.5 3.4 2.3 3.7 5" />
+                                    </svg>
+                                </div>
+                                <span class="stat-mini-label">CUENTAS</span>
+                            </div>
+
+                            <div class="stat-copy">
+                                <span>Usuarios registrados</span>
+                                <strong id="stat-usuarios">{{ stats.usuarios }}</strong>
+                                <small>Cuentas del sistema</small>
+                            </div>
+
+                            <div class="stat-arrow">↗</div>
+                        </article>
+
+                        <!-- PRODUCTOS -->
+                        <article class="admin-stat">
+                            <div class="stat-glow orange-glow"></div>
+
+                            <div class="stat-top-row">
+                                <div class="stat-icon orange">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z" />
+                                        <path d="M4.5 7.8 12 12l7.5-4.2" />
+                                        <path d="M12 12v9" />
+                                    </svg>
+                                </div>
+                                <span class="stat-mini-label">CATÁLOGO</span>
+                            </div>
+
+                            <div class="stat-copy">
+                                <span>Productos activos</span>
+                                <strong id="stat-productos">{{ stats.productos }}</strong>
+                                <small>Catálogo disponible</small>
+                            </div>
+
+                            <div class="stat-arrow">↗</div>
+                        </article>
+
+                        <!-- PEDIDOS -->
+                        <article class="admin-stat">
+                            <div class="stat-glow gold-glow"></div>
+
+                            <div class="stat-top-row">
+                                <div class="stat-icon gold">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M4 5h16v14H4z" />
+                                        <path d="M8 9h8M8 13h8M8 17h5" />
+                                    </svg>
+                                </div>
+                                <span class="stat-mini-label">OPERACIÓN</span>
+                            </div>
+
+                            <div class="stat-copy">
+                                <span>Pedidos registrados</span>
+                                <strong id="stat-pedidos">{{ stats.pedidos }}</strong>
+                                <small>Operaciones realizadas</small>
+                            </div>
+
+                            <div class="stat-arrow">↗</div>
+                        </article>
+
+                        <!-- VENTAS -->
+                        <article class="admin-stat">
+                            <div class="stat-glow green-glow"></div>
+
+                            <div class="stat-top-row">
+                                <div class="stat-icon green">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M4 19V5" />
+                                        <path d="M4 19h16" />
+                                        <path d="m7 15 4-4 3 2 5-6" />
+                                    </svg>
+                                </div>
+                                <span class="stat-mini-label">INGRESOS</span>
+                            </div>
+
+                            <div class="stat-copy">
+                                <span>Ventas acumuladas</span>
+                                <strong id="stat-ventas" data-raw="{{ stats.ventas }}">${{ stats.ventas|floatformat:0 }}</strong>
+                                <small>Ingresos no cancelados</small>
+                            </div>
+
+                            <div class="stat-arrow">↗</div>
+                        </article>
+                    </div>
+                </section>
+
+                <!-- MÓDULOS -->
+                <section class="admin-modules">
+                    <div class="admin-section-title">
+                        <div>
+                            <span>ADMINISTRACIÓN</span>
+                            <h2>Módulos principales</h2>
+                        </div>
+                        <span class="module-count">04 módulos</span>
+                    </div>
+
+                    <div class="admin-module-grid">
+                        <!-- 01. PRODUCTOS -->
+                        <a href="{% url 'menu' %}" class="admin-module-card">
+                            <div class="module-shine"></div>
+                            <div class="module-line"></div>
+
+                            <div class="module-top">
+                                <div class="module-icon">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z" />
+                                        <path d="M4.5 7.8 12 12l7.5-4.2" />
+                                        <path d="M12 12v9" />
+                                    </svg>
+                                </div>
+                                <span class="module-number">01</span>
+                            </div>
+
+                            <span class="module-category">CATÁLOGO</span>
+                            <h3>Gestión de productos</h3>
+                            <p>
+                                Crea, modifica, activa, desactiva y elimina productos del catálogo.
+                            </p>
+
+                            <div class="module-action">
+                                <span>Administrar módulo</span>
+                                <b>→</b>
+                            </div>
+                        </a>
+
+                        <!-- 02. USUARIOS -->
+                        <a href="{% url 'usuarios' %}" class="admin-module-card">
+                            <div class="module-shine"></div>
+                            <div class="module-line"></div>
+
+                            <div class="module-top">
+                                <div class="module-icon">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <circle cx="9" cy="8" r="3" />
+                                        <path d="M3.5 20c.5-4 2.4-6 5.5-6s5 2 5.5 6" />
+                                        <path d="M16 5.5a3 3 0 0 1 0 5.8" />
+                                        <path d="M17 14c2.2.5 3.4 2.3 3.7 5" />
+                                    </svg>
+                                </div>
+                                <span class="module-number">02</span>
+                            </div>
+
+                            <span class="module-category">ACCESOS</span>
+                            <h3>Usuarios y roles</h3>
+                            <p>Controla las cuentas, roles y permisos del sistema.</p>
+
+                            <div class="module-action">
+                                <span>Administrar módulo</span>
+                                <b>→</b>
+                            </div>
+                        </a>
+
+                        <!-- 03. PEDIDOS -->
+                        <a href="{% url 'gestion' %}" class="admin-module-card">
+                            <div class="module-shine"></div>
+                            <div class="module-line"></div>
+
+                            <div class="module-top">
+                                <div class="module-icon">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M4 5h16v14H4z" />
+                                        <path d="M8 9h8M8 13h8M8 17h5" />
+                                    </svg>
+                                </div>
+                                <span class="module-number">03</span>
+                            </div>
+
+                            <span class="module-category">OPERACIÓN</span>
+                            <h3>Gestión de pedidos</h3>
+                            <p>Consulta pedidos y controla sus diferentes estados.</p>
+
+                            <div class="module-action">
+                                <span>Administrar módulo</span>
+                                <b>→</b>
+                            </div>
+                        </a>
+
+                        <!-- 04. FACTURACIÓN -->
+                        <a href="{% url 'facturacion' %}" class="admin-module-card">
+                            <div class="module-shine"></div>
+                            <div class="module-line"></div>
+
+                            <div class="module-top">
+                                <div class="module-icon">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M6 3h12v18l-2.5-1.7L13 21l-2.5-1.7L8 21l-2-1.7V3Z" />
+                                        <path d="M9 8h6M9 12h6M9 16h4" />
+                                    </svg>
+                                </div>
+                                <span class="module-number">04</span>
+                            </div>
+
+                            <span class="module-category">FINANZAS</span>
+                            <h3>Facturación</h3>
+                            <p>Consulta comprobantes y movimientos de venta.</p>
+
+                            <div class="module-action">
+                                <span>Administrar módulo</span>
+                                <b>→</b>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- PANEL INFORMATIVO -->
+                <section class="admin-info-panel" id="inventario">
+                    <div class="info-decoration"></div>
+
+                    <div class="info-content">
+                        <span>CONTROL OPERATIVO</span>
+                        <h2>Deli Arepas JD</h2>
+                        <p>
+                            El panel está conectado a la base de datos mediante Django ORM. Los indicadores superiores se obtienen directamente de los registros del sistema.
+                        </p>
+
+                        <div class="info-status">
+                            <i></i>
+                            Base de datos conectada
+                        </div>
+                    </div>
+
+                    <div class="admin-info-mark">DA</div>
+                </section>
+
+                <!-- VOLVER ARRIBA -->
+                <button
+                    type="button"
+                    class="back-top"
+                    onclick="volverArriba()"
+                >
+                    <span>↑</span>
+                    <small>Volver arriba</small>
+                </button>
+            </main>
+        </div>
+
+        {% include 'deliapp/components/footer.html' %}
+    </div>
+
+    <script>
+        const formatoCOP = new Intl.NumberFormat("es-CO", {
+            style: "currency",
+            currency: "COP",
+            maximumFractionDigits: 0,
+        });
+
+        // Inicialización de tema y formato de moneda
+        document.addEventListener("DOMContentLoaded", () => {
+            const temaGuardado = localStorage.getItem("admin-theme");
+            if (temaGuardado === "dark") {
+                aplicarTema(true);
+            }
+
+            const ventasEl = document.getElementById("stat-ventas");
+            if (ventasEl && ventasEl.dataset.raw) {
+                ventasEl.innerText = formatoCOP.format(Number(ventasEl.dataset.raw) || 0);
+            }
+        });
+
+        function aplicarTema(esOscuro) {
+            const layout = document.getElementById("admin-layout");
+            const circle = document.getElementById("theme-circle");
+            const label = document.getElementById("theme-label");
+
+            if (esOscuro) {
+                layout.classList.remove("theme-light");
+                layout.classList.add("theme-dark");
+                circle.innerText = "☀";
+                label.innerText = "Modo día";
+                localStorage.setItem("admin-theme", "dark");
+            } else {
+                layout.classList.remove("theme-dark");
+                layout.classList.add("theme-light");
+                circle.innerText = "☾";
+                label.innerText = "Modo noche";
+                localStorage.setItem("admin-theme", "light");
+            }
+        }
+
+        function alternarTema() {
+            const layout = document.getElementById("admin-layout");
+            const esOscuroActual = layout.classList.contains("theme-dark");
+            aplicarTema(!esOscuroActual);
+        }
+
+        function alternarPerfil() {
+            const menu = document.getElementById("admin-profile-menu");
+            const btn = document.getElementById("btn-user-menu");
+            const abierto = menu.style.display === "block";
+
+            menu.style.display = abierto ? "none" : "block";
+            btn.classList.toggle("user-open", !abierto);
+            btn.setAttribute("aria-expanded", String(!abierto));
+        }
+
+        // Cerrar menú de perfil al hacer clic fuera
+        document.addEventListener("click", (e) => {
+            const area = document.querySelector(".admin-user-area");
+            const menu = document.getElementById("admin-profile-menu");
+            const btn = document.getElementById("btn-user-menu");
+            if (area && !area.contains(e.target)) {
+                menu.style.display = "none";
+                btn.classList.remove("user-open");
+                btn.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        async function actualizarPanel() {
+            const btn = document.getElementById("btn-refresh");
+            const icon = document.getElementById("refresh-icon");
+            const text = document.getElementById("refresh-text");
+
+            btn.disabled = true;
+            icon.classList.add("spinning");
+            text.innerText = "Actualizando...";
+
+            try {
+                const response = await fetch("{% url 'api_stats' %}", {
+                    cache: "no-store",
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById("stat-usuarios").innerText = (Number(data.usuarios) || 0).toLocaleString("es-CO");
+                    document.getElementById("stat-productos").innerText = (Number(data.productos) || 0).toLocaleString("es-CO");
+                    document.getElementById("stat-pedidos").innerText = (Number(data.pedidos) || 0).toLocaleString("es-CO");
+                    document.getElementById("stat-ventas").innerText = formatoCOP.format(Number(data.ventas) || 0);
+                }
+            } catch (error) {
+                console.error("Error cargando estadísticas:", error);
+            } finally {
+                setTimeout(() => {
+                    btn.disabled = false;
+                    icon.classList.remove("spinning");
+                    text.innerText = "Actualizar";
+                }, 500);
+            }
+        }
+
+        function volverArriba() {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+            });
+        }
+    </script>
+</body>
+</html>
