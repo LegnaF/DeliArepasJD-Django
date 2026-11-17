@@ -1,0 +1,516 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gestión de arepas | Deli Arepas JD</title>
+
+    <link rel="stylesheet" href="{% static 'deliapp/css/productos_admin.css' %}">
+</head>
+
+<body>
+
+<main class="products-page">
+
+    <!-- ENCABEZADO -->
+    <header class="products-header">
+
+        <div class="header-content">
+
+            <a class="back-link" href="{% url 'admin_dashboard' %}">
+                <span aria-hidden="true">←</span>
+                Volver al panel
+            </a>
+
+            <span class="eyebrow">
+                DELI AREPAS JD / ADMINISTRACIÓN
+            </span>
+
+            <h1>Gestión de arepas</h1>
+
+            <p>
+                Administra el catálogo, las fotografías, los precios
+                y las existencias de tus productos.
+            </p>
+
+        </div>
+
+        <a class="primary-button" href="{% url 'producto_crear' %}">
+            <span aria-hidden="true">＋</span>
+            Registrar arepa
+        </a>
+
+    </header>
+
+
+    <!-- MENSAJES -->
+    {% if messages %}
+
+        <section class="messages" aria-live="polite">
+
+            {% for message in messages %}
+
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        </section>
+
+    {% endif %}
+
+
+    <!-- INDICADORES -->
+    <section class="summary-grid">
+
+        <article class="summary-card">
+
+            <div class="summary-icon icon-products">
+                <span aria-hidden="true">01</span>
+            </div>
+
+            <div>
+                <span class="summary-label">
+                    Productos registrados
+                </span>
+
+                <strong>{{ total_productos|default:0 }}</strong>
+
+                <small>Catálogo completo</small>
+            </div>
+
+        </article>
+
+
+        <article class="summary-card">
+
+            <div class="summary-icon icon-active">
+                <span aria-hidden="true">02</span>
+            </div>
+
+            <div>
+                <span class="summary-label">
+                    Productos activos
+                </span>
+
+                <strong>{{ productos_activos|default:0 }}</strong>
+
+                <small>Disponibles en el menú</small>
+            </div>
+
+        </article>
+
+
+        <article class="summary-card">
+
+            <div class="summary-icon icon-empty">
+                <span aria-hidden="true">03</span>
+            </div>
+
+            <div>
+                <span class="summary-label">
+                    Productos agotados
+                </span>
+
+                <strong>{{ productos_agotados|default:0 }}</strong>
+
+                <small>Requieren reposición</small>
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- CATÁLOGO -->
+    <section class="catalog-panel">
+
+        <div class="catalog-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    INVENTARIO Y CATÁLOGO
+                </span>
+
+                <h2>Arepas registradas</h2>
+
+                <p>
+                    Consulta, modifica o elimina los productos del negocio.
+                </p>
+
+            </div>
+
+            {% if productos %}
+
+                <div class="search-box">
+
+                    <span aria-hidden="true">⌕</span>
+
+                    <input
+                        id="product-search"
+                        type="search"
+                        placeholder="Buscar por nombre o descripción..."
+                        autocomplete="off"
+                        aria-label="Buscar arepas"
+                    >
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        {% if productos %}
+
+            <div class="catalog-count">
+
+                <span>
+                    Mostrando
+                    <strong id="visible-count">{{ productos|length }}</strong>
+                    de
+                    <strong>{{ total_productos }}</strong>
+                    productos
+                </span>
+
+            </div>
+
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Inventario</th>
+                            <th>Descuento</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="product-table">
+
+                        {% for item in productos %}
+
+                            <tr
+                                data-name="{{ item.nombre|lower }}"
+                                data-description="{{ item.descripcion|default:''|lower }}"
+                            >
+
+                                <!-- PRODUCTO -->
+                                <td>
+
+                                    <div class="product-cell">
+
+                                        <div class="product-image">
+
+                                            {% if item.imagen_archivo %}
+
+                                                <img
+                                                    src="{{ item.imagen_archivo.url }}"
+                                                    alt="{{ item.nombre }}"
+                                                    loading="lazy"
+                                                >
+
+                                            {% else %}
+
+                                                <img
+                                                    src="{% static 'deliapp/img/arepa3.jpg' %}"
+                                                    alt="{{ item.nombre }}"
+                                                    loading="lazy"
+                                                >
+
+                                            {% endif %}
+
+                                        </div>
+
+
+                                        <div class="product-info">
+
+                                            <strong>
+                                                {{ item.nombre }}
+                                            </strong>
+
+                                            <small>
+                                                {{ item.descripcion|default:"Sin descripción"|truncatechars:75 }}
+                                            </small>
+
+                                            <span class="product-reference">
+                                                Producto #{{ item.id }}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- PRECIO -->
+                                <td>
+
+                                    <span class="price">
+                                        ${{ item.precio|floatformat:0 }}
+                                    </span>
+
+                                </td>
+
+
+                                <!-- INVENTARIO -->
+                                <td>
+
+                                    {% if item.stock > 10 %}
+
+                                        <span class="stock stock-normal">
+                                            {{ item.stock }} unidades
+                                        </span>
+
+                                    {% elif item.stock > 0 %}
+
+                                        <span class="stock stock-low">
+                                            {{ item.stock }} unidades
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="stock stock-empty">
+                                            Agotado
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- DESCUENTO -->
+                                <td>
+
+                                    {% if item.descuento > 0 %}
+
+                                        <span class="discount">
+                                            -{{ item.descuento }}%
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="no-discount">
+                                            Sin descuento
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- ESTADO -->
+                                <td>
+
+                                    {% if item.activo %}
+
+                                        <span class="status status-active">
+                                            <span></span>
+                                            Activo
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status status-inactive">
+                                            <span></span>
+                                            Inactivo
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- ACCIONES -->
+                                <td>
+
+                                    <div class="actions">
+
+                                        <a
+                                            class="edit-button"
+                                            href="{% url 'producto_editar' item.id %}"
+                                            aria-label="Editar {{ item.nombre }}"
+                                        >
+                                            Editar
+                                        </a>
+
+
+                                        <a
+                                            class="delete-button"
+                                            href="{% url 'producto_eliminar' item.id %}"
+                                            aria-label="Eliminar {{ item.nombre }}"
+                                            onclick="return confirm('¿Estás seguro de que deseas eliminar {{ item.nombre|escapejs }}? Esta acción no se puede deshacer.');"
+                                        >
+                                            Eliminar
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- SIN RESULTADOS -->
+            <div id="no-results" class="no-results" hidden>
+
+                <div class="empty-icon">
+                    ⌕
+                </div>
+
+                <h3>No encontramos resultados</h3>
+
+                <p>
+                    Intenta buscar con otro nombre o descripción.
+                </p>
+
+                <button type="button" id="clear-search">
+                    Limpiar búsqueda
+                </button>
+
+            </div>
+
+
+        {% else %}
+
+            <!-- CATÁLOGO VACÍO -->
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    +
+                </div>
+
+                <h3>Aún no tienes arepas registradas</h3>
+
+                <p>
+                    Comienza agregando tus productos para construir
+                    el catálogo de Deli Arepas JD.
+                </p>
+
+                <a
+                    class="primary-button"
+                    href="{% url 'producto_crear' %}"
+                >
+                    Registrar primera arepa
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- PIE -->
+    <footer class="products-footer">
+
+        <span>
+            DELI AREPAS JD
+        </span>
+
+        <span>
+            Administración de productos
+        </span>
+
+    </footer>
+
+</main>
+
+
+<!-- BÚSQUEDA -->
+<script>
+
+(() => {
+
+    'use strict';
+
+    const searchInput = document.getElementById('product-search');
+    const rows = document.querySelectorAll('#product-table tr');
+    const noResults = document.getElementById('no-results');
+    const visibleCount = document.getElementById('visible-count');
+    const clearButton = document.getElementById('clear-search');
+
+    if (!searchInput) {
+        return;
+    }
+
+    function filterProducts() {
+
+        const query = searchInput.value
+            .trim()
+            .toLocaleLowerCase('es');
+
+        let visible = 0;
+
+        rows.forEach(row => {
+
+            const name = row.dataset.name || '';
+            const description = row.dataset.description || '';
+
+            const matches = (
+                name.includes(query) ||
+                description.includes(query)
+            );
+
+            row.hidden = !matches;
+
+            if (matches) {
+                visible++;
+            }
+
+        });
+
+        if (visibleCount) {
+            visibleCount.textContent = visible;
+        }
+
+        if (noResults) {
+            noResults.hidden = visible !== 0;
+        }
+
+    }
+
+    searchInput.addEventListener('input', filterProducts);
+
+    if (clearButton) {
+
+        clearButton.addEventListener('click', () => {
+
+            searchInput.value = '';
+
+            filterProducts();
+
+            searchInput.focus();
+
+        });
+
+    }
+
+})();
+
+</script>
+
+</body>
+</html>

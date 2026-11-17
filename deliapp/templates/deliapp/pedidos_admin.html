@@ -1,0 +1,178 @@
+{% extends 'deliapp/base.html' %}
+{% load static %}
+
+{% block title %}Gestión de pedidos | Deli Arepas JD{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'deliapp/css/admin_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-panel">
+
+    <section class="admin-welcome">
+        <div>
+            <span class="admin-eyebrow">CENTRO DE OPERACIONES</span>
+            <h1>Gestión de pedidos</h1>
+            <p>Consulta los pedidos de tus clientes y actualiza su estado de preparación y entrega.</p>
+        </div>
+        <div class="admin-welcome-icon">
+            <span>PD</span>
+        </div>
+    </section>
+
+    <div class="orders-back">
+        <a href="{% url 'admin_dashboard' %}">← Volver al panel administrativo</a>
+    </div>
+
+    {% if messages %}
+        <div class="admin-messages">
+            {% for message in messages %}
+                <div class="admin-message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <section class="admin-stats">
+        <article class="stat-card">
+            <div class="stat-icon stat-products">PD</div>
+            <div>
+                <span>Total de pedidos</span>
+                <strong>{{ total_pedidos }}</strong>
+            </div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-icon stat-orders">PE</div>
+            <div>
+                <span>Pendientes</span>
+                <strong>{{ pendientes }}</strong>
+            </div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-icon stat-users">EP</div>
+            <div>
+                <span>En preparación</span>
+                <strong>{{ en_preparacion }}</strong>
+            </div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-icon stat-sales">EN</div>
+            <div>
+                <span>Entregados</span>
+                <strong>{{ entregados }}</strong>
+            </div>
+        </article>
+    </section>
+
+    <section class="orders-container">
+        <div class="orders-heading">
+            <div>
+                <span class="admin-eyebrow">REGISTROS</span>
+                <h2>Pedidos registrados</h2>
+                <p>Busca un pedido por número, cliente o teléfono.</p>
+            </div>
+        </div>
+
+        <form method="get" class="orders-filters">
+            <input
+                type="search"
+                name="buscar"
+                value="{{ busqueda }}"
+                placeholder="Buscar pedido, cliente o teléfono..."
+            >
+
+            <select name="estado">
+                <option value="">Todos los estados</option>
+                {% for valor, etiqueta in estados %}
+                    <option value="{{ valor }}" {% if estado_filtro == valor %}selected{% endif %}>
+                        {{ etiqueta }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Buscar</button>
+            <a href="{% url 'pedidos_admin' %}" class="filter-clear">Limpiar</a>
+        </form>
+
+        <div class="orders-table-wrapper">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Actualizar estado</th>
+                        <th>Detalle</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in pedidos %}
+                        <tr>
+                            <td class="order-number">#{{ item.id }}</td>
+                            <td>{{ item.cliente.nombre }}</td>
+                            <td>{{ item.cliente.telefono }}</td>
+                            <td>{{ item.createdAt|date:"d/m/Y H:i" }}</td>
+                            <td class="order-total">${{ item.total|floatformat:0 }}</td>
+                            <td>
+                                <span class="order-status status-{{ item.estado|lower }}">
+                                    {{ item.get_estado_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <form
+                                    method="post"
+                                    action="{% url 'actualizar_estado_pedido' item.id %}"
+                                    class="order-update-form"
+                                >
+                                    {% csrf_token %}
+                                    <select name="estado" aria-label="Nuevo estado del pedido {{ item.id }}">
+                                        {% for valor, etiqueta in estados %}
+                                            <option value="{{ valor }}" {% if item.estado == valor %}selected{% endif %}>
+                                                {{ etiqueta }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit">Guardar</button>
+                                </form>
+                            </td>
+                            <td>
+                                <details class="order-detail">
+                                    <summary>Ver</summary>
+                                    <div class="order-detail-content">
+                                        <strong>Productos del pedido</strong>
+                                        {% for detalle in item.detallepedido.all %}
+                                            <p>
+                                                {{ detalle.producto.nombre }}
+                                                <span>{{ detalle.cantidad }} × ${{ detalle.precioUnit|floatformat:0 }}</span>
+                                            </p>
+                                        {% empty %}
+                                            <p>No hay productos registrados en este pedido.</p>
+                                        {% endfor %}
+                                        <div class="order-detail-total">
+                                            Total: ${{ item.total|floatformat:0 }}
+                                        </div>
+                                    </div>
+                                </details>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="orders-empty">
+                                No se encontraron pedidos con esos criterios.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+{% endblock %}

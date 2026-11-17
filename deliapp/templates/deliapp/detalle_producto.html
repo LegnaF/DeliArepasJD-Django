@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ producto.nombre }} | Deli Arepas JD</title>
+
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'deliapp/css/detalle_producto.css' %}">
+</head>
+
+<body>
+<div class="detalle-page">
+
+    {% include 'deliapp/components/navbar.html' %}
+
+    <main class="detalle-container">
+
+        <nav class="detalle-migas" aria-label="Ruta de navegación">
+            <a href="{% url 'inicio' %}">Inicio</a>
+            <span>/</span>
+            <a href="{% url 'menu' %}">Nuestro menú</a>
+            <span>/</span>
+            <span>{{ producto.nombre }}</span>
+        </nav>
+
+        <section class="detalle-card">
+
+            <div class="detalle-imagen-contenedor">
+                <img
+                    class="detalle-imagen"
+                    src="{{ producto.imagen|default:'/arepa3.jpg' }}"
+                    alt="{{ producto.nombre }}"
+                    onerror="this.onerror=null;this.src='/arepa3.jpg';"
+                >
+
+                {% if producto.descuento > 0 %}
+                    <span class="detalle-descuento">
+                        {{ producto.descuento }}% de descuento
+                    </span>
+                {% endif %}
+
+                {% if producto.stock <= 0 %}
+                    <span class="detalle-agotado">Agotado</span>
+                {% endif %}
+            </div>
+
+            <div class="detalle-informacion">
+
+                <span class="detalle-etiqueta">DELI AREPAS JD</span>
+
+                <p class="detalle-categoria">
+                    {{ producto.categoria|default:"Arepas artesanales" }}
+                </p>
+
+                <h1>{{ producto.nombre }}</h1>
+
+                <p class="detalle-descripcion">
+                    {{ producto.descripcion|default:"Una deliciosa preparación artesanal, elaborada para disfrutar el auténtico sabor de nuestras arepas." }}
+                </p>
+
+                <div class="detalle-precio-contenedor">
+
+                    {% if producto.descuento > 0 %}
+                        <span class="detalle-precio-anterior">
+                            ${{ producto.precio|floatformat:0 }}
+                        </span>
+                    {% endif %}
+
+                    <strong class="detalle-precio">
+                        {% if producto.descuento > 0 %}
+                            ${{ producto.precio|floatformat:0 }}
+                        {% else %}
+                            ${{ producto.precio|floatformat:0 }}
+                        {% endif %}
+                    </strong>
+
+                    {% if producto.descuento > 0 %}
+                        <span class="detalle-nota-descuento">
+                            Descuento disponible
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="detalle-disponibilidad">
+                    {% if producto.stock > 0 %}
+                        <span class="detalle-punto disponible"></span>
+                        <span>Disponible para pedido</span>
+                    {% else %}
+                        <span class="detalle-punto no-disponible"></span>
+                        <span>Actualmente agotado</span>
+                    {% endif %}
+                </div>
+
+                {% if producto.stock > 0 %}
+                    <p class="detalle-stock">
+                        Unidades disponibles: {{ producto.stock }}
+                    </p>
+                {% endif %}
+
+                <div class="detalle-acciones">
+                    <a href="{% url 'menu' %}" class="detalle-btn-principal">
+                        Volver al menú
+                    </a>
+
+                    <a href="{% url 'inicio' %}" class="detalle-btn-secundario">
+                        Ir al inicio
+                    </a>
+                </div>
+
+                <p class="detalle-pie">
+                    Deli Arepas JD · Sabor tradicional en cada preparación.
+                </p>
+
+            </div>
+        </section>
+
+        <section class="detalle-confianza">
+            <article>
+                <span class="confianza-icono">01</span>
+                <div>
+                    <h3>Preparación artesanal</h3>
+                    <p>Productos elaborados con dedicación.</p>
+                </div>
+            </article>
+
+            <article>
+                <span class="confianza-icono">02</span>
+                <div>
+                    <h3>Atención cercana</h3>
+                    <p>Estamos disponibles para atender tus pedidos.</p>
+                </div>
+            </article>
+
+            <article>
+                <span class="confianza-icono">03</span>
+                <div>
+                    <h3>Sabor tradicional</h3>
+                    <p>El gusto de disfrutar una buena arepa.</p>
+                </div>
+            </article>
+        </section>
+
+    </main>
+
+    {% include 'deliapp/components/footer.html' %}
+
+</div>
+</body>
+</html>

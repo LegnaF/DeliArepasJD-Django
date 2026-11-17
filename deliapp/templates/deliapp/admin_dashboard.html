@@ -1,0 +1,721 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f1e8">
+    <title>Panel de Control | Deli Arepas JD</title>
+
+    <script>
+        (() => {
+            try {
+                const tema = localStorage.getItem('deli-admin-tema');
+                document.documentElement.dataset.theme =
+                    tema === 'dark' ? 'dark' : 'light';
+            } catch (error) {
+                document.documentElement.dataset.theme = 'light';
+            }
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'deliapp/css/admin_dashboard.css' %}">
+</head>
+
+<body class="admin-body">
+
+    <header>
+        {% include 'deliapp/components/navbar.html' %}
+    </header>
+
+    <main class="admin-main">
+
+        <!-- ENCABEZADO PRINCIPAL -->
+        <section class="dashboard-heading reveal">
+            <div class="heading-decoration"></div>
+
+            <div class="heading-copy">
+                <span class="eyebrow">
+                    <span class="eyebrow-line"></span>
+                    ADMINISTRACIÓN GENERAL
+                </span>
+
+                <h1>Panel de <span>Control.</span></h1>
+
+                <p>
+                    Bienvenido de nuevo. Aquí tienes el resumen de la
+                    actividad de <strong>Deli Arepas JD</strong>.
+                </p>
+
+                <div class="heading-date">
+                    <span class="date-icon">▦</span>
+                    <span>
+                        {% if fecha_actual %}
+                            {{ fecha_actual|date:"l, d \d\e F \d\e Y" }}
+                        {% else %}
+                            Panel administrativo
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="heading-actions">
+
+                <!-- INTERRUPTOR DE TEMA -->
+                <button
+                    type="button"
+                    class="admin-theme-toggle"
+                    id="adminThemeToggle"
+                    aria-label="Activar modo noche"
+                    aria-pressed="false"
+                >
+                    <span class="theme-toggle-icon">
+                        <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="4"/>
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
+                        </svg>
+
+                        <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"/>
+                        </svg>
+                    </span>
+
+                    <span class="theme-toggle-label" id="adminThemeLabel">
+                        Modo noche
+                    </span>
+
+                    <span class="theme-toggle-track">
+                        <span class="theme-toggle-thumb"></span>
+                    </span>
+                </button>
+
+                <div class="system-status">
+                    <span class="status-dot"></span>
+                    Sistema operativo
+                </div>
+
+                <div class="admin-identity">
+                    <span class="identity-avatar">
+                        {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                    </span>
+
+                    <span class="identity-text">
+                        <small>ADMINISTRADOR</small>
+                        <strong>
+                            {{ request.user.first_name|default:request.user.username }}
+                        </strong>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- MENSAJES DEL SISTEMA -->
+        {% if messages %}
+            <div class="admin-messages reveal">
+                {% for message in messages %}
+                    <div class="admin-message {{ message.tags }}">
+                        <span class="message-indicator"></span>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- INDICADORES PRINCIPALES -->
+        <section class="dashboard-section reveal">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">RESUMEN DEL NEGOCIO</span>
+                    <h2>Vista general</h2>
+                    <p class="section-subtitle">
+                        Los datos principales de tu negocio en un solo lugar.
+                    </p>
+                </div>
+
+                <span class="section-note">
+                    <span class="note-dot"></span>
+                    Datos actuales
+                </span>
+            </div>
+
+            <div class="stats-grid">
+
+                <article class="stat-card stat-users">
+                    <div class="stat-card-top">
+                        <span class="stat-icon">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="9" cy="8" r="3"/>
+                                <path d="M3 20v-2a6 6 0 0 1 12 0v2"/>
+                                <path d="M16 5.5a3 3 0 0 1 0 5.8M18 14a5 5 0 0 1 3 4.5"/>
+                            </svg>
+                        </span>
+                        <span class="stat-category">CUENTAS</span>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">Usuarios registrados</span>
+                        <strong class="stat-number">{{ stats.usuarios|default:0 }}</strong>
+                        <a href="{% url 'usuarios' %}" class="stat-link">
+                            Administrar usuarios <span>↗</span>
+                        </a>
+                    </div>
+                    <span class="stat-watermark">01</span>
+                </article>
+
+                <article class="stat-card stat-products">
+                    <div class="stat-card-top">
+                        <span class="stat-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="m12 3 9 5-9 5-9-5z"/>
+                                <path d="M3 8v9l9 5 9-5V8M12 13v9"/>
+                            </svg>
+                        </span>
+                        <span class="stat-category">CATÁLOGO</span>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">Productos activos</span>
+                        <strong class="stat-number">{{ stats.productos|default:0 }}</strong>
+                        <a href="{% url 'productos_admin' %}" class="stat-link">
+                            Administrar catálogo <span>↗</span>
+                        </a>
+                    </div>
+                    <span class="stat-watermark">02</span>
+                </article>
+
+                <article class="stat-card stat-orders">
+                    <div class="stat-card-top">
+                        <span class="stat-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 3h14v18H5z"/>
+                                <path d="M8 8h8M8 12h8M8 16h5"/>
+                            </svg>
+                        </span>
+                        <span class="stat-category">OPERACIÓN</span>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">Pedidos registrados</span>
+                        <strong class="stat-number">{{ stats.pedidos|default:0 }}</strong>
+                        <a href="{% url 'pedidos_admin' %}" class="stat-link">
+                            Gestionar pedidos <span>↗</span>
+                        </a>
+                    </div>
+                    <span class="stat-watermark">03</span>
+                </article>
+
+                <article class="stat-card stat-sales">
+                    <div class="stat-card-top">
+                        <span class="stat-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M3 3v18h18"/>
+                                <path d="m7 14 4-4 3 3 6-7"/>
+                            </svg>
+                        </span>
+                        <span class="stat-category">INGRESOS</span>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">Ventas no canceladas</span>
+                        <strong class="stat-number money-value">
+                            ${{ stats.ventas|floatformat:0 }}
+                        </strong>
+                        <a href="{% url 'facturacion' %}" class="stat-link">
+                            Consultar ingresos <span>↗</span>
+                        </a>
+                    </div>
+                    <span class="stat-watermark">$</span>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- ACCESOS ADMINISTRATIVOS -->
+        <section class="dashboard-section modules-section reveal">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">CENTRO DE ADMINISTRACIÓN</span>
+                    <h2>Gestiona tu negocio</h2>
+                    <p class="section-subtitle">
+                        Accede directamente a las herramientas de administración.
+                    </p>
+                </div>
+
+                <span class="section-note">04 áreas de gestión</span>
+            </div>
+
+            <div class="modules-grid">
+
+                <a href="{% url 'productos_admin' %}" class="module-card module-products">
+                    <div class="module-top">
+                        <span class="module-icon orange">
+                            <svg viewBox="0 0 24 24">
+                                <path d="m12 3 9 5-9 5-9-5z"/>
+                                <path d="M3 8v9l9 5 9-5V8M12 13v9"/>
+                            </svg>
+                        </span>
+                        <span class="module-number">01</span>
+                    </div>
+
+                    <span class="module-category">CATÁLOGO</span>
+                    <h3>Gestión de productos</h3>
+                    <p>
+                        Crea, edita, organiza y administra las arepas
+                        que forman parte de tu catálogo.
+                    </p>
+
+                    <span class="module-action">
+                        Abrir administración <span>→</span>
+                    </span>
+                </a>
+
+                <a href="{% url 'usuarios' %}" class="module-card module-users">
+                    <div class="module-top">
+                        <span class="module-icon blue">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="9" cy="8" r="3"/>
+                                <path d="M3 20v-2a6 6 0 0 1 12 0v2"/>
+                                <path d="M16 5.5a3 3 0 0 1 0 5.8M18 14a5 5 0 0 1 3 4.5"/>
+                            </svg>
+                        </span>
+                        <span class="module-number">02</span>
+                    </div>
+
+                    <span class="module-category">ACCESOS Y PERMISOS</span>
+                    <h3>Usuarios y roles</h3>
+                    <p>
+                        Administra las cuentas y supervisa los accesos
+                        de quienes utilizan la plataforma.
+                    </p>
+
+                    <span class="module-action">
+                        Abrir administración <span>→</span>
+                    </span>
+                </a>
+
+                <a href="{% url 'pedidos_admin' %}" class="module-card module-orders">
+                    <div class="module-top">
+                        <span class="module-icon purple">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 3h14v18H5z"/>
+                                <path d="M8 8h8M8 12h8M8 16h5"/>
+                            </svg>
+                        </span>
+                        <span class="module-number">03</span>
+                    </div>
+
+                    <span class="module-category">OPERACIÓN</span>
+                    <h3>Gestión de pedidos</h3>
+                    <p>
+                        Revisa las solicitudes de los clientes y controla
+                        el avance de cada pedido.
+                    </p>
+
+                    <span class="module-action">
+                        Abrir administración <span>→</span>
+                    </span>
+                </a>
+
+                <a href="{% url 'facturacion' %}" class="module-card module-billing">
+                    <div class="module-top">
+                        <span class="module-icon green">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 3h14v18l-3-2-4 2-4-2-3 2z"/>
+                                <path d="M8 8h8M8 12h8M8 16h4"/>
+                            </svg>
+                        </span>
+                        <span class="module-number">04</span>
+                    </div>
+
+                    <span class="module-category">FINANZAS</span>
+                    <h3>Facturación</h3>
+                    <p>
+                        Consulta las ventas y administra la información
+                        de facturación del negocio.
+                    </p>
+
+                    <span class="module-action">
+                        Abrir administración <span>→</span>
+                    </span>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- REPORTES INTEGRADOS -->
+        <section class="dashboard-section reports-section reveal">
+
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">INTELIGENCIA DEL NEGOCIO</span>
+                    <h2>Reportes y estadísticas</h2>
+                    <p class="section-subtitle">
+                        Analiza el comportamiento de las ventas y los pedidos.
+                    </p>
+                </div>
+
+                <span class="report-period">
+                    <span class="period-dot"></span>
+                    Últimos 7 días
+                </span>
+            </div>
+
+            <div class="reports-grid">
+
+                <!-- GRÁFICA DE VENTAS -->
+                <article class="report-card sales-report">
+                    <div class="report-card-heading">
+                        <div>
+                            <span class="report-kicker">RENDIMIENTO COMERCIAL</span>
+                            <h3>Ventas recientes</h3>
+                            <p>Comportamiento diario de los ingresos</p>
+                        </div>
+
+                        <span class="report-heading-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M3 3v18h18"/>
+                                <path d="m7 14 4-4 3 3 6-7"/>
+                            </svg>
+                        </span>
+                    </div>
+
+                    <div class="sales-chart">
+                        {% for dia in ventas_semana %}
+                            <div class="chart-column">
+                                <span class="chart-value">
+                                    ${{ dia.total|floatformat:0 }}
+                                </span>
+
+                                <div class="chart-track">
+                                    <div
+                                        class="chart-bar"
+                                        style="height: {% if dia.porcentaje > 0 %}{{ dia.porcentaje }}{% else %}2{% endif %}%"
+                                        title="{{ dia.dia }}: ${{ dia.total|floatformat:0 }}"
+                                    ></div>
+                                </div>
+
+                                <span class="chart-label">{{ dia.dia }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="report-footnote">
+                        <span class="report-footnote-dot"></span>
+                        Se excluyen los pedidos cancelados.
+                    </div>
+                </article>
+
+                <!-- ESTADOS DE PEDIDOS -->
+                <article class="report-card states-report">
+                    <div class="report-card-heading">
+                        <div>
+                            <span class="report-kicker">SEGUIMIENTO OPERATIVO</span>
+                            <h3>Estado de los pedidos</h3>
+                            <p>Distribución de pedidos por estado</p>
+                        </div>
+
+                        <span class="report-heading-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 4h16v16H4z"/>
+                                <path d="m8 12 3 3 5-6"/>
+                            </svg>
+                        </span>
+                    </div>
+
+                    <div class="state-total">
+                        <strong>{{ total_pedidos_reporte|default:0 }}</strong>
+                        <span>Pedidos registrados</span>
+                    </div>
+
+                    <div class="states-list">
+                        {% for estado in estados_reporte %}
+                            <div class="state-row">
+                                <div class="state-label">
+                                    <span class="state-dot {{ estado.clase }}"></span>
+                                    <span>{{ estado.nombre }}</span>
+                                </div>
+
+                                <div class="state-result">
+                                    <strong>{{ estado.cantidad }}</strong>
+                                    <div class="state-progress">
+                                        <span
+                                            class="state-progress-fill {{ estado.clase }}"
+                                            style="width: {{ estado.porcentaje|default:0 }}%;"
+                                        ></span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <!-- PRODUCTOS MÁS VENDIDOS -->
+                <article class="report-card products-report">
+                    <div class="report-card-heading">
+                        <div>
+                            <span class="report-kicker">DESEMPEÑO DEL CATÁLOGO</span>
+                            <h3>Productos más vendidos</h3>
+                            <p>Los productos con mayor movimiento</p>
+                        </div>
+
+                        <span class="report-heading-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="m12 3 9 5-9 5-9-5z"/>
+                                <path d="M3 8v9l9 5 9-5V8"/>
+                            </svg>
+                        </span>
+                    </div>
+
+                    {% if productos_destacados %}
+                        <div class="top-products-list">
+                            {% for item in productos_destacados %}
+                                <div class="top-product">
+                                    <div class="product-position">
+                                        {{ forloop.counter|stringformat:"02d" }}
+                                    </div>
+
+                                    <div class="top-product-info">
+                                        <strong>{{ item.producto__nombre }}</strong>
+                                        <span>
+                                            {{ item.unidades }} unidades vendidas
+                                        </span>
+                                    </div>
+
+                                    <strong class="top-product-value">
+                                        ${{ item.ingresos|floatformat:0 }}
+                                    </strong>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="report-empty">
+                            <span class="empty-report-icon">—</span>
+                            <strong>Sin datos disponibles</strong>
+                            <span>Los productos vendidos aparecerán aquí.</span>
+                        </div>
+                    {% endif %}
+                </article>
+
+            </div>
+        </section>
+
+        <!-- PEDIDOS RECIENTES -->
+        <section class="dashboard-section recent-section reveal">
+
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">MOVIMIENTO DEL NEGOCIO</span>
+                    <h2>Últimos pedidos</h2>
+                    <p class="section-subtitle">
+                        Consulta rápidamente las operaciones más recientes.
+                    </p>
+                </div>
+
+                <a href="{% url 'pedidos_admin' %}" class="view-all-link">
+                    Ver todos los pedidos <span>→</span>
+                </a>
+            </div>
+
+            <div class="recent-card">
+
+                {% if pedidos_recientes %}
+                    <div class="table-scroll">
+                        <table class="recent-table">
+                            <thead>
+                                <tr>
+                                    <th>Pedido</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha de registro</th>
+                                    <th>Valor total</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for item in pedidos_recientes %}
+                                    <tr>
+                                        <td>
+                                            <strong class="order-id">
+                                                #{{ item.id }}
+                                            </strong>
+                                        </td>
+
+                                        <td>
+                                            <strong class="customer-name">
+                                                {{ item.cliente.nombre }}
+                                            </strong>
+                                        </td>
+
+                                        <td class="order-date">
+                                            {{ item.createdAt|date:"d/m/Y · H:i" }}
+                                        </td>
+
+                                        <td>
+                                            <strong class="order-total">
+                                                ${{ item.total|floatformat:0 }}
+                                            </strong>
+                                        </td>
+
+                                        <td>
+                                            <span class="status-badge
+                                                {% if item.estado == 'PENDIENTE' %}status-pending
+                                                {% elif item.estado == 'EN_PREPARACION' %}status-preparing
+                                                {% elif item.estado == 'ENTREGADO' %}status-delivered
+                                                {% elif item.estado == 'CANCELADO' %}status-cancelled
+                                                {% endif %}">
+                                                {{ item.get_estado_display }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-orders">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 3h14v18H5z"/>
+                                <path d="M8 8h8M8 12h8"/>
+                            </svg>
+                        </div>
+
+                        <h3>Aún no hay pedidos registrados</h3>
+                        <p>
+                            Cuando se registren nuevos pedidos,
+                            aparecerán aquí para facilitar su seguimiento.
+                        </p>
+                    </div>
+                {% endif %}
+
+            </div>
+        </section>
+
+        <div class="dashboard-signature">
+            <span></span>
+            <p>Administración <strong>Deli Arepas JD</strong></p>
+            <span></span>
+        </div>
+
+    </main>
+
+    <footer>
+        {% include 'deliapp/components/footer.html' %}
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            /* =========================================
+               CAMBIO DE TEMA EXCLUSIVO DEL ADMIN
+            ========================================= */
+
+            const toggle = document.getElementById('adminThemeToggle');
+            const label = document.getElementById('adminThemeLabel');
+            const root = document.documentElement;
+
+            function actualizarBoton(tema) {
+                const esOscuro = tema === 'dark';
+
+                if (!toggle || !label) return;
+
+                toggle.setAttribute('aria-pressed', String(esOscuro));
+                toggle.setAttribute(
+                    'aria-label',
+                    esOscuro ? 'Activar modo día' : 'Activar modo noche'
+                );
+
+                label.textContent = esOscuro ? 'Modo día' : 'Modo noche';
+            }
+
+            function aplicarTema(tema, guardar = true) {
+                root.dataset.theme = tema;
+                actualizarBoton(tema);
+
+                if (guardar) {
+                    try {
+                        localStorage.setItem('deli-admin-tema', tema);
+                    } catch (error) {
+                        // El tema permanece activo durante la visita.
+                    }
+                }
+            }
+
+            aplicarTema(
+                root.dataset.theme === 'dark' ? 'dark' : 'light',
+                false
+            );
+
+            if (toggle) {
+                toggle.addEventListener('click', function () {
+                    const nuevoTema =
+                        root.dataset.theme === 'dark' ? 'light' : 'dark';
+
+                    toggle.classList.add('is-animating');
+                    aplicarTema(nuevoTema);
+
+                    window.setTimeout(function () {
+                        toggle.classList.remove('is-animating');
+                    }, 550);
+                });
+            }
+
+            /* =========================================
+               ANIMACIÓN DE SECCIONES
+            ========================================= */
+
+            const elements = document.querySelectorAll('.reveal');
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.08,
+                    rootMargin: '0px 0px -35px 0px'
+                });
+
+                elements.forEach((element) => observer.observe(element));
+            } else {
+                elements.forEach((element) => element.classList.add('visible'));
+            }
+
+            /* =========================================
+               ANIMACIÓN DE GRÁFICAS
+            ========================================= */
+
+            const bars = document.querySelectorAll('.chart-bar');
+
+            bars.forEach((bar, index) => {
+                const finalHeight = bar.style.height;
+                bar.style.height = '0';
+
+                window.setTimeout(() => {
+                    bar.style.height = finalHeight;
+                }, 250 + (index * 100));
+            });
+
+            const progressBars = document.querySelectorAll('.state-progress-fill');
+
+            progressBars.forEach((bar, index) => {
+                const finalWidth = bar.style.width;
+                bar.style.width = '0';
+
+                window.setTimeout(() => {
+                    bar.style.width = finalWidth;
+                }, 350 + (index * 120));
+            });
+        });
+    </script>
+
+</body>
+</html>

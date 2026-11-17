@@ -1,8 +1,8 @@
 
 from django.contrib.auth import views as django_auth_views
-from django.urls import path, reverse_lazy
+from django.urls import path
 
-from . import auth_views, views
+from . import auth_views, views, producto_admin_views
 
 
 urlpatterns = [
@@ -34,7 +34,7 @@ urlpatterns = [
     ),
 
     # =====================================================
-    # PEDIDOS
+    # PEDIDOS Y CONSULTA PÚBLICA
     # =====================================================
 
     path(
@@ -43,8 +43,90 @@ urlpatterns = [
         name='crear_pedido'
     ),
 
+    path(
+        'consultar-pedido/',
+        views.consultar_pedido,
+        name='consultar_pedido'
+    ),
+
     # =====================================================
-    # GESTIÓN DE PQRS
+    # PANEL ADMINISTRATIVO
+    # =====================================================
+
+    path(
+        'admin-dashboard/',
+        views.admin_dashboard,
+        name='admin_dashboard'
+    ),
+
+    path(
+        'api/stats/',
+        views.api_stats,
+        name='api_stats'
+    ),
+
+    # =====================================================
+    # ADMINISTRACIÓN DE PRODUCTOS
+    # =====================================================
+
+    path(
+        'admin-dashboard/productos/',
+        producto_admin_views.productos_admin,
+        name='productos_admin'
+    ),
+
+    path(
+        'admin-dashboard/productos/crear/',
+        producto_admin_views.producto_crear,
+        name='producto_crear'
+    ),
+
+    path(
+        'admin-dashboard/productos/editar/<int:id>/',
+        producto_admin_views.producto_editar,
+        name='producto_editar'
+    ),
+
+    path(
+        'admin-dashboard/productos/eliminar/<int:id>/',
+        producto_admin_views.producto_eliminar,
+        name='producto_eliminar'
+    ),
+
+    # =====================================================
+    # ADMINISTRACIÓN DE PEDIDOS
+    # =====================================================
+
+    path(
+        'admin-dashboard/pedidos/',
+        views.pedidos_admin,
+        name='pedidos_admin'
+    ),
+
+    path(
+        'admin-dashboard/pedidos/<int:pedido_id>/estado/',
+        views.actualizar_estado_pedido,
+        name='actualizar_estado_pedido'
+    ),
+
+    # =====================================================
+    # ADMINISTRACIÓN DE USUARIOS
+    # =====================================================
+
+    path(
+        'usuarios/',
+        views.usuarios_page,
+        name='usuarios'
+    ),
+
+    path(
+        'api/usuarios/',
+        views.api_usuarios,
+        name='api_usuarios'
+    ),
+
+    # =====================================================
+    # GESTIÓN DE PQR
     # =====================================================
 
     path(
@@ -63,6 +145,70 @@ urlpatterns = [
         'gestion-pqr/eliminar/<int:id>/',
         views.eliminar_pqr,
         name='eliminar_pqr'
+    ),
+
+    # =====================================================
+    # FACTURACIÓN
+    # =====================================================
+
+    path(
+        'facturacion/',
+        views.facturacion,
+        name='facturacion'
+    ),
+
+    path(
+        'facturacion/<int:pedido_id>/editar/',
+        views.editar_factura,
+        name='editar_factura'
+    ),
+
+    path(
+        'facturacion/<int:pedido_id>/eliminar/',
+        views.eliminar_factura,
+        name='eliminar_factura'
+    ),
+
+    # =====================================================
+    # PANEL DE EMPLEADOS
+    # =====================================================
+
+    path(
+        'empleado-pedidos/',
+        views.empleado_pedidos,
+        name='empleado_pedidos'
+    ),
+
+    path(
+        'api/empleado/pedidos/<int:pedido_id>/',
+        views.api_empleado_actualizar_estado,
+        name='api_empleado_actualizar_estado'
+    ),
+
+    # =====================================================
+    # GESTIÓN GENERAL DE PEDIDOS
+    # =====================================================
+
+    path(
+        'gestion/',
+        views.gestion_pedidos_page,
+        name='gestion'
+    ),
+
+    path(
+        'api/gestion/pedidos/',
+        views.api_gestion_pedidos,
+        name='api_gestion_pedidos'
+    ),
+
+    # =====================================================
+    # MÓDULO DE CLIENTE
+    # =====================================================
+
+    path(
+        'cliente/',
+        views.home_page,
+        name='cliente'
     ),
 
     # =====================================================
@@ -93,17 +239,7 @@ urlpatterns = [
 
     path(
         'recuperar-contrasena/',
-        django_auth_views.PasswordResetView.as_view(
-            template_name='deliapp/recuperar_password.html',
-            email_template_name='registration/password_reset_email.txt',
-            html_email_template_name='registration/password_reset_email.html',
-            subject_template_name='registration/password_reset_subject.txt',
-            from_email=None,
-            extra_email_context={
-                'nombre_negocio': 'Deli Arepas JD',
-            },
-            success_url=reverse_lazy('password_reset_done'),
-        ),
+        auth_views.recuperar_password,
         name='password_reset'
     ),
 
@@ -119,7 +255,7 @@ urlpatterns = [
         'restablecer-contrasena/<uidb64>/<token>/',
         django_auth_views.PasswordResetConfirmView.as_view(
             template_name='deliapp/restablecer_password.html',
-            success_url=reverse_lazy('password_reset_complete')
+            success_url='/restablecer-contrasena/completado/'
         ),
         name='password_reset_confirm'
     ),
@@ -130,46 +266,6 @@ urlpatterns = [
             template_name='deliapp/password_reset_complete.html'
         ),
         name='password_reset_complete'
-    ),
-
-    # =====================================================
-    # MÓDULOS AUXILIARES
-    # =====================================================
-
-    path(
-        'admin-dashboard/',
-        views.home_page,
-        name='admin_dashboard'
-    ),
-
-    path(
-        'empleado-pedidos/',
-        views.home_page,
-        name='empleado_pedidos'
-    ),
-
-    path(
-        'gestion/',
-        views.home_page,
-        name='gestion'
-    ),
-
-    path(
-        'facturacion/',
-        views.home_page,
-        name='facturacion'
-    ),
-
-    path(
-        'usuarios/',
-        views.home_page,
-        name='usuarios'
-    ),
-
-    path(
-        'cliente/',
-        views.home_page,
-        name='cliente'
     ),
 
 ]

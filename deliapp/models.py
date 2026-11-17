@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 # ==========================================
 # ENUMS
@@ -14,6 +15,36 @@ class UsuarioRol(models.TextChoices):
     ADMIN = 'ADMIN', 'ADMIN'
     EMPLEADO = 'EMPLEADO', 'EMPLEADO'
     USUARIO = 'USUARIO', 'USUARIO'
+
+
+class PerfilRol(models.TextChoices):
+    ADMIN = 'ADMIN', 'Administrador'
+    EMPLEADO = 'EMPLEADO', 'Empleado'
+    CLIENTE = 'CLIENTE', 'Cliente'
+
+
+class PerfilUsuario(models.Model):
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='perfil'
+    )
+
+    rol = models.CharField(
+        max_length=20,
+        choices=PerfilRol.choices,
+        default=PerfilRol.CLIENTE
+    )
+
+    createdAt = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'perfil_usuario'
+        verbose_name = 'Perfil de usuario'
+        verbose_name_plural = 'Perfiles de usuarios'
+
+    def __str__(self):
+        return f'{self.usuario.username} - {self.rol}'
 
 
 # ==========================================
@@ -42,6 +73,15 @@ class producto(models.Model):
     stock = models.IntegerField(default=0)
     categoria = models.CharField(max_length=100, default="Arepas")
     imagen = models.CharField(max_length=255, default="/arepa3.jpg")
+
+    # Fotografía cargada desde el formulario administrativo.
+    imagen_archivo = models.ImageField(
+        upload_to="arepas/",
+        null=True,
+        blank=True,
+        verbose_name="Fotografía de la arepa"
+    )
+
     descuento = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
     createdAt = models.DateTimeField(auto_now_add=True)

@@ -24,26 +24,26 @@
         <a href="{% url 'inicio' %}#pqr" class="nav-link">PQR</a>
         <a href="{% url 'menu' %}" class="nav-link">Productos</a>
 
-        <!-- ADMINISTRADOR -->
-        {% if request.user.is_authenticated and request.user.rol == 'ADMIN' %}
-            <a href="{% url 'admin_dashboard' %}" class="nav-link">Panel Admin</a>
-            <a href="{% url 'empleado_pedidos' %}" class="nav-link">Empleados</a>
-            <a href="{% url 'gestion' %}" class="nav-link">Gestión Pedidos</a>
-            <a href="{% url 'facturacion' %}" class="nav-link">Facturas</a>
-            <a href="{% url 'usuarios' %}" class="nav-link">Usuarios</a>
-            <a href="{% url 'gestion_pqr' %}" class="nav-link">Gestión PQRS</a>
-        {% endif %}
+        {% if request.user.is_authenticated %}
+            {% if request.user.is_superuser %}
+                <!-- ADMINISTRADOR -->
+                <a href="{% url 'admin_dashboard' %}" class="nav-link">Panel Admin</a>
+                <a href="{% url 'empleado_pedidos' %}" class="nav-link">Empleados</a>
+                <a href="{% url 'gestion' %}" class="nav-link">Gestión Pedidos</a>
+                <a href="{% url 'facturacion' %}" class="nav-link">Facturas</a>
+                <a href="{% url 'usuarios' %}" class="nav-link">Usuarios</a>
+                <a href="{% url 'gestion_pqr' %}" class="nav-link">Gestión PQRS</a>
 
-        <!-- EMPLEADO -->
-        {% if request.user.is_authenticated and request.user.rol == 'EMPLEADO' %}
-            <a href="{% url 'empleado_pedidos' %}" class="nav-link">Empleados</a>
-            <a href="{% url 'gestion' %}" class="nav-link">Gestión Pedidos</a>
-            <a href="{% url 'facturacion' %}" class="nav-link">Facturas</a>
-        {% endif %}
+            {% elif request.user.is_staff %}
+                <!-- EMPLEADO -->
+                <a href="{% url 'empleado_pedidos' %}" class="nav-link">Empleados</a>
+                <a href="{% url 'gestion' %}" class="nav-link">Gestión Pedidos</a>
+                <a href="{% url 'facturacion' %}" class="nav-link">Facturas</a>
 
-        <!-- CLIENTE / USUARIO -->
-        {% if request.user.is_authenticated and request.user.rol == 'CLIENTE' or request.user.is_authenticated and request.user.rol == 'USUARIO' %}
-            <a href="{% url 'cliente' %}" class="nav-link">Mis Pedidos</a>
+            {% else %}
+                <!-- CLIENTE / USUARIO -->
+                <a href="{% url 'cliente' %}" class="nav-link">Mis Pedidos</a>
+            {% endif %}
         {% endif %}
     </div>
 
@@ -51,6 +51,7 @@
     <div class="navbar-login">
         {% if request.user.is_authenticated %}
             <div class="user-container">
+
                 <!-- PERFIL -->
                 <div class="user-profile">
                     <div class="user-avatar">
@@ -74,10 +75,12 @@
                 </form>
             </div>
         {% else %}
+
             <!-- INICIAR SESIÓN -->
             <a href="{% url 'login' %}" class="btn-login">
                 Iniciar sesión
             </a>
+
         {% endif %}
     </div>
 

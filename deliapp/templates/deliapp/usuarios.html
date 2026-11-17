@@ -1,0 +1,722 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Deli Arepas JD</title>
+
+    <!-- Estilos globales (Navbar y Footer) -->
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+    <!-- Estilos específicos de Gestión de Usuarios -->
+    <link rel="stylesheet" href="{% static 'deliapp/css/usuarios.css' %}">
+</head>
+<body>
+
+    {% csrf_token %}
+
+    <div id="usuarios-page" class="usuarios-page">
+        {% include 'deliapp/components/navbar.html' %}
+
+        <main class="usuarios-container">
+            <!-- HERO -->
+            <section class="usuarios-hero">
+                <div class="hero-decoration hero-decoration-one"></div>
+                <div class="hero-decoration hero-decoration-two"></div>
+
+                <div class="usuarios-hero-content">
+                    <div class="usuarios-kicker">
+                        <span class="kicker-line"></span>
+                        <span>ADMINISTRACIÓN · DELI AREPAS JD</span>
+                    </div>
+
+                    <h1>
+                        Gestión de
+                        <span> Usuarios</span>
+                    </h1>
+
+                    <p>
+                        Administra las cuentas del sistema, controla los roles
+                        y mantén organizada la comunidad de Deli Arepas.
+                    </p>
+                </div>
+
+                <div class="hero-theme-area">
+                    <button
+                        type="button"
+                        id="btn-theme-toggle"
+                        class="theme-toggle"
+                        onclick="alternarTema()"
+                        aria-label="Activar modo noche"
+                    >
+                        <span id="theme-toggle-icon" class="theme-toggle-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M21 15.5A9 9 0 0 1 8.5 3a9 9 0 1 0 12.5 12.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+
+                        <span id="theme-toggle-label">Modo noche</span>
+
+                        <span class="theme-switch">
+                            <span id="theme-switch-dot" class="theme-switch-dot"></span>
+                        </span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- TARJETAS DE ESTADÍSTICAS -->
+            <section class="usuarios-stats">
+                <article class="stat-card stat-total">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                            <circle cx="9" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="stat-label">Usuarios registrados</span>
+                        <strong id="stat-total">0</strong>
+                        <small>Total del sistema</small>
+                    </div>
+                </article>
+
+                <article class="stat-card stat-admin">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 3l7 3v5c0 4.55-2.93 8.58-7 10-4.07-1.42-7-5.45-7-10V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                            <path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="stat-label">Administradores</span>
+                        <strong id="stat-admins">0</strong>
+                        <small>Acceso administrativo</small>
+                    </div>
+                </article>
+
+                <article class="stat-card stat-empleado">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+                            <path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="stat-label">Empleados</span>
+                        <strong id="stat-empleados">0</strong>
+                        <small>Personal operativo</small>
+                    </div>
+                </article>
+
+                <article class="stat-card stat-cliente">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 21a8 8 0 0 0-16 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                            <circle cx="12" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="stat-label">Clientes</span>
+                        <strong id="stat-clientes">0</strong>
+                        <small>Usuarios clientes</small>
+                    </div>
+                </article>
+            </section>
+
+            <!-- PANEL PRINCIPAL -->
+            <section class="usuarios-panel">
+                <div class="panel-heading">
+                    <div>
+                        <span class="section-eyebrow">CONTROL DE CUENTAS</span>
+                        <h2>Usuarios del sistema</h2>
+                        <p>Consulta, filtra y administra las cuentas registradas.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="btn-recargar"
+                        class="btn-recargar"
+                        onclick="cargarUsuarios()"
+                    >
+                        <span id="recargar-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 11a8 8 0 0 0-14.9-4M4 5v4h4M4 13a8 8 0 0 0 14.9 4M20 19v-4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                        Actualizar
+                    </button>
+                </div>
+
+                <!-- TOOLBAR -->
+                <div class="usuarios-toolbar">
+                    <div class="search-box">
+                        <span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+                                <path d="M20 20l-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                        </span>
+
+                        <input
+                            type="search"
+                            id="input-busqueda"
+                            placeholder="Buscar por nombre o correo..."
+                            oninput="renderizarTabla()"
+                        />
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filtro-rol">Filtrar por rol</label>
+
+                        <select id="filtro-rol" onchange="renderizarTabla()">
+                            <option value="TODOS">Todos los roles</option>
+                            <option value="ADMIN">Administradores</option>
+                            <option value="EMPLEADO">Empleados</option>
+                            <option value="CLIENTE">Clientes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- MENSAJE DE ERROR -->
+                <div id="usuarios-error" class="usuarios-error" style="display: none;">
+                    <strong>Se produjo un problema</strong>
+                    <span id="usuarios-error-texto"></span>
+                </div>
+
+                <!-- ESTADO CARGANDO -->
+                <div id="usuarios-loading" class="usuarios-loading-box">
+                    <div class="loading-spinner"></div>
+                    <strong>Cargando usuarios</strong>
+                    <span>Estamos preparando la información...</span>
+                </div>
+
+                <!-- CONTENIDO TABLA -->
+                <div id="usuarios-contenido" style="display: none;">
+                    <div class="table-info">
+                        <span>
+                            Mostrando <strong id="count-filtrados">0</strong> de <strong id="count-total">0</strong> usuarios
+                        </span>
+
+                        <button
+                            type="button"
+                            id="btn-limpiar-filtros"
+                            style="display: none;"
+                            onclick="limpiarFiltros()"
+                        >
+                            Limpiar filtros
+                        </button>
+                    </div>
+
+                    <div class="usuarios-table-wrapper">
+                        <table class="usuarios-table">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Correo electrónico</th>
+                                    <th>Rol</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usuarios-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- MODAL DE EDICIÓN -->
+        <div
+            id="modal-editar-overlay"
+            class="modal-overlay"
+            style="display: none;"
+            onmousedown="cerrarModalAfuera(event)"
+        >
+            <div
+                class="modal-content"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="editar-usuario-title"
+            >
+                <div class="modal-top">
+                    <div class="modal-heading">
+                        <div class="modal-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 20h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+
+                        <div>
+                            <span>GESTIÓN DE CUENTA</span>
+                            <h2 id="editar-usuario-title">Editar usuario</h2>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="btn-modal-close"
+                        class="modal-close"
+                        onclick="cerrarModal()"
+                        aria-label="Cerrar"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="modal-user-preview">
+                    <div id="modal-preview-avatar" class="modal-avatar">U</div>
+                    <div>
+                        <strong id="modal-preview-nombre">Usuario</strong>
+                        <span id="modal-preview-email">correo@ejemplo.com</span>
+                    </div>
+                </div>
+
+                <form id="form-editar-usuario" onsubmit="guardarEdicion(event)">
+                    <input type="hidden" id="edit-user-id" />
+
+                    <div class="form-field">
+                        <label for="nombre-usuario">Nombre completo</label>
+                        <input
+                            id="nombre-usuario"
+                            type="text"
+                            oninput="actualizarPreviewModal()"
+                            required
+                            autocomplete="name"
+                        />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="email-usuario">Correo electrónico</label>
+                        <input
+                            id="email-usuario"
+                            type="email"
+                            oninput="actualizarPreviewModal()"
+                            required
+                            autocomplete="email"
+                        />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="rol-usuario">Rol de usuario</label>
+                        <select id="rol-usuario">
+                            <option value="CLIENTE">CLIENTE</option>
+                            <option value="EMPLEADO">EMPLEADO</option>
+                            <option value="ADMIN">ADMIN</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button
+                            type="button"
+                            id="btn-modal-cancelar"
+                            class="btn-cancelar"
+                            onclick="cerrarModal()"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            id="btn-modal-guardar"
+                            class="btn-guardar"
+                        >
+                            Guardar cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% include 'deliapp/components/footer.html' %}
+    </div>
+
+    <script>
+        let usuarios = [];
+        let guardando = false;
+
+        const SVG_SOL = `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>`;
+
+        const SVG_LUNA = `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 15.5A9 9 0 0 1 8.5 3a9 9 0 1 0 12.5 12.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>`;
+
+        const SVG_EDIT = `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 20h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>`;
+
+        const SVG_TRASH = `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>`;
+
+        const SVG_USERS = `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <circle cx="9" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>`;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("admin-theme") === "dark") {
+                aplicarTema(true);
+            }
+            cargarUsuarios();
+        });
+
+        document.addEventListener("keydown", (event) => {
+            const overlay = document.getElementById("modal-editar-overlay");
+            if (event.key === "Escape" && overlay.style.display === "flex" && !guardando) {
+                cerrarModal();
+            }
+        });
+
+        function obtenerCSRFToken() {
+            const input = document.querySelector("[name=csrfmiddlewaretoken]");
+            return input ? input.value : "";
+        }
+
+        function escaparHTML(texto) {
+            const div = document.createElement("div");
+            div.textContent = texto ?? "";
+            return div.innerHTML;
+        }
+
+        function obtenerIniciales(nombre) {
+            const partes = String(nombre || "")
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean);
+
+            if (partes.length === 0) return "U";
+            if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
+            return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+        }
+
+        /* ==========================================
+           TEMA DÍA / NOCHE
+           ========================================== */
+        function aplicarTema(esOscuro) {
+            const page = document.getElementById("usuarios-page");
+            const btn = document.getElementById("btn-theme-toggle");
+            const icon = document.getElementById("theme-toggle-icon");
+            const label = document.getElementById("theme-toggle-label");
+            const dot = document.getElementById("theme-switch-dot");
+
+            page.classList.toggle("tema-oscuro", esOscuro);
+            document.body.classList.toggle("usuarios-dark-body", esOscuro);
+            dot.classList.toggle("active", esOscuro);
+
+            icon.innerHTML = esOscuro ? SVG_SOL : SVG_LUNA;
+            label.textContent = esOscuro ? "Modo día" : "Modo noche";
+            btn.setAttribute("aria-label", esOscuro ? "Activar modo día" : "Activar modo noche");
+
+            localStorage.setItem("admin-theme", esOscuro ? "dark" : "light");
+        }
+
+        function alternarTema() {
+            const page = document.getElementById("usuarios-page");
+            aplicarTema(!page.classList.contains("tema-oscuro"));
+        }
+
+        /* ==========================================
+           CARGAR Y RENDERIZAR USUARIOS
+           ========================================== */
+        async function cargarUsuarios() {
+            const btnRecargar = document.getElementById("btn-recargar");
+            const iconRecargar = document.getElementById("recargar-icon");
+            const errorBox = document.getElementById("usuarios-error");
+            const errorTexto = document.getElementById("usuarios-error-texto");
+            const loadingBox = document.getElementById("usuarios-loading");
+            const contenidoBox = document.getElementById("usuarios-contenido");
+
+            btnRecargar.disabled = true;
+            iconRecargar.classList.add("spin");
+            errorBox.style.display = "none";
+
+            if (usuarios.length === 0) {
+                loadingBox.style.display = "flex";
+                contenidoBox.style.display = "none";
+            }
+
+            try {
+                const res = await fetch("{% url 'api_usuarios' %}", {
+                    cache: "no-store",
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || "Error al obtener usuarios");
+                }
+
+                usuarios = Array.isArray(data) ? data : [];
+                actualizarEstadisticas();
+                renderizarTabla();
+            } catch (err) {
+                errorTexto.textContent = err.message || "Error al cargar los usuarios";
+                errorBox.style.display = "flex";
+            } finally {
+                loadingBox.style.display = "none";
+                contenidoBox.style.display = "block";
+                btnRecargar.disabled = false;
+                iconRecargar.classList.remove("spin");
+            }
+        }
+
+        function actualizarEstadisticas() {
+            document.getElementById("stat-total").textContent = usuarios.length;
+            document.getElementById("stat-admins").textContent = usuarios.filter(u => u.rol === "ADMIN").length;
+            document.getElementById("stat-empleados").textContent = usuarios.filter(u => u.rol === "EMPLEADO").length;
+            document.getElementById("stat-clientes").textContent = usuarios.filter(u => u.rol === "CLIENTE").length;
+        }
+
+        function renderizarTabla() {
+            const termino = document.getElementById("input-busqueda").value.trim().toLowerCase();
+            const filtroRol = document.getElementById("filtro-rol").value;
+
+            const filtrados = usuarios.filter((usuario) => {
+                const coincideBusqueda =
+                    !termino ||
+                    usuario.nombre.toLowerCase().includes(termino) ||
+                    usuario.email.toLowerCase().includes(termino);
+
+                const coincideRol = filtroRol === "TODOS" || usuario.rol === filtroRol;
+                return coincideBusqueda && coincideRol;
+            });
+
+            document.getElementById("count-filtrados").textContent = filtrados.length;
+            document.getElementById("count-total").textContent = usuarios.length;
+
+            const btnLimpiar = document.getElementById("btn-limpiar-filtros");
+            btnLimpiar.style.display = (termino || filtroRol !== "TODOS") ? "inline-block" : "none";
+
+            const tbody = document.getElementById("usuarios-tbody");
+
+            if (filtrados.length === 0) {
+                const tituloVacio = usuarios.length === 0
+                    ? "No hay usuarios registrados"
+                    : "No encontramos resultados";
+                const descVacio = usuarios.length === 0
+                    ? "Cuando existan cuentas registradas aparecerán aquí."
+                    : "Prueba con otro nombre, correo o filtro de rol.";
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colSpan="4">
+                            <div class="empty-state">
+                                <div class="empty-icon">${SVG_USERS}</div>
+                                <h3>${tituloVacio}</h3>
+                                <p>${descVacio}</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtrados.map((usr, index) => {
+                const nombreSeguro = escaparHTML(usr.nombre);
+                const emailSeguro = escaparHTML(usr.email);
+                const rolSeguro = escaparHTML(usr.rol);
+                const rolClase = usr.rol.toLowerCase();
+                const iniciales = escaparHTML(obtenerIniciales(usr.nombre));
+
+                return `
+                    <tr class="usuario-row" style="--row-delay: ${index * 60}ms;">
+                        <td>
+                            <div class="usuario-info">
+                                <div class="usuario-avatar">${iniciales}</div>
+                                <div class="usuario-name">
+                                    <strong>${nombreSeguro}</strong>
+                                    <span>ID #${usr.id}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="usuario-email">${emailSeguro}</span>
+                        </td>
+                        <td>
+                            <span class="badge-rol badge-${rolClase}">
+                                <span class="badge-dot"></span>
+                                ${rolSeguro}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="acciones-td">
+                                <button
+                                    type="button"
+                                    class="btn-accion btn-editar"
+                                    onclick="abrirModalEditar(${usr.id})"
+                                >
+                                    ${SVG_EDIT}
+                                    <span>Editar</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    id="btn-eliminar-${usr.id}"
+                                    class="btn-accion btn-eliminar"
+                                    onclick="eliminarUsuario(${usr.id})"
+                                >
+                                    ${SVG_TRASH}
+                                    <span>Eliminar</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        function limpiarFiltros() {
+            document.getElementById("input-busqueda").value = "";
+            document.getElementById("filtro-rol").value = "TODOS";
+            renderizarTabla();
+        }
+
+        /* ==========================================
+           MODAL DE EDICIÓN
+           ========================================== */
+        function abrirModalEditar(id) {
+            const usr = usuarios.find(u => u.id === id);
+            if (!usr) return;
+
+            document.getElementById("edit-user-id").value = usr.id;
+            document.getElementById("nombre-usuario").value = usr.nombre;
+            document.getElementById("email-usuario").value = usr.email;
+            document.getElementById("rol-usuario").value = usr.rol;
+
+            actualizarPreviewModal();
+            document.getElementById("modal-editar-overlay").style.display = "flex";
+        }
+
+        function actualizarPreviewModal() {
+            const nombre = document.getElementById("nombre-usuario").value || "Usuario";
+            const email = document.getElementById("email-usuario").value || "";
+
+            document.getElementById("modal-preview-avatar").textContent = obtenerIniciales(nombre);
+            document.getElementById("modal-preview-nombre").textContent = nombre;
+            document.getElementById("modal-preview-email").textContent = email;
+        }
+
+        function cerrarModal() {
+            if (guardando) return;
+            document.getElementById("modal-editar-overlay").style.display = "none";
+        }
+
+        function cerrarModalAfuera(event) {
+            if (event.target === event.currentTarget && !guardando) {
+                cerrarModal();
+            }
+        }
+
+        async function guardarEdicion(event) {
+            event.preventDefault();
+            if (guardando) return;
+
+            const id = Number(document.getElementById("edit-user-id").value);
+            const nombre = document.getElementById("nombre-usuario").value.trim();
+            const email = document.getElementById("email-usuario").value.trim();
+            const rol = document.getElementById("rol-usuario").value;
+
+            const btnGuardar = document.getElementById("btn-modal-guardar");
+            const btnCancelar = document.getElementById("btn-modal-cancelar");
+            const btnCerrar = document.getElementById("btn-modal-close");
+
+            try {
+                guardando = true;
+                btnGuardar.disabled = true;
+                btnCancelar.disabled = true;
+                btnCerrar.disabled = true;
+                btnGuardar.innerHTML = `<span class="button-spinner"></span> Guardando...`;
+
+                const res = await fetch("{% url 'api_usuarios' %}", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": obtenerCSRFToken(),
+                    },
+                    body: JSON.stringify({ id, nombre, email, rol }),
+                });
+
+                const data = await res.json().catch(() => null);
+
+                if (!res.ok) {
+                    throw new Error(data?.error || "Error al actualizar la información");
+                }
+
+                usuarios = usuarios.map(usr =>
+                    usr.id === id ? { ...usr, nombre, email, rol } : usr
+                );
+
+                actualizarEstadisticas();
+                renderizarTabla();
+                guardando = false;
+                cerrarModal();
+            } catch (err) {
+                alert(err.message || "Error al guardar los cambios");
+            } finally {
+                guardando = false;
+                btnGuardar.disabled = false;
+                btnCancelar.disabled = false;
+                btnCerrar.disabled = false;
+                btnGuardar.textContent = "Guardar cambios";
+            }
+        }
+
+        /* ==========================================
+           ELIMINAR USUARIO
+           ========================================== */
+        async function eliminarUsuario(id) {
+            if (!confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
+                return;
+            }
+
+            const btnEliminar = document.getElementById(`btn-eliminar-${id}`);
+            if (btnEliminar) {
+                btnEliminar.disabled = true;
+                btnEliminar.innerHTML = `${SVG_TRASH}<span>Eliminando...</span>`;
+            }
+
+            try {
+                const res = await fetch(`{% url 'api_usuarios' %}?id=${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRFToken": obtenerCSRFToken(),
+                    },
+                });
+
+                const data = await res.json().catch(() => null);
+
+                if (!res.ok) {
+                    throw new Error(data?.error || "No se pudo eliminar el usuario");
+                }
+
+                usuarios = usuarios.filter(usr => usr.id !== id);
+                actualizarEstadisticas();
+                renderizarTabla();
+            } catch (err) {
+                alert(err.message || "Error al eliminar");
+                if (btnEliminar) {
+                    btnEliminar.disabled = false;
+                    btnEliminar.innerHTML = `${SVG_TRASH}<span>Eliminar</span>`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

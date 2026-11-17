@@ -1,0 +1,554 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos - Deli Arepas JD</title>
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'deliapp/css/gestion.css' %}">
+</head>
+<body>
+    <div id="page-wrapper" class="page-wrapper">
+        <header>
+            {% include 'deliapp/components/navbar.html' %}
+        </header>
+
+        <!-- Sub-Barra de Gestión -->
+        <div class="panel-subbar" style="padding: 1rem 0;">
+            <div
+                class="subbar-container"
+                style="max-width: 1350px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding: 0 1.5rem;"
+            >
+                <div class="subbar-titulo">
+                    <h1 style="margin: 0; font-size: 1.5rem; font-weight: bold;">
+                        Panel de Gestión de Pedidos
+                    </h1>
+                </div>
+
+                <div class="subbar-acciones" style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="buscador">
+                        <span class="buscar-icono">⌕</span>
+                        <input
+                            id="input-busqueda"
+                            type="text"
+                            placeholder="Buscar por cliente, # o producto..."
+                        />
+                    </div>
+
+                    <button type="button" id="btn-tema" class="tema-boton">
+                        🌙 Modo Noche
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor Principal Centrado -->
+        <main
+            class="main-content-gestion"
+            style="max-width: 1350px; margin: 0 auto; width: 100%; padding: 1.5rem 1.5rem 3rem;"
+        >
+            <!-- HERO -->
+            <section id="inicio" class="hero-panel">
+                <div>
+                    <span class="hero-etiqueta">CONTROL DE PEDIDOS</span>
+                    <h2>Todo bajo control,<br />pedido por pedido.</h2>
+                    <p>
+                        Consulta clientes, productos, cantidades, estados y valores de cada
+                        pedido desde un solo lugar.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="boton-principal"
+                        onclick="document.getElementById('pedidos')?.scrollIntoView({ behavior: 'smooth', block: 'start' })"
+                        style="margin-top: 1.5rem; display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1.75rem; background-color: #ffffff; color: #c0392b; font-weight: 700; font-size: 1rem; border-radius: 50px; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15); transition: all 0.2s ease-in-out;"
+                    >
+                        <span>Ver pedidos</span>
+                        <span style="font-size: 1.2rem; line-height: 1;">→</span>
+                    </button>
+                </div>
+
+                <div class="hero-decoracion">
+                    <div class="hero-circulo grande"></div>
+                    <div class="hero-circulo pequeno"></div>
+                    <div class="hero-mini-card">
+                        <span>Pedidos activos</span>
+                        <strong id="hero-activos">0</strong>
+                        <small>En proceso</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MÉTRICAS Y CARDS DE ESTADO -->
+            <section class="estadisticas-grid">
+                <article class="stat-card">
+                    <div class="stat-cabecera">
+                        <span>Total pedidos</span>
+                        <b>01</b>
+                    </div>
+                    <strong id="stat-total">0</strong>
+                    <p>Pedidos registrados</p>
+                    <div class="stat-linea"><span style="width: 100%"></span></div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-cabecera">
+                        <span>Pendientes</span>
+                        <b>02</b>
+                    </div>
+                    <strong id="stat-pendientes">0</strong>
+                    <p>Esperando preparación</p>
+                    <div class="stat-linea pendiente">
+                        <span id="linea-pendientes" style="width: 8%"></span>
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-cabecera">
+                        <span>En preparación</span>
+                        <b>03</b>
+                    </div>
+                    <strong id="stat-preparacion">0</strong>
+                    <p>Pedidos activos</p>
+                    <div class="stat-linea preparacion">
+                        <span id="linea-preparacion" style="width: 10%"></span>
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-cabecera">
+                        <span>Ingresos</span>
+                        <b>04</b>
+                    </div>
+                    <strong id="stat-ingresos" class="precio-stat">$0</strong>
+                    <p>Pedidos no cancelados</p>
+                    <div class="stat-linea ingresos"><span style="width: 86%"></span></div>
+                </article>
+            </section>
+
+            <!-- GRÁFICAS DE ESTADO Y PRODUCTOS -->
+            <section id="estadisticas" class="graficas-grid">
+                <article class="grafica-card">
+                    <div class="seccion-cabecera">
+                        <div>
+                            <span>ANÁLISIS</span>
+                            <h3>Pedidos por estado</h3>
+                        </div>
+                        <span class="grafica-periodo">Actual</span>
+                    </div>
+
+                    <div id="barras-estado" class="barras-estado"></div>
+                </article>
+
+                <article class="grafica-card">
+                    <div class="seccion-cabecera">
+                        <div>
+                            <span>PRODUCTOS</span>
+                            <h3>Más solicitados</h3>
+                        </div>
+                        <span class="grafica-periodo">Top 5</span>
+                    </div>
+
+                    <div id="productos-grafica" class="productos-grafica"></div>
+                </article>
+            </section>
+
+            <!-- TABLA / LISTA DE PEDIDOS -->
+            <section id="pedidos" class="pedidos-section">
+                <div class="pedidos-cabecera">
+                    <div>
+                        <span>PEDIDOS</span>
+                        <h2>Gestión de pedidos</h2>
+                        <p>Consulta toda la información de cada compra y actualiza su estado.</p>
+                    </div>
+                    <button type="button" class="actualizar-boton" onclick="cargarPedidos()">
+                        Actualizar
+                    </button>
+                </div>
+
+                <div id="filtros-container" class="filtros">
+                    <button type="button" class="filtro activo" data-filtro="TODOS">
+                        Todos <span id="count-TODOS">0</span>
+                    </button>
+                    <button type="button" class="filtro" data-filtro="PENDIENTE">
+                        Pendientes <span id="count-PENDIENTE">0</span>
+                    </button>
+                    <button type="button" class="filtro" data-filtro="EN_PREPARACION">
+                        En preparación <span id="count-EN_PREPARACION">0</span>
+                    </button>
+                    <button type="button" class="filtro" data-filtro="LISTOS">
+                        Listos <span id="count-LISTOS">0</span>
+                    </button>
+                    <button type="button" class="filtro" data-filtro="ENTREGADO">
+                        Entregados <span id="count-ENTREGADO">0</span>
+                    </button>
+                </div>
+
+                <div id="mensaje-error" class="mensaje-error" style="display: none;">
+                    <strong>No se pudieron cargar los pedidos</strong>
+                    <p id="texto-error"></p>
+                    <button type="button" onclick="cargarPedidos()">Intentar nuevamente</button>
+                </div>
+
+                <div id="tabla-contenedor" class="tabla-contenedor"></div>
+            </section>
+        </main>
+
+        <div id="toast" class="toast" style="display: none;"></div>
+
+        <button
+            type="button"
+            id="boton-arriba"
+            class="boton-arriba"
+            style="display: none;"
+            onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+            title="Volver arriba"
+        >
+            ↑
+        </button>
+
+        <footer>
+            {% include 'deliapp/components/footer.html' %}
+        </footer>
+    </div>
+
+    {% csrf_token %}
+
+    <script>
+        // Datos iniciales cargados desde Django
+        let pedidos = {{ pedidos_json|safe }};
+        let filtroActual = "TODOS";
+        let busquedaActual = "";
+        let modoNoche = localStorage.getItem("tema-panel") === "noche";
+
+        const estadoTexto = {
+            PENDIENTE: "Pendiente",
+            EN_PREPARACION: "En preparación",
+            ENTREGADO: "Listo",
+            CANCELADO: "Cancelado",
+        };
+
+        const formatoPrecio = (valor) =>
+            new Intl.NumberFormat("es-CO", {
+                style: "currency",
+                currency: "COP",
+                maximumFractionDigits: 0,
+            }).format(valor);
+
+        const formatoHora = (fecha) => {
+            const fechaPedido = new Date(fecha);
+            if (Number.isNaN(fechaPedido.getTime())) return "--:--";
+            return fechaPedido.toLocaleTimeString("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        };
+
+        function mostrarToast(mensaje) {
+            const toastEl = document.getElementById("toast");
+            toastEl.textContent = mensaje;
+            toastEl.style.display = "block";
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => {
+                toastEl.style.display = "none";
+            }, 2800);
+        }
+
+        // TEMA DÍA / NOCHE
+        const pageWrapper = document.getElementById("page-wrapper");
+        const btnTema = document.getElementById("btn-tema");
+
+        function aplicarTema() {
+            pageWrapper.classList.toggle("tema-noche", modoNoche);
+            btnTema.textContent = modoNoche ? "☀️ Modo Día" : "🌙 Modo Noche";
+            localStorage.setItem("tema-panel", modoNoche ? "noche" : "dia");
+        }
+
+        btnTema.addEventListener("click", () => {
+            modoNoche = !modoNoche;
+            aplicarTema();
+        });
+        aplicarTema();
+
+        // BOTÓN VOLVER ARRIBA
+        const btnArriba = document.getElementById("boton-arriba");
+        window.addEventListener("scroll", () => {
+            btnArriba.style.display = window.scrollY > 300 ? "flex" : "none";
+        });
+
+        // BUSCADOR Y FILTROS
+        document.getElementById("input-busqueda").addEventListener("input", (e) => {
+            busquedaActual = e.target.value;
+            renderizarTabla();
+        });
+
+        document.querySelectorAll("#filtros-container .filtro").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#filtros-container .filtro").forEach((b) => b.classList.remove("activo"));
+                btn.classList.add("activo");
+                filtroActual = btn.dataset.filtro;
+                renderizarTabla();
+            });
+        });
+
+        // RENDERIZAR MÉTRICAS Y GRÁFICAS
+        function renderizarDashboard() {
+            const pendientes = pedidos.filter((p) => p.estado === "PENDIENTE").length;
+            const preparacion = pedidos.filter((p) => p.estado === "EN_PREPARACION").length;
+            const entregados = pedidos.filter((p) => p.estado === "ENTREGADO").length;
+            const cancelados = pedidos.filter((p) => p.estado === "CANCELADO").length;
+
+            const ingresos = pedidos
+                .filter((p) => p.estado !== "CANCELADO")
+                .reduce((total, p) => total + Number(p.total || 0), 0);
+
+            document.getElementById("hero-activos").textContent = pendientes + preparacion;
+            document.getElementById("stat-total").textContent = pedidos.length;
+            document.getElementById("stat-pendientes").textContent = pendientes;
+            document.getElementById("stat-preparacion").textContent = preparacion;
+            document.getElementById("stat-ingresos").textContent = formatoPrecio(ingresos);
+
+            document.getElementById("linea-pendientes").style.width = `${Math.min(pendientes * 12 + 8, 100)}%`;
+            document.getElementById("linea-preparacion").style.width = `${Math.min(preparacion * 15 + 10, 100)}%`;
+
+            // Contadores en filtros
+            document.getElementById("count-TODOS").textContent = pedidos.length;
+            document.getElementById("count-PENDIENTE").textContent = pendientes;
+            document.getElementById("count-EN_PREPARACION").textContent = preparacion;
+            document.getElementById("count-LISTOS").textContent = entregados;
+            document.getElementById("count-ENTREGADO").textContent = entregados;
+
+            // Gráfica de barras por estado
+            const maxEstado = Math.max(pendientes, preparacion, entregados, cancelados, 1);
+            const barrasData = [
+                { nombre: "Pendientes", valor: pendientes, clase: "barra-roja" },
+                { nombre: "Preparación", valor: preparacion, clase: "barra-naranja" },
+                { nombre: "Listos", valor: entregados, clase: "barra-verde" },
+                { nombre: "Cancelados", valor: cancelados, clase: "barra-gris" },
+            ];
+
+            document.getElementById("barras-estado").innerHTML = barrasData
+                .map(
+                    (item) => `
+                    <div class="barra-columna">
+                        <div class="barra-valor">${item.valor}</div>
+                        <div class="barra-fondo">
+                            <div class="barra ${item.clase}" style="height: ${(item.valor / maxEstado) * 100}%"></div>
+                        </div>
+                        <span>${item.nombre}</span>
+                    </div>
+                `
+                )
+                .join("");
+
+            // Gráfica Top 5 productos más solicitados
+            const cantidades = {};
+            pedidos.forEach((p) => {
+                (p.items || []).forEach((item) => {
+                    cantidades[item.nombre] = (cantidades[item.nombre] || 0) + Number(item.cantidad || 0);
+                });
+            });
+
+            const populares = Object.entries(cantidades)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const maxProducto = populares.length > 0 ? Math.max(...populares.map(([, c]) => c)) : 1;
+
+            const prodContainer = document.getElementById("productos-grafica");
+            if (populares.length === 0) {
+                prodContainer.innerHTML = `<div class="sin-datos">Todavía no hay productos registrados.</div>`;
+            } else {
+                prodContainer.innerHTML = populares
+                    .map(
+                        ([nombre, cantidad], idx) => `
+                        <div class="producto-barra">
+                            <div class="producto-barra-info">
+                                <span><b>0${idx + 1}</b> ${nombre}</span>
+                                <strong>${cantidad}</strong>
+                            </div>
+                            <div class="linea-producto">
+                                <span style="width: ${(cantidad / maxProducto) * 100}%"></span>
+                            </div>
+                        </div>
+                    `
+                    )
+                    .join("");
+            }
+
+            renderizarTabla();
+        }
+
+        function renderizarTabla() {
+            const texto = busquedaActual.toLowerCase().trim();
+            const filtrados = pedidos.filter((pedido) => {
+                const coincideFiltro =
+                    filtroActual === "TODOS"
+                        ? true
+                        : filtroActual === "LISTOS"
+                        ? pedido.estado === "ENTREGADO"
+                        : pedido.estado === filtroActual;
+
+                const productosTexto = (pedido.items || [])
+                    .map((i) => i.nombre)
+                    .join(" ")
+                    .toLowerCase();
+
+                const coincideBusqueda =
+                    !texto ||
+                    pedido.cliente.toLowerCase().includes(texto) ||
+                    String(pedido.id).includes(texto) ||
+                    productosTexto.includes(texto);
+
+                return coincideFiltro && coincideBusqueda;
+            });
+
+            const contenedor = document.getElementById("tabla-contenedor");
+
+            if (filtrados.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="sin-pedidos">
+                        <div class="sin-pedidos-numero">00</div>
+                        <h3>No encontramos pedidos</h3>
+                        <p>Prueba con otro filtro o cambia la búsqueda.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const filasHTML = filtrados
+                .map((pedido, index) => {
+                    const inicial = (pedido.cliente || "?").charAt(0).toUpperCase();
+                    const itemsHTML = (pedido.items || [])
+                        .map(
+                            (item) => `
+                            <div class="producto-linea">
+                                <span>${item.cantidad}x</span>
+                                <strong>${item.nombre}</strong>
+                            </div>
+                        `
+                        )
+                        .join("");
+
+                    return `
+                        <article class="pedido-fila" style="animation-delay: ${index * 0.05}s">
+                            <div class="pedido-numero">
+                                <strong>#${pedido.id}</strong>
+                                <small>Pedido</small>
+                            </div>
+
+                            <div class="cliente-info">
+                                <div class="cliente-avatar">${inicial}</div>
+                                <div>
+                                    <strong>${pedido.cliente}</strong>
+                                    <small>${pedido.direccion || "Sin dirección"}</small>
+                                </div>
+                            </div>
+
+                            <div class="productos-info">
+                                ${itemsHTML}
+                            </div>
+
+                            <div class="total-info">
+                                ${formatoPrecio(Number(pedido.total || 0))}
+                            </div>
+
+                            <div class="estado-columna">
+                                <span class="estado estado-${pedido.estado.toLowerCase()}">
+                                    <i></i>
+                                    ${estadoTexto[pedido.estado] || pedido.estado}
+                                </span>
+
+                                <select onchange="cambiarEstado(${pedido.id}, this)">
+                                    <option value="PENDIENTE" ${pedido.estado === "PENDIENTE" ? "selected" : ""}>Pendiente</option>
+                                    <option value="EN_PREPARACION" ${pedido.estado === "EN_PREPARACION" ? "selected" : ""}>En preparación</option>
+                                    <option value="ENTREGADO" ${pedido.estado === "ENTREGADO" ? "selected" : ""}>Listo / Entregado</option>
+                                    <option value="CANCELADO" ${pedido.estado === "CANCELADO" ? "selected" : ""}>Cancelado</option>
+                                </select>
+                            </div>
+
+                            <div class="hora-info">
+                                ${formatoHora(pedido.fecha)}
+                            </div>
+                        </article>
+                    `;
+                })
+                .join("");
+
+            contenedor.innerHTML = `
+                <div class="tabla-head">
+                    <span>Pedido</span>
+                    <span>Cliente</span>
+                    <span>Productos</span>
+                    <span>Total</span>
+                    <span>Estado</span>
+                    <span>Hora</span>
+                </div>
+                <div class="tabla-body">
+                    ${filasHTML}
+                </div>
+            `;
+        }
+
+        // RECARGAR PEDIDOS DESDE LA API
+        async function cargarPedidos() {
+            const contenedor = document.getElementById("tabla-contenedor");
+            const errorBox = document.getElementById("mensaje-error");
+            errorBox.style.display = "none";
+
+            contenedor.innerHTML = `
+                <div class="cargando">
+                    <div class="loader"></div>
+                    <strong>Cargando pedidos...</strong>
+                    <span>Estamos consultando la información.</span>
+                </div>
+            `;
+
+            try {
+                const res = await fetch("/api/gestion/pedidos/", { cache: "no-store" });
+                if (!res.ok) throw new Error("No se pudieron cargar los pedidos.");
+                pedidos = await res.json();
+                renderizarDashboard();
+            } catch (err) {
+                errorBox.style.display = "block";
+                document.getElementById("texto-error").textContent = err.message;
+                contenedor.innerHTML = "";
+            }
+        }
+
+        // CAMBIAR ESTADO DE PEDIDO (PATCH)
+        async function cambiarEstado(id, selectEl) {
+            const nuevoEstado = selectEl.value;
+            const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+            selectEl.disabled = true;
+
+            try {
+                const res = await fetch(`/api/empleado/pedidos/${id}/`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken,
+                    },
+                    body: JSON.stringify({ estado: nuevoEstado }),
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.error || "No se pudo actualizar el pedido.");
+                }
+
+                pedidos = pedidos.map((p) => (p.id === id ? { ...p, estado: nuevoEstado } : p));
+                renderizarDashboard();
+                mostrarToast("Estado del pedido actualizado");
+            } catch (err) {
+                mostrarToast(err.message);
+                renderizarDashboard();
+            }
+        }
+
+        // Renderizado inicial inmediato con los datos de Django
+        renderizarDashboard();
+    </script>
+</body>
+</html>

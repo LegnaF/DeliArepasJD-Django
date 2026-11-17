@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar arepa | Deli Arepas JD</title>
+    <link rel="stylesheet" href="{% static 'deliapp/css/productos_admin.css' %}">
+</head>
+<body>
+    <main class="confirm-page">
+        <section class="confirm-panel">
+            <span class="eyebrow">CONFIRMACIÓN</span>
+            <h1>¿Eliminar esta arepa?</h1>
+
+            <div class="confirm-product">
+                {% if producto.imagen_archivo %}
+                    <img src="{{ producto.imagen_archivo.url }}" alt="{{ producto.nombre }}">
+                {% else %}
+                    <img src="{% static 'deliapp/img/arepa3.jpg' %}" alt="{{ producto.nombre }}">
+                {% endif %}
+                <div>
+                    <strong>{{ producto.nombre }}</strong>
+                    <span>${{ producto.precio|floatformat:0 }}</span>
+                </div>
+            </div>
+
+            <p>Esta acción eliminará el producto del catálogo. No podrás recuperar su registro desde esta pantalla.</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <a class="secondary-button" href="{% url 'productos_admin' %}">Cancelar</a>
+                    <button class="delete-button large" type="submit">Sí, eliminar arepa</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

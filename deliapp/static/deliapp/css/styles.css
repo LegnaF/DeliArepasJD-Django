@@ -1776,124 +1776,135 @@ body, .pagina {
   }
 }
 
-/* ==========================================
-   FOOTER
-   ========================================== */
-.footer, .dashboard-footer, footer {
-    background-color: #3b2318;
-    color: #ffffff;
-    padding: 3rem 8% 1.5rem 8%;
+
+/* =========================================================
+   FOOTER - DELI AREPAS JD
+   Solo identidad de marca y horarios
+========================================================= */
+
+footer.footer {
     width: 100%;
-    border-top: 5px solid #F5B82E;
     margin-top: auto;
+    padding: 38px 7%;
+    background: #3b2318;
+    color: #ffffff;
+    border-top: 4px solid #f5b82e;
 }
 
 .footer-contenido {
+    width: 100%;
     max-width: 1100px;
     margin: 0 auto;
-    width: 100%;
 }
 
 .footer-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 2rem;
-    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 55px;
 }
 
 .footer-brand {
-    max-width: 400px;
+    max-width: 430px;
 }
 
 .footer-brand-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
 .footer-logo {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
     border-radius: 50%;
     object-fit: cover;
 }
 
 .footer-titulo {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: #ffffff;
     margin: 0;
+    color: #ffffff;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
 }
 
 .footer-subtitulo {
-    font-size: 0.85rem;
-    color: #d1d5db;
-    line-height: 1.5;
+    max-width: 390px;
     margin: 0;
+    color: #d8c9bd;
+    font-size: 13px;
+    line-height: 1.7;
     text-align: left;
 }
 
+.footer-horarios {
+    justify-self: end;
+    width: 100%;
+    max-width: 390px;
+}
+
 .footer-horarios-titulo {
-    color: #ea580c;
-    font-size: 0.8rem;
+    margin: 0 0 12px;
+    color: #f5b82e;
+    font-size: 12px;
     font-weight: 800;
-    letter-spacing: 0.5px;
-    margin: 0 0 0.5rem 0;
+    letter-spacing: 1px;
 }
 
 .footer-horarios-texto {
-    font-size: 0.85rem;
-    color: #e5e7eb;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 8px;
+    color: #eee3da;
+    font-size: 13px;
+    line-height: 1.6;
 }
 
-.footer-divider {
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.1);
-    width: 100%;
-    margin: 0 auto;
-}
+/* El footer ya no utiliza redes, división ni sección inferior */
 
-.footer-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 1.5rem;
-}
-
-.footer-copy {
-    font-size: 0.8rem;
-    color: #9ca3af;
-    margin: 0;
-}
-
-.footer-redes {
-    display: flex;
-    gap: 0.75rem;
-}
-
+.footer-divider,
+.footer-bottom,
+.footer-copy,
+.footer-redes,
 .footer-red-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    font-size: 0.85rem;
-    transition: background-color 0.2s ease;
+    display: none !important;
 }
 
-.footer-red-icon:hover {
-    background-color: #ea580c;
+/* =========================================================
+   FOOTER RESPONSIVE
+========================================================= */
+
+@media (max-width: 650px) {
+    footer.footer {
+        padding: 32px 22px;
+    }
+
+    .footer-top {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .footer-brand,
+    .footer-horarios {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .footer-horarios {
+        justify-self: start;
+    }
+
+    .footer-titulo {
+        font-size: 17px;
+    }
+
+    .footer-subtitulo,
+    .footer-horarios-texto {
+        font-size: 12px;
+    }
 }
 
-.footer-contacto {
-    font-size: 0.95rem;
-    color: #FFFFFF;
-}
 
 /* ==========================================
    DISEÑO RESPONSIVO (MEDIA QUERIES)
@@ -1976,5 +1987,336 @@ body, .pagina {
     .footer-redes {
         justify-content: center;
         flex-wrap: wrap;
+    }
+}
+
+
+/* =========================================================
+   SISTEMA GLOBAL DE TEMAS - DELI AREPAS JD
+   ========================================================= */
+
+:root {
+    color-scheme: light;
+
+    --color-fondo: #FFF8E7;
+    --color-superficie: #FFFFFF;
+    --color-superficie-secundaria: #FFF1DC;
+    --color-texto: #371D10;
+    --color-texto-secundario: #6B7280;
+    --color-borde: #E9DED0;
+    --color-navbar: #4A2C1A;
+    --color-footer: #3B2318;
+    --color-acento: #EA580C;
+    --color-acento-hover: #C2410C;
+    --color-campo: #F9FAFB;
+    --color-sombra: rgba(55, 29, 16, .08);
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+
+    --color-fondo: #171A20;
+    --color-superficie: #222832;
+    --color-superficie-secundaria: #2B3440;
+    --color-texto: #F3EEE7;
+    --color-texto-secundario: #B9C2CE;
+    --color-borde: #3B4654;
+    --color-navbar: #171B22;
+    --color-footer: #12161C;
+    --color-acento: #F59E0B;
+    --color-acento-hover: #FBBF24;
+    --color-campo: #1B222C;
+    --color-sombra: rgba(0, 0, 0, .25);
+}
+
+/* =========================================================
+   TRANSICIONES
+   ========================================================= */
+
+html {
+    background: var(--color-fondo);
+    transition: background-color .25s ease;
+}
+
+body,
+.pagina,
+main.main,
+.main {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    transition:
+        background-color .25s ease,
+        color .25s ease;
+}
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.navbar {
+    background-color: var(--color-navbar);
+}
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 39px;
+    padding: 0 13px;
+    border: 1px solid rgba(255, 255, 255, .23);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, .10);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: .76rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background .25s ease,
+        border-color .25s ease,
+        transform .25s ease,
+        box-shadow .25s ease;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, .19);
+    border-color: rgba(255, 255, 255, .4);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .15);
+}
+
+.theme-toggle svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.theme-toggle:focus-visible {
+    outline: 3px solid #F6A15A;
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   MODO DÍA
+   ========================================================= */
+
+html[data-theme="light"] body,
+html[data-theme="light"] .pagina {
+    background: var(--color-fondo);
+    color: var(--color-texto);
+}
+
+/* =========================================================
+   MODO NOCHE - ESTRUCTURA GENERAL
+   ========================================================= */
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] .pagina,
+html[data-theme="dark"] main,
+html[data-theme="dark"] .main {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+}
+
+/* Secciones de inicio */
+
+html[data-theme="dark"] .cimientosSection,
+html[data-theme="dark"] .pqrSection {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+}
+
+html[data-theme="dark"] .sectionTitle,
+html[data-theme="dark"] .pqrTitle,
+html[data-theme="dark"] .cardTitle,
+html[data-theme="dark"] .formTitle,
+html[data-theme="dark"] .contactoValor {
+    color: var(--color-texto);
+}
+
+html[data-theme="dark"] .cardText,
+html[data-theme="dark"] .pqrDesc,
+html[data-theme="dark"] .contactoLabel {
+    color: var(--color-texto-secundario);
+}
+
+/* =========================================================
+   TARJETAS Y PANELES
+   ========================================================= */
+
+html[data-theme="dark"] .infoCard,
+html[data-theme="dark"] .pqrCard,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .panel-card,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .stat-card-admin,
+html[data-theme="dark"] .module-card,
+html[data-theme="dark"] .content-card,
+html[data-theme="dark"] .form-container,
+html[data-theme="dark"] .table-container {
+    background-color: var(--color-superficie);
+    color: var(--color-texto);
+    border-color: var(--color-borde);
+    box-shadow: 0 10px 28px var(--color-sombra);
+}
+
+/* =========================================================
+   TEXTOS GENERALES
+   ========================================================= */
+
+html[data-theme="dark"] .card p,
+html[data-theme="dark"] .panel p,
+html[data-theme="dark"] .module-card p,
+html[data-theme="dark"] .stat-card p {
+    color: var(--color-texto-secundario);
+}
+
+/* =========================================================
+   FORMULARIOS
+   ========================================================= */
+
+html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select,
+html[data-theme="dark"] .formInput,
+html[data-theme="dark"] .formTextarea {
+    background-color: var(--color-campo);
+    color: var(--color-texto);
+    border-color: var(--color-borde);
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+    color: #929EAD;
+}
+
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] textarea:focus,
+html[data-theme="dark"] select:focus {
+    border-color: var(--color-acento);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, .13);
+}
+
+html[data-theme="dark"] label,
+html[data-theme="dark"] .formLabel {
+    color: var(--color-texto);
+}
+
+/* =========================================================
+   TABLAS
+   ========================================================= */
+
+html[data-theme="dark"] table {
+    color: var(--color-texto);
+    border-color: var(--color-borde);
+}
+
+html[data-theme="dark"] thead,
+html[data-theme="dark"] th {
+    background-color: var(--color-superficie-secundaria);
+    color: var(--color-texto);
+    border-color: var(--color-borde);
+}
+
+html[data-theme="dark"] td {
+    color: var(--color-texto-secundario);
+    border-color: var(--color-borde);
+}
+
+html[data-theme="dark"] tbody tr {
+    background-color: var(--color-superficie);
+}
+
+html[data-theme="dark"] tbody tr:nth-child(even) {
+    background-color: var(--color-superficie-secundaria);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+html[data-theme="dark"] footer.footer {
+    background-color: var(--color-footer);
+    border-top-color: #D97706;
+}
+
+/* =========================================================
+   PQRS
+   ========================================================= */
+
+html[data-theme="dark"] .contactoItem:hover {
+    background: rgba(255, 255, 255, .05);
+}
+
+html[data-theme="dark"] .pqrForm input,
+html[data-theme="dark"] .pqrForm textarea {
+    background-color: var(--color-campo);
+    color: var(--color-texto);
+    border-color: var(--color-borde);
+}
+
+html[data-theme="dark"] .pqrForm input::placeholder,
+html[data-theme="dark"] .pqrForm textarea::placeholder {
+    color: #929EAD;
+}
+
+/* =========================================================
+   ELEMENTOS SECUNDARIOS
+   ========================================================= */
+
+html[data-theme="dark"] hr {
+    border-color: var(--color-borde);
+}
+
+html[data-theme="dark"] .dropdown-menu,
+html[data-theme="dark"] .modal-content,
+html[data-theme="dark"] .modal-dialog,
+html[data-theme="dark"] .alert,
+html[data-theme="dark"] .pagination {
+    background-color: var(--color-superficie);
+    color: var(--color-texto);
+    border-color: var(--color-borde);
+}
+
+/* =========================================================
+   RESPONSIVE DEL SELECTOR DE TEMA
+   ========================================================= */
+
+@media (max-width: 900px) {
+    .theme-toggle {
+        min-height: 38px;
+        padding: 0 11px;
+    }
+}
+
+@media (max-width: 600px) {
+    .theme-toggle {
+        font-size: .72rem;
+        padding: 0 10px;
+    }
+
+    .navbar-login {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+
+/* =========================================================
+   ACCESIBILIDAD
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    html,
+    body,
+    body *,
+    body *::before,
+    body *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }

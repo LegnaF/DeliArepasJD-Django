@@ -1,0 +1,474 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de PQRS - Deli Arepas JD</title>
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'deliapp/css/pqr.css' %}">
+</head>
+<body>
+    <div class="pqr-page">
+        <header>
+            {% include 'deliapp/components/navbar.html' %}
+        </header>
+
+        <main class="pqr-main">
+            <!-- HERO -->
+            <section class="pqr-hero">
+                <div class="pqr-hero-content">
+                    <div class="pqr-title-area">
+                        <span class="pqr-eyebrow">CENTRO DE ATENCIÓN</span>
+
+                        <h1>Gestión de PQRS</h1>
+
+                        <p>
+                            Administra las peticiones, quejas, reclamos y sugerencias
+                            recibidas por Deli Arepas JD.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="btn-refresh-pqr"
+                        class="pqr-refresh-btn"
+                        onclick="actualizarLista()"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 11a8.1 8.1 0 0 0-14.9-3.9L3 10" />
+                            <path d="M3 5v5h5" />
+                            <path d="M4 13a8.1 8.1 0 0 0 14.9 3.9L21 14" />
+                            <path d="M21 19v-5h-5" />
+                        </svg>
+                        <span id="refresh-pqr-text">Actualizar lista</span>
+                    </button>
+                </div>
+
+                <div class="pqr-hero-decoration">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </section>
+
+            <!-- ESTADÍSTICAS -->
+            <section class="pqr-stats">
+                <article class="pqr-stat-card">
+                    <div class="pqr-stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.7 8.7 0 0 1-3.4-.7L4 20l1.7-4.1A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5Z" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="pqr-stat-label">Solicitudes registradas</span>
+                        <strong id="stat-total-pqr">{{ total_count|default:0 }}</strong>
+                    </div>
+                </article>
+
+                <article class="pqr-stat-card pqr-stat-card-green">
+                    <div class="pqr-stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 3v18" />
+                            <path d="M3 12h18" />
+                            <path d="M5 5l14 14" />
+                            <path d="M19 5 5 19" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="pqr-stat-label">Recibidas últimos 7 días</span>
+                        <strong id="stat-recientes-pqr">{{ recientes_count|default:0 }}</strong>
+                    </div>
+                </article>
+
+                <article class="pqr-stat-card pqr-stat-card-orange">
+                    <div class="pqr-stat-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="8" />
+                            <path d="M12 8v4l2.5 2" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="pqr-stat-label">Gestión disponible</span>
+                        <strong>Activa</strong>
+                    </div>
+                </article>
+            </section>
+
+            <!-- TABLA O ESTADO VACÍO -->
+            {% if not pqrs %}
+                <section class="pqr-empty">
+                    <div class="pqr-empty-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.7 8.7 0 0 1-3.4-.7L4 20l1.7-4.1A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5Z" />
+                        </svg>
+                    </div>
+
+                    <span class="pqr-eyebrow">SIN REGISTROS</span>
+
+                    <h2>No hay solicitudes de PQRS</h2>
+
+                    <p>
+                        Actualmente no existen peticiones, quejas, reclamos o
+                        sugerencias registradas en el sistema.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="pqr-empty-button"
+                        onclick="actualizarLista()"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 11a8.1 8.1 0 0 0-14.9-3.9L3 10" />
+                            <path d="M3 5v5h5" />
+                            <path d="M4 13a8.1 8.1 0 0 0 14.9 3.9L21 14" />
+                            <path d="M21 19v-5h-5" />
+                        </svg>
+                        Actualizar
+                    </button>
+                </section>
+            {% else %}
+                <section class="pqr-table-section" id="pqr-table-section">
+                    <div class="pqr-table-header">
+                        <div>
+                            <span class="pqr-section-label">REGISTROS</span>
+
+                            <h2>Solicitudes recibidas</h2>
+
+                            <p>Consulta y administra cada solicitud registrada.</p>
+                        </div>
+
+                        <div class="pqr-count">
+                            <strong id="pqr-count-num">{{ total_count }}</strong>
+                            <span id="pqr-count-label">
+                                {% if total_count == 1 %}registro{% else %}registros{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pqr-table-wrapper">
+                        <table class="pqr-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Contacto</th>
+                                    <th>Mensaje</th>
+                                    <th class="pqr-actions-heading">Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="pqr-tbody">
+                                {% for item in pqrs %}
+                                    <tr id="pqr-row-{{ item.id }}" style="--pqr-delay: {{ forloop.counter0|add:0 }}5ms;">
+                                        <td>
+                                            <span class="pqr-id">#{{ item.id }}</span>
+                                        </td>
+
+                                        <td>
+                                            <div class="pqr-date">
+                                                <strong>{{ item.createdAt|date:"d M Y" }}</strong>
+                                                <span>{{ item.createdAt|date:"H:i" }}</span>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="pqr-client">
+                                                <div class="pqr-avatar" id="avatar-{{ item.id }}">
+                                                    {{ item.nombre|slice:":1"|upper }}
+                                                </div>
+
+                                                <div>
+                                                    <strong id="nombre-{{ item.id }}">{{ item.nombre }}</strong>
+                                                    <span>Cliente</span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <span class="pqr-contact" id="contacto-{{ item.id }}">{{ item.contacto }}</span>
+                                        </td>
+
+                                        <td>
+                                            <div class="pqr-message" id="mensaje-{{ item.id }}">{{ item.mensaje }}</div>
+                                        </td>
+
+                                        <td class="pqr-actions">
+                                            <button
+                                                type="button"
+                                                class="pqr-action-btn pqr-edit-btn"
+                                                data-id="{{ item.id }}"
+                                                data-nombre="{{ item.nombre }}"
+                                                data-contacto="{{ item.contacto }}"
+                                                data-mensaje="{{ item.mensaje }}"
+                                                onclick="abrirModalEditar(this)"
+                                                title="Editar PQR"
+                                            >
+                                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M12 20h9" />
+                                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                                                </svg>
+                                                <span>Editar</span>
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                class="pqr-action-btn pqr-delete-btn"
+                                                onclick="eliminarPqr({{ item.id }})"
+                                                title="Eliminar PQR"
+                                            >
+                                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M4 7h16" />
+                                                    <path d="M10 11v6" />
+                                                    <path d="M14 11v6" />
+                                                    <path d="M6 7l1 13h10l1-13" />
+                                                    <path d="M9 7V4h6v3" />
+                                                </svg>
+                                                <span>Eliminar</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% endif %}
+
+            <div class="pqr-bottom-info">
+                <span class="pqr-bottom-dot"></span>
+                Sistema de gestión de PQRS · Deli Arepas JD
+            </div>
+        </main>
+
+        <!-- MODAL DE EDICIÓN -->
+        <div
+            id="pqr-modal-backdrop"
+            class="pqr-modal-backdrop"
+            style="display: none;"
+            onmousedown="if (event.target === this) cerrarModalEditar();"
+        >
+            <section
+                class="pqr-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="pqr-modal-title"
+            >
+                <div class="pqr-modal-header">
+                    <div>
+                        <span class="pqr-section-label">ACTUALIZACIÓN</span>
+
+                        <h2 id="pqr-modal-title">Editar solicitud #<span id="modal-pqr-id"></span></h2>
+
+                        <p>Modifica la información registrada por el cliente.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="pqr-modal-close"
+                        onclick="cerrarModalEditar()"
+                        aria-label="Cerrar"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m6 6 12 12" />
+                            <path d="m18 6-12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="form-editar-pqr" class="pqr-form" onsubmit="guardarEdicion(event)">
+                    <input type="hidden" id="edit-pqr-id">
+
+                    <div class="pqr-form-grid">
+                        <label class="pqr-field">
+                            <span>Nombre completo</span>
+                            <input type="text" id="edit-pqr-nombre" required>
+                        </label>
+
+                        <label class="pqr-field">
+                            <span>Contacto</span>
+                            <input type="text" id="edit-pqr-contacto" required>
+                        </label>
+                    </div>
+
+                    <label class="pqr-field">
+                        <span>Mensaje de la solicitud</span>
+                        <textarea id="edit-pqr-mensaje" required></textarea>
+                    </label>
+
+                    <div class="pqr-modal-footer">
+                        <button
+                            type="button"
+                            class="pqr-cancel-btn"
+                            id="btn-cancelar-pqr"
+                            onclick="cerrarModalEditar()"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="pqr-save-btn"
+                            id="btn-guardar-pqr"
+                        >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 4h12l2 2v14H5Z" />
+                                <path d="M8 4v6h8V4" />
+                                <path d="M8 20v-6h8v6" />
+                            </svg>
+                            <span id="btn-guardar-texto">Guardar cambios</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <footer>
+            {% include 'deliapp/components/footer.html' %}
+        </footer>
+    </div>
+
+    {% csrf_token %}
+
+    <script>
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+        function actualizarLista() {
+            const btn = document.getElementById("btn-refresh-pqr");
+            const txt = document.getElementById("refresh-pqr-text");
+            if (btn && txt) {
+                btn.classList.add("is-loading");
+                btn.disabled = true;
+                txt.textContent = "Actualizando...";
+            }
+            window.location.reload();
+        }
+
+        // ABRIR MODAL DE EDICIÓN
+        function abrirModalEditar(btn) {
+            const id = btn.dataset.id;
+            const nombre = btn.dataset.nombre;
+            const contacto = btn.dataset.contacto;
+            const mensaje = btn.dataset.mensaje;
+
+            document.getElementById("edit-pqr-id").value = id;
+            document.getElementById("modal-pqr-id").textContent = id;
+            document.getElementById("edit-pqr-nombre").value = nombre;
+            document.getElementById("edit-pqr-contacto").value = contacto;
+            document.getElementById("edit-pqr-mensaje").value = mensaje;
+
+            document.getElementById("pqr-modal-backdrop").style.display = "flex";
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById("pqr-modal-backdrop").style.display = "none";
+        }
+
+        // Cerrar modal con tecla Escape
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                cerrarModalEditar();
+            }
+        });
+
+        // GUARDAR EDICIÓN (POST a /gestion-pqr/editar/<id>/)
+        async function guardarEdicion(event) {
+            event.preventDefault();
+
+            const id = document.getElementById("edit-pqr-id").value;
+            const nombre = document.getElementById("edit-pqr-nombre").value.trim();
+            const contacto = document.getElementById("edit-pqr-contacto").value.trim();
+            const mensaje = document.getElementById("edit-pqr-mensaje").value.trim();
+
+            const btnGuardar = document.getElementById("btn-guardar-pqr");
+            const btnCancelar = document.getElementById("btn-cancelar-pqr");
+            const textoGuardar = document.getElementById("btn-guardar-texto");
+
+            btnGuardar.disabled = true;
+            btnCancelar.disabled = true;
+            textoGuardar.textContent = "Guardando...";
+
+            try {
+                const res = await fetch(`/gestion-pqr/editar/${id}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken,
+                    },
+                    body: JSON.stringify({ nombre, contacto, mensaje }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || "Error al actualizar la PQR");
+                }
+
+                // Actualizar la fila en la tabla sin recargar
+                document.getElementById(`nombre-${id}`).textContent = nombre;
+                document.getElementById(`avatar-${id}`).textContent = nombre.charAt(0).toUpperCase();
+                document.getElementById(`contacto-${id}`).textContent = contacto;
+                document.getElementById(`mensaje-${id}`).textContent = mensaje;
+
+                const editBtn = document.querySelector(`#pqr-row-${id} .pqr-edit-btn`);
+                if (editBtn) {
+                    editBtn.dataset.nombre = nombre;
+                    editBtn.dataset.contacto = contacto;
+                    editBtn.dataset.mensaje = mensaje;
+                }
+
+                cerrarModalEditar();
+            } catch (err) {
+                alert(err.message || "Error al actualizar");
+            } finally {
+                btnGuardar.disabled = false;
+                btnCancelar.disabled = false;
+                textoGuardar.textContent = "Guardar cambios";
+            }
+        }
+
+        // ELIMINAR PQR (DELETE a /gestion-pqr/eliminar/<id>/)
+        async function eliminarPqr(id) {
+            if (!confirm("¿Estás seguro de que deseas eliminar este PQR?")) return;
+
+            try {
+                const res = await fetch(`/gestion-pqr/eliminar/${id}/`, {
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                    },
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || "No se pudo eliminar el registro");
+                }
+
+                const fila = document.getElementById(`pqr-row-${id}`);
+                if (fila) fila.remove();
+
+                // Actualizar contadores
+                const restantes = document.querySelectorAll("#pqr-tbody tr").length;
+                const totalEl = document.getElementById("stat-total-pqr");
+                const countNum = document.getElementById("pqr-count-num");
+                const countLabel = document.getElementById("pqr-count-label");
+
+                if (totalEl) totalEl.textContent = restantes;
+                if (countNum) countNum.textContent = restantes;
+                if (countLabel) countLabel.textContent = restantes === 1 ? "registro" : "registros";
+
+                if (restantes === 0) {
+                    window.location.reload();
+                }
+            } catch (err) {
+                alert(err.message || "Error al eliminar");
+            }
+        }
+    </script>
+</body>
+</html>

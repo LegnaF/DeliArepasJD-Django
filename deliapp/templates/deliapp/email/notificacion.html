@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }}</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f5f0e8; font-family:Arial,Helvetica,sans-serif; color:#38251c;">
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+           style="background-color:#f5f0e8; padding:35px 12px;">
+        <tr>
+            <td align="center">
+
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                       style="max-width:600px; background-color:#ffffff; border-radius:16px; overflow:hidden;">
+
+                    <!-- ENCABEZADO -->
+                    <tr>
+                        <td align="center" style="background-color:#38251c; padding:30px 20px;">
+
+                            <h1 style="margin:0; color:#ffffff; font-size:27px; font-weight:700;">
+                                Deli Arepas <span style="color:#f0a35b;">JD</span>
+                            </h1>
+
+                            <p style="margin:9px 0 0; color:#e8d4bd; font-size:12px; letter-spacing:2px;">
+                                SABOR TRADICIONAL
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <!-- CONTENIDO -->
+                    <tr>
+                        <td style="padding:38px 32px 25px;">
+
+                            <p style="margin:0 0 12px; color:#b66b36; font-size:12px; font-weight:bold; letter-spacing:1.5px; text-transform:uppercase;">
+                                NOTIFICACIÓN DELI AREPAS
+                            </p>
+
+                            <h2 style="margin:0 0 20px; color:#38251c; font-size:25px; line-height:1.3;">
+                                {{ titulo }}
+                            </h2>
+
+                            {% if nombre %}
+                                <p style="font-size:15px; line-height:1.7; color:#604b3d;">
+                                    Hola, <strong>{{ nombre }}</strong>.
+                                </p>
+                            {% endif %}
+
+                            <div style="font-size:15px; line-height:1.8; color:#66574d;">
+                                {{ mensaje|linebreaksbr }}
+                            </div>
+
+                            {% if detalle %}
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                                       style="margin:25px 0; background-color:#fff8ef; border:1px solid #f0dfca; border-radius:10px;">
+                                    <tr>
+                                        <td style="padding:18px 20px; color:#604b3d; font-size:14px; line-height:1.8;">
+                                            {{ detalle|linebreaksbr }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            {% endif %}
+
+                            {% if boton_url and boton_texto %}
+                                <table role="presentation" cellspacing="0" cellpadding="0" style="margin:28px 0;">
+                                    <tr>
+                                        <td align="center" bgcolor="#b85c2b" style="border-radius:8px;">
+                                            <a href="{{ boton_url }}"
+                                               style="display:inline-block; padding:15px 28px; color:#ffffff; font-size:14px; font-weight:bold; text-decoration:none; border-radius:8px;">
+                                                {{ boton_texto }}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p style="font-size:12px; line-height:1.7; color:#827469;">
+                                    Si el botón no funciona, puedes copiar y pegar este enlace en tu navegador:
+                                    <br>
+                                    <a href="{{ boton_url }}" style="color:#a6532b; word-break:break-all;">
+                                        {{ boton_url }}
+                                    </a>
+                                </p>
+                            {% endif %}
+
+                            {% if nota %}
+                                <p style="margin-top:25px; padding-top:18px; border-top:1px solid #eee4d8; color:#827469; font-size:13px; line-height:1.7;">
+                                    {{ nota }}
+                                </p>
+                            {% endif %}
+
+                        </td>
+                    </tr>
+
+                    <!-- PIE -->
+                    <tr>
+                        <td align="center" style="background-color:#faf6f0; padding:24px 20px; border-top:1px solid #eee4d8;">
+
+                            <p style="margin:0 0 8px; color:#604b3d; font-size:14px; font-weight:bold;">
+                                Gracias por elegir Deli Arepas JD
+                            </p>
+
+                            <p style="margin:0; color:#968578; font-size:12px; line-height:1.7;">
+                                Este es un mensaje automático. Por favor, no respondas directamente a este correo.
+                            </p>
+
+                            <p style="margin:15px 0 0; color:#b0a397; font-size:11px;">
+                                © {% now "Y" %} Deli Arepas JD. Todos los derechos reservados.
+                            </p>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

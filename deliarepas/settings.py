@@ -79,7 +79,9 @@ WSGI_APPLICATION = 'deliarepas.wsgi.application'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -99,7 +101,7 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'estadic',
+        'NAME': 'deliarepas',
         'USER': 'postgres',
         'PASSWORD': '123',
         'HOST': 'localhost',
@@ -190,13 +192,13 @@ LOGOUT_REDIRECT_URL = 'inicio'
 # RECUPERACIÓN DE CONTRASEÑA
 # =====================================================
 
-# El enlace de recuperación dura 15 minutos.
+# El enlace de recuperación tiene una duración de 15 minutos.
 
 PASSWORD_RESET_TIMEOUT = 900
 
 
 # =====================================================
-# CORREO ELECTRÓNICO REAL MEDIANTE GMAIL
+# CORREO ELECTRÓNICO MEDIANTE GMAIL
 # =====================================================
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -209,13 +211,14 @@ EMAIL_USE_TLS = True
 
 EMAIL_USE_SSL = False
 
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '').strip()
+# Reemplazar por tu correo real de Gmail.
+EMAIL_HOST_USER = 'deliarepassjd@gmail.com'
 
-EMAIL_HOST_PASSWORD = os.environ.get(
-    'EMAIL_HOST_PASSWORD', ''
-).replace(' ', '')
+# Utilizar una contraseña de aplicación de Google,
+# no la contraseña normal de Gmail.
+EMAIL_HOST_PASSWORD = 'iomm ebtb tupf rvrq'
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'Deli Arepas JD'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 EMAIL_SUBJECT_PREFIX = '[Deli Arepas JD] '
 

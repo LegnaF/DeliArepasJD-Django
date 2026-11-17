@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Facturación | Deli Arepas JD</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'deliapp/css/facturacion.css' %}">
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+</head>
+
+<body>
+
+     
+    {% include 'deliapp/components/navbar.html' %}
+    
+
+
+
+        <div class="facturas-page-container">
+
+            <main class="facturas-page">
+
+                <div class="facturas-decoracion decoracion-1"></div>
+                <div class="facturas-decoracion decoracion-2"></div>
+                <div class="facturas-decoracion decoracion-3"></div>
+                <div class="facturas-decoracion decoracion-4"></div>
+
+                <section class="contenido">
+
+                    <!-- =====================================
+                        ENCABEZADO
+                    ====================================== -->
+
+                    <header class="titulo">
+
+                        <div class="titulo-copy">
+
+                            <span class="eyebrow">
+                                <span class="eyebrow-line"></span>
+                                GESTIÓN FINANCIERA
+                            </span>
+
+                            <h1>
+                                Facturación
+                                <span class="titulo-punto">.</span>
+                            </h1>
+
+                            <p>
+                                Consulta, administra y controla las facturas
+                                generadas automáticamente a partir de los
+                                pedidos de Deli Arepas JD.
+                            </p>
+
+                        </div>
+
+                        <div class="titulo-lado">
+
+                            <div class="estado-sistema">
+
+                                <span class="estado-sistema-punto"></span>
+
+                                <div>
+                                    <strong>Sistema activo</strong>
+                                    <span>Facturación automática</span>
+                                </div>
+
+                                <span class="estado-check">
+                                    ✓
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </header>
+
+
+                    <!-- =====================================
+                        MENSAJES DJANGO
+                    ====================================== -->
+
+                    {% if messages %}
+
+                        <div class="mensajes-container">
+
+                            {% for message in messages %}
+
+                                <div class="mensaje mensaje-{{ message.tags }}">
+                                    {{ message }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- =====================================
+                        ESTADÍSTICAS
+                    ====================================== -->
+
+                    <section class="estadisticas">
+
+                        <article class="stat-card stat-total">
+
+                            <div class="stat-glow"></div>
+
+                            <div class="stat-icon"></div>
+
+                            <div class="stat-content">
+
+                                <span class="stat-label">
+                                    Facturas generadas
+                                </span>
+
+                                <strong>{{ total_facturas }}</strong>
+
+                                <p>
+                                    Documentos registrados en el sistema.
+                                </p>
+
+                            </div>
+
+                            <span class="stat-number-bg">01</span>
+
+                        </article>
+
+
+                        <article class="stat-card stat-pagadas">
+
+                            <div class="stat-glow"></div>
+
+                            <div class="stat-icon"></div>
+
+                            <div class="stat-content">
+
+                                <span class="stat-label">
+                                    Facturas pagadas
+                                </span>
+
+                                <strong>{{ pagadas }}</strong>
+
+                                <p>
+                                    Cobros confirmados correctamente.
+                                </p>
+
+                            </div>
+
+                            <span class="stat-number-bg">02</span>
+
+                        </article>
+
+
+                        <article class="stat-card stat-pendientes">
+
+                            <div class="stat-glow"></div>
+
+                            <div class="stat-icon"></div>
+
+                            <div class="stat-content">
+
+                                <span class="stat-label">
+                                    Facturas pendientes
+                                </span>
+
+                                <strong>{{ pendientes }}</strong>
+
+                                <p>
+                                    Facturas que esperan confirmación.
+                                </p>
+
+                            </div>
+
+                            <span class="stat-number-bg">03</span>
+
+                        </article>
+
+
+                        <article class="stat-card stat-anuladas">
+
+                            <div class="stat-glow"></div>
+
+                            <div class="stat-icon"></div>
+
+                            <div class="stat-content">
+
+                                <span class="stat-label">
+                                    Facturas anuladas
+                                </span>
+
+                                <strong>{{ anuladas }}</strong>
+
+                                <p>
+                                    Documentos cancelados del sistema.
+                                </p>
+
+                            </div>
+
+                            <span class="stat-number-bg">04</span>
+
+                        </article>
+
+                    </section>
+
+
+                    <!-- =====================================
+                        RESUMEN SUPERIOR
+                    ====================================== -->
+
+                    <section class="resumen-superior">
+
+                        <div class="resumen-item resumen-dinero">
+
+                            <span>Total recaudado</span>
+
+                            <strong>
+                                ${{ total_facturado|floatformat:0 }}
+                            </strong>
+
+                        </div>
+
+                        <div class="resumen-separador"></div>
+
+                        <div class="resumen-item">
+
+                            <span>Registros visibles</span>
+
+                            <strong>{{ facturas|length }}</strong>
+
+                        </div>
+
+                        <div class="resumen-separador"></div>
+
+                        <div class="resumen-info">
+
+                            <span class="resumen-punto"></span>
+
+                            <span>
+                                Datos sincronizados con pedidos
+                            </span>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =====================================
+                        BUSCADOR Y FILTROS
+                    ====================================== -->
+
+                    <section class="panel-filtros">
+
+                        <div class="filtros-principal">
+
+                            <form method="GET" action="{% url 'facturacion' %}"
+                                class="buscador">
+
+                                <span class="icono-busqueda">⌕</span>
+
+                                <input
+                                    type="text"
+                                    name="buscar"
+                                    value="{{ busqueda }}"
+                                    placeholder="Buscar factura o cliente..."
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="estado"
+                                    value="{{ filtro }}"
+                                >
+
+                                {% if busqueda %}
+
+                                    <a
+                                        href="?estado={{ filtro }}"
+                                        class="limpiar-busqueda"
+                                        aria-label="Limpiar búsqueda"
+                                    >
+                                        ×
+                                    </a>
+
+                                {% endif %}
+
+                                <button type="submit" class="btn-buscar">
+                                    Buscar
+                                </button>
+
+                            </form>
+
+                            <span class="encontradas">
+                                <strong>{{ facturas|length }}</strong>
+                                <span> resultados encontrados</span>
+                            </span>
+
+                        </div>
+
+
+                        <div class="filtros">
+
+                            <a
+                                href="?estado=Todas&buscar={{ busqueda|urlencode }}"
+                                class="{% if filtro == 'Todas' %}filtro-activo{% endif %}"
+                            >
+                                Todas
+                                <span>{{ total_facturas }}</span>
+                            </a>
+
+
+                            <a
+                                href="?estado=Pagadas&buscar={{ busqueda|urlencode }}"
+                                class="{% if filtro == 'Pagadas' %}filtro-activo{% endif %}"
+                            >
+                                Pagadas
+                                <span>{{ pagadas }}</span>
+                            </a>
+
+
+                            <a
+                                href="?estado=Pendientes&buscar={{ busqueda|urlencode }}"
+                                class="{% if filtro == 'Pendientes' %}filtro-activo{% endif %}"
+                            >
+                                Pendientes
+                                <span>{{ pendientes }}</span>
+                            </a>
+
+
+                            <a
+                                href="?estado=Anuladas&buscar={{ busqueda|urlencode }}"
+                                class="{% if filtro == 'Anuladas' %}filtro-activo{% endif %}"
+                            >
+                                Anuladas
+                                <span>{{ anuladas }}</span>
+                            </a>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =====================================
+                        TABLA DE FACTURAS
+                    ====================================== -->
+
+                    <section class="tabla">
+
+                        <div class="tabla-header">
+
+                            <div class="tabla-heading">
+
+                                <span class="tabla-eyebrow">
+                                    REGISTRO DE FACTURACIÓN
+                                </span>
+
+                                <h2>Facturas registradas</h2>
+
+                                <p>
+                                    Administra todos los documentos
+                                    generados por los pedidos.
+                                </p>
+
+                            </div>
+
+                            <span class="tabla-contador">
+
+                                <span class="contador-dot"></span>
+
+                                {{ facturas|length }} registros
+
+                            </span>
+
+                        </div>
+
+
+                        {% if facturas %}
+
+                            <div class="tabla-scroll">
+
+                                <table>
+
+                                    <thead>
+
+                                        <tr>
+                                            <th>N.º FACTURA</th>
+                                            <th>CLIENTE</th>
+                                            <th>FECHA</th>
+                                            <th>TOTAL</th>
+                                            <th>MÉTODO</th>
+                                            <th>ESTADO</th>
+                                            <th>ACCIONES</th>
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+                                        {% for factura in facturas %}
+
+                                            <tr>
+
+                                                <!-- NÚMERO -->
+
+                                                <td>
+
+                                                    <div class="factura-numero">
+
+                                                        <span class="mini-file">
+                                                            📄
+                                                        </span>
+
+                                                        <strong>
+                                                            {{ factura.numero }}
+                                                        </strong>
+
+                                                    </div>
+
+                                                </td>
+
+
+                                                <!-- CLIENTE -->
+
+                                                <td>
+
+                                                    <div class="cliente-cell">
+
+                                                        <span class="cliente-avatar">
+                                                            {{ factura.cliente|first|upper }}
+                                                        </span>
+
+                                                        <strong>
+                                                            {{ factura.cliente }}
+                                                        </strong>
+
+                                                    </div>
+
+                                                </td>
+
+
+                                                <!-- FECHA -->
+
+                                                <td>
+
+                                                    <span class="fecha-cell">
+                                                        {{ factura.fecha|date:"d/m/Y" }}
+                                                    </span>
+
+                                                </td>
+
+
+                                                <!-- TOTAL -->
+
+                                                <td>
+
+                                                    <strong class="total-cell">
+                                                        ${{ factura.total|floatformat:0 }}
+                                                    </strong>
+
+                                                </td>
+
+
+                                                <!-- MÉTODO -->
+
+                                                <td>
+
+                                                    <span class="metodo-cell">
+                                                        {{ factura.metodo }}
+                                                    </span>
+
+                                                </td>
+
+
+                                                <!-- ESTADO -->
+
+                                                <td>
+
+                                                    <span class="estado {{ factura.estado|lower }}">
+
+                                                        <i></i>
+
+                                                        {{ factura.estado }}
+
+                                                    </span>
+
+                                                </td>
+
+
+                                                <!-- ACCIONES -->
+
+                                                <td>
+
+                                                    <div class="acciones-tabla">
+
+                                                        <!-- VER -->
+
+                                                        <a
+                                                            href="{% url 'facturacion' %}?ver={{ factura.pedido.id }}"
+                                                            class="accion accion-ver"
+                                                            title="Ver factura"
+                                                        >
+                                                            <span>◉</span>
+                                                            <span>Ver</span>
+                                                        </a>
+
+
+                                                        <!-- EDITAR -->
+
+                                                        <a
+                                                            href="{% url 'editar_factura' factura.pedido.id %}"
+                                                            class="accion accion-editar"
+                                                            title="Editar factura"
+                                                        >
+                                                            <span>✎</span>
+                                                            <span>Editar</span>
+                                                        </a>
+
+
+                                                        <!-- ELIMINAR -->
+
+                                                        <form
+                                                            method="POST"
+                                                            action="{% url 'eliminar_factura' factura.pedido.id %}"
+                                                            onsubmit="return confirmarEliminacion('{{ factura.numero }}')"
+                                                        >
+
+                                                            {% csrf_token %}
+
+                                                            <button
+                                                                type="submit"
+                                                                class="accion accion-eliminar"
+                                                                title="Eliminar factura"
+                                                            >
+                                                                <span>♲</span>
+                                                                <span>Eliminar</span>
+                                                            </button>
+
+                                                        </form>
+
+                                                    </div>
+
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+
+                        {% else %}
+
+                            <!-- SIN RESULTADOS -->
+
+                            <div class="empty-state">
+
+                                <div class="empty-icon">
+                                    📁
+                                </div>
+
+                                <h3>No encontramos facturas</h3>
+
+                                <p>
+                                    No existen registros que coincidan
+                                    con los filtros seleccionados.
+                                </p>
+
+                                {% if busqueda or filtro != 'Todas' %}
+
+                                    <a
+                                        href="{% url 'facturacion' %}"
+                                        class="btn-limpiar-filtros"
+                                    >
+                                        Limpiar filtros
+                                    </a>
+
+                                {% endif %}
+
+                            </div>
+
+                        {% endif %}
+
+                    </section>
+
+                </section>
+
+
+                <!-- =====================================
+                    MODAL DETALLE DE FACTURA
+                ====================================== -->
+
+                {% if factura_seleccionada %}
+
+                    <div class="overlay" id="modalFactura">
+
+                        <div class="modal-factura">
+
+                            <a
+                                href="{% url 'facturacion' %}"
+                                class="cerrar"
+                                aria-label="Cerrar"
+                            >
+                                ×
+                            </a>
+
+
+                            <div class="modal-top">
+
+                                <div class="modal-document-icon">
+                                    📄
+                                </div>
+
+                                <div>
+
+                                    <span class="modal-overline">
+                                        DOCUMENTO DE VENTA
+                                    </span>
+
+                                    <h2>
+                                        {{ factura_seleccionada.numero }}
+                                    </h2>
+
+                                    <p>
+                                        Detalle completo de la factura
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CLIENTE Y FECHA -->
+
+                            <div class="modal-cliente">
+
+                                <div>
+
+                                    <span>CLIENTE</span>
+
+                                    <strong>
+                                        {{ factura_seleccionada.cliente }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>FECHA</span>
+
+                                    <strong>
+                                        {{ factura_seleccionada.fecha|date:"d/m/Y H:i" }}
+                                    </strong>
+
+                                </div>
+
+
+                                <span class="estado-modal {{ factura_seleccionada.estado|lower }}">
+
+                                    <i></i>
+
+                                    {{ factura_seleccionada.estado }}
+
+                                </span>
+
+                            </div>
+
+
+                            <!-- PRODUCTOS -->
+
+                            <div class="modal-section-title">
+                                <span>DETALLE DEL PEDIDO</span>
+                            </div>
+
+
+                            <div class="productos">
+
+                                {% for producto in factura_seleccionada.productos %}
+
+                                    <div class="producto">
+
+                                        <div class="producto-info">
+
+                                            <span class="producto-index">
+                                                {{ forloop.counter|stringformat:"02d" }}
+                                            </span>
+
+                                            <div>
+
+                                                <strong>
+                                                    {{ producto.nombre }}
+                                                </strong>
+
+                                                <span>
+                                                    Cantidad: {{ producto.cantidad }}
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <strong>
+                                            ${{ producto.subtotal|floatformat:0 }}
+                                        </strong>
+
+                                    </div>
+
+                                {% empty %}
+
+                                    <p class="sin-productos">
+                                        No hay productos registrados.
+                                    </p>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- RESUMEN -->
+
+                            <div class="resumen-factura">
+
+                                <div>
+
+                                    <span>Subtotal</span>
+
+                                    <strong>
+                                        ${{ factura_seleccionada.total|floatformat:0 }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <span>Método de pago</span>
+
+                                    <strong>
+                                        {{ factura_seleccionada.metodo }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="total-final">
+
+                                    <span>Total</span>
+
+                                    <strong>
+                                        ${{ factura_seleccionada.total|floatformat:0 }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- IMPRIMIR -->
+
+                            <button
+                                type="button"
+                                class="btn-imprimir"
+                                onclick="window.print()"
+                            >
+                                <span>▣</span>
+                                Imprimir factura
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </main>
+
+        </div>
+
+
+
+
+    <script src="{% static 'js/facturacion.js' %}"></script>
+</body>
+</html>
+

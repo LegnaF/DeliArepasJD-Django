@@ -1,4 +1,6 @@
 
+import logging
+
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -14,10 +16,13 @@ from django.contrib.auth.forms import (
 )
 from django.core.mail import BadHeaderError
 from django.core.exceptions import ValidationError
+from django.template import TemplateDoesNotExist
+from smtplib import SMTPException
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -165,7 +170,15 @@ def recuperar_password(request):
 
         if form.is_valid():
 
-            if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+            if (
+                not getattr(settings, 'EMAIL_HOST_USER', None)
+                or not getattr(settings, 'EMAIL_HOST_PASSWORD', None)
+            ):
+
+                logger.error(
+                    'Recuperación de contraseña: faltan las credenciales '
+                    'EMAIL_HOST_USER o EMAIL_HOST_PASSWORD.'
+                )
 
                 messages.error(
                     request,
@@ -182,7 +195,7 @@ def recuperar_password(request):
                         use_https=request.is_secure(),
                         from_email=settings.DEFAULT_FROM_EMAIL,
                         email_template_name=(
-                            'registration/password_reset_email.html'
+                            'registration/password_reset_email.txt'
                         ),
                         subject_template_name=(
                             'registration/password_reset_subject.txt'
@@ -205,21 +218,49 @@ def recuperar_password(request):
 
                     return redirect('password_reset_done')
 
-                except BadHeaderError:
+                except TemplateDoesNotExist:
+                    logger.exception(
+                        'No se encontró una plantilla de recuperación '
+                        'de contraseña.'
+                    )
 
                     messages.error(
                         request,
-                        'No se pudo enviar el correo. '
-                        'Verifica la información e inténtalo nuevamente.'
+                        'No se encontraron las plantillas necesarias '
+                        'para enviar la recuperación.'
+                    )
+
+                except BadHeaderError:
+                    logger.exception(
+                        'Error en el encabezado del correo de recuperación.'
+                    )
+
+                    messages.error(
+                        request,
+                        'No se pudo preparar el correo de recuperación.'
+                    )
+
+                except (SMTPException, OSError):
+                    logger.exception(
+                        'Error de conexión al enviar el correo de recuperación.'
+                    )
+
+                    messages.error(
+                        request,
+                        'No fue posible conectar con el servicio de correo. '
+                        'Verifica la configuración e inténtalo nuevamente.'
                     )
 
                 except Exception:
+                    logger.exception(
+                        'Error inesperado durante la recuperación '
+                        'de contraseña.'
+                    )
 
                     messages.error(
                         request,
-                        'Ocurrió un problema al enviar el correo. '
-                        'Verifica la configuración del servicio de correo '
-                        'e inténtalo nuevamente.'
+                        'Ocurrió un problema al procesar la recuperación. '
+                        'Inténtalo nuevamente.'
                     )
 
     return render(

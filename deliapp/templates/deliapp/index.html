@@ -4,23 +4,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#FFF8E7">
     <title>Deli Arepas - Artesanal y Delicioso</title>
+
     <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+
+    <script>
+        (() => {
+            try {
+                const temaGuardado = localStorage.getItem('deli-tema');
+                const tema = temaGuardado === 'dark' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', tema);
+            } catch (error) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 </head>
+
 <body>
 
-    <!-- NAVBAR MOVIDO A COMPONENTES -->
+    <!-- NAVBAR -->
     <header>
         {% include 'deliapp/components/navbar.html' %}
     </header>
 
+    <!-- BOTÓN DE MODO DÍA / NOCHE -->
+    <button
+        type="button"
+        class="theme-toggle"
+        id="themeToggle"
+        aria-label="Activar modo noche"
+        aria-pressed="false"
+    >
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.42 1.42"></path>
+            <path d="m17.65 17.65 1.42 1.42"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.35 17.65-1.42 1.42"></path>
+            <path d="m19.07 4.93-1.42 1.42"></path>
+        </svg>
+        <span id="themeText">Modo noche</span>
+    </button>
+
     <main class="main">
+
         <!-- SECCIÓN HERO -->
         <section class="hero">
             <div class="glassCard">
                 <span class="badge">100% Maíz Seleccionado</span>
                 <h1 class="title">DELI AREPAS</h1>
                 <h2 class="subtitle">Artesanal y Delicioso</h2>
+
                 <p class="description">
                     Disfruta de la auténtica tradición colombiana con arepas doradas,
                     crujientes por fuera y generosamente rellenas por dentro. Hechas a
@@ -45,6 +87,7 @@
                         <div class="iconContainer">◎</div>
                         <h3 class="cardTitle">Misión</h3>
                     </div>
+
                     <p class="cardText">
                         Ofrecer productos de excelente calidad, brindando a nuestros
                         clientes una experiencia deliciosa y un servicio confiable.
@@ -56,6 +99,7 @@
                         <div class="iconContainer">👁</div>
                         <h3 class="cardTitle">Visión</h3>
                     </div>
+
                     <p class="cardText">
                         Ser reconocidos por nuestro sabor, calidad y excelente atención,
                         creciendo junto a nuestros clientes para llevar la arepa a nuevos
@@ -65,15 +109,18 @@
             </div>
         </section>
 
-        <!-- SECCIÓN PETICIONES, QUEJAS Y RECLAMOS (PQRS) -->
+        <!-- SECCIÓN PQRS -->
         <section class="pqrSection" id="pqr">
             <div class="pqrContainer">
-                <!-- LADO IZQUIERDO: INFORMACIÓN -->
+
                 <div class="pqrInfo">
                     <div class="pqrTag">Peticiones, Quejas y Reclamos</div>
                     <h2 class="pqrTitle">Contáctanos</h2>
+
                     <p class="pqrDesc">
-                        Comunícate con nosotros para realizar tus pedidos, cotizar eventos especiales o hacer cualquier queja o reclamo que tengas con cualquiera de nuestros productos.
+                        Comunícate con nosotros para realizar tus pedidos, cotizar
+                        eventos especiales o hacer cualquier queja o reclamo que
+                        tengas con cualquiera de nuestros productos.
                     </p>
 
                     <div class="contactoItem">
@@ -88,12 +135,13 @@
                         <div class="contactoIcono">📍</div>
                         <div>
                             <p class="contactoLabel">Dirección Principal</p>
-                            <p class="contactoValor">Calle 45 # 12 - 34, Soacha, Cundinamarca</p>
+                            <p class="contactoValor">
+                                Calle 45 # 12 - 34, Soacha, Cundinamarca
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- LADO DERECHO: FORMULARIO -->
                 <div class="pqrCard">
                     <h3 class="formTitle">Envíanos un mensaje</h3>
 
@@ -109,17 +157,23 @@
                         {% csrf_token %}
 
                         <div class="formGroup">
-                            <label class="formLabel" for="{{ form.nombre.id_for_label }}">Nombre Completo</label>
+                            <label class="formLabel" for="{{ form.nombre.id_for_label }}">
+                                Nombre Completo
+                            </label>
                             {{ form.nombre }}
                         </div>
 
                         <div class="formGroup">
-                            <label class="formLabel" for="{{ form.contacto.id_for_label }}">Correo Electrónico o Celular</label>
+                            <label class="formLabel" for="{{ form.contacto.id_for_label }}">
+                                Correo Electrónico o Celular
+                            </label>
                             {{ form.contacto }}
                         </div>
 
                         <div class="formGroup">
-                            <label class="formLabel" for="{{ form.mensaje.id_for_label }}">¿Cómo podemos ayudarte?</label>
+                            <label class="formLabel" for="{{ form.mensaje.id_for_label }}">
+                                ¿Cómo podemos ayudarte?
+                            </label>
                             {{ form.mensaje }}
                         </div>
 
@@ -128,14 +182,75 @@
                         </button>
                     </form>
                 </div>
+
             </div>
         </section>
     </main>
 
-    <!-- FOOTER MOVIDO A COMPONENTES -->
+    <!-- FOOTER -->
     <footer>
         {% include 'deliapp/components/footer.html' %}
     </footer>
+
+    <script>
+        (() => {
+            const boton = document.getElementById('themeToggle');
+            const texto = document.getElementById('themeText');
+            const icono = document.getElementById('themeIcon');
+            const raiz = document.documentElement;
+
+            if (!boton || !texto || !icono) return;
+
+            const iconoSol = `
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="m4.93 4.93 1.42 1.42"></path>
+                <path d="m17.65 17.65 1.42 1.42"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="m6.35 17.65-1.42 1.42"></path>
+                <path d="m19.07 4.93-1.42 1.42"></path>
+            `;
+
+            const iconoLuna = `
+                <path d="M20.9 13A9 9 0 0 1 11 3.1
+                         9 9 0 1 0 20.9 13Z"></path>
+            `;
+
+            function actualizarBoton() {
+                const modoNoche = raiz.getAttribute('data-theme') === 'dark';
+
+                texto.textContent = modoNoche ? 'Modo día' : 'Modo noche';
+                icono.innerHTML = modoNoche ? iconoLuna : iconoSol;
+                boton.setAttribute('aria-pressed', String(modoNoche));
+                boton.setAttribute(
+                    'aria-label',
+                    modoNoche ? 'Activar modo día' : 'Activar modo noche'
+                );
+
+                document.querySelector('meta[name="theme-color"]')
+                    ?.setAttribute('content', modoNoche ? '#171A20' : '#FFF8E7');
+            }
+
+            boton.addEventListener('click', () => {
+                const modoActual = raiz.getAttribute('data-theme');
+                const nuevoTema = modoActual === 'dark' ? 'light' : 'dark';
+
+                raiz.setAttribute('data-theme', nuevoTema);
+
+                try {
+                    localStorage.setItem('deli-tema', nuevoTema);
+                } catch (error) {
+                    // El tema seguirá funcionando durante esta visita.
+                }
+
+                actualizarBoton();
+            });
+
+            actualizarBoton();
+        })();
+    </script>
 
 </body>
 </html>
