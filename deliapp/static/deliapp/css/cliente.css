@@ -1,0 +1,344 @@
+/* ============================================================
+   DELI AREPAS JD - PANEL DE CLIENTE
+   Ubicación: deliapp/static/deliapp/css/cliente.css
+   ============================================================ */
+
+.cliente-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  background-color: #fbf7f0;
+  color: #2d2118;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
+.cliente-container {
+  flex: 1;
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+/* ============================================================
+   ENCABEZADO DEL PANEL
+   ============================================================ */
+
+.cliente-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.2rem;
+  padding: 1.75rem 2rem;
+  background-color: #ffffff;
+  border: 1px solid #eadfd2;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(45, 33, 24, 0.05);
+}
+
+.cliente-eyebrow {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #e67e22;
+}
+
+.cliente-header-copy h1,
+.cliente-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.8rem;
+  color: #371d10;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.cliente-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.cliente-header-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cliente-rol-badge {
+  background-color: #fff2e2;
+  color: #cf6811;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+}
+
+.cliente-bienvenida {
+  font-size: 1.05rem;
+  color: #2d2118;
+  font-weight: 700;
+}
+
+/* ============================================================
+   MÓDULOS DE SERVICIO DEL CLIENTE
+   ============================================================ */
+
+.cliente-seccion {
+  margin-bottom: 2.5rem;
+}
+
+.cliente-titulo-seccion {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #371d10;
+  margin: 0 0 1rem 0;
+}
+
+.modulos-cliente-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.modulo-cliente-card {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 1.3rem;
+  border: 1px solid #eadfd2;
+  box-shadow: 0 2px 8px rgba(45, 33, 24, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.modulo-cliente-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(230, 126, 34, 0.4);
+  box-shadow: 0 10px 24px rgba(45, 33, 24, 0.08);
+}
+
+.modulo-cliente-codigo {
+  display: inline-block;
+  margin-bottom: 0.6rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background-color: #fff2e2;
+  color: #cf6811;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.modulo-cliente-card h3 {
+  margin: 0 0 0.4rem 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #2d2118;
+}
+
+.modulo-cliente-card p {
+  font-size: 0.85rem;
+  color: #6f6257;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.btn-modulo-cliente {
+  margin-top: 1.1rem;
+  padding: 0.55rem 0.9rem;
+  background-color: #e67e22;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.88rem;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-modulo-cliente:hover {
+  background-color: #cf6811;
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   HISTORIAL DE PEDIDOS DEL CLIENTE
+   ============================================================ */
+
+.pedidos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.tarjeta-pedido-cliente {
+  background: #ffffff;
+  border: 1px solid #eadfd2;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(45, 33, 24, 0.04);
+}
+
+.tarjeta-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f3ece4;
+  padding-bottom: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.pedido-codigo {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  color: #ea580c;
+  font-size: 1.1rem;
+}
+
+.badge-cliente {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* Estados compatibles con Django PedidoEstado y variantes */
+.estado-PENDIENTE {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.estado-EN_PREPARACION,
+.estado-PREPARACION {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.estado-ENTREGADO,
+.estado-COMPLETADO {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.estado-CANCELADO {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.items-cliente-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.item-cliente-linea {
+  display: flex;
+  justify-content: space-between;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.direccion-pedido-cliente {
+  font-size: 0.86rem;
+  color: #6f6257;
+  margin: 0.5rem 0 0 0;
+}
+
+.tarjeta-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f3ece4;
+  padding-top: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.fecha-pedido {
+  font-size: 0.85rem;
+  color: #95877a;
+}
+
+.monto-total {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #2d2118;
+}
+
+/* ============================================================
+   ESTADO SIN PEDIDOS
+   ============================================================ */
+
+.sin-pedidos {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #eadfd2;
+  box-shadow: 0 2px 8px rgba(45, 33, 24, 0.04);
+}
+
+.sin-pedidos h3 {
+  margin: 0 0 0.5rem 0;
+  color: #371d10;
+  font-family: 'Manrope', sans-serif;
+}
+
+.sin-pedidos p {
+  color: #6f6257;
+  margin: 0 0 1.5rem 0;
+}
+
+.btn-ver-menu-cliente {
+  display: inline-block;
+  padding: 11px 22px;
+  background: #e67e22;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-ver-menu-cliente:hover {
+  background: #cf6811;
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .cliente-container {
+    padding: 1.5rem 0.9rem 3rem;
+  }
+
+  .cliente-header {
+    padding: 1.3rem;
+  }
+
+  .modulos-cliente-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tarjeta-pie {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+}

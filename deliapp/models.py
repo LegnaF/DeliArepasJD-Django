@@ -97,17 +97,26 @@ class producto(models.Model):
 
 class pedido(models.Model):
     cliente = models.ForeignKey(
-        cliente, 
-        on_delete=models.CASCADE, 
-        db_column='clienteId', 
+        cliente,
+        on_delete=models.CASCADE,
+        db_column='clienteId',
         related_name='pedido'
     )
+
     estado = models.CharField(
-        max_length=20, 
-        choices=PedidoEstado.choices, 
+        max_length=20,
+        choices=PedidoEstado.choices,
         default=PedidoEstado.PENDIENTE
     )
+
     total = models.FloatField()
+
+    observaciones = models.TextField(
+        blank=True,
+        default='',
+        verbose_name='Observaciones del pedido'
+    )
+
     createdAt = models.DateTimeField(auto_now_add=True)
 
     class Meta:

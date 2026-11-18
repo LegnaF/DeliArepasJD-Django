@@ -1,0 +1,58 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="arepa" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#FFE5A0"></stop>
+      <stop offset="45%" stop-color="#F5BD59"></stop>
+      <stop offset="100%" stop-color="#D9822B"></stop>
+    </linearGradient>
+
+    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#B96725"></stop>
+      <stop offset="100%" stop-color="#713719"></stop>
+    </linearGradient>
+
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feGaussianBlur stdDeviation="2"></feGaussianBlur>
+    </filter>
+  </defs>
+
+  <!-- Fondo -->
+  <rect width="64" height="64" rx="15" fill="#38251C"></rect>
+
+  <!-- Sombra -->
+  <ellipse cx="32" cy="43" rx="23" ry="9" fill="#170F0B" opacity=".55" filter="url(#shadow)"></ellipse>
+
+  <!-- Borde tostado -->
+  <path d="M8 34
+           C8 21 18 12 32 12
+           C46 12 56 21 56 34
+           C56 45 45 52 32 52
+           C19 52 8 45 8 34Z" fill="url(#edge)"></path>
+
+  <!-- Arepa -->
+  <path d="M10 31
+           C10 20 19 14 32 14
+           C45 14 54 20 54 31
+           C54 42 45 49 32 49
+           C19 49 10 42 10 31Z" fill="url(#arepa)"></path>
+
+  <!-- Brillo superior -->
+  <path d="M17 27
+           C21 19 27 17 34 17" fill="none" stroke="#FFF2CC" stroke-width="3" stroke-linecap="round" opacity=".85"></path>
+
+  <!-- Marcas de asado -->
+  <g fill="none" stroke="#A95620" stroke-width="3.2" stroke-linecap="round">
+    <path d="M21 28 L25 35"></path>
+    <path d="M31 25 L35 34"></path>
+    <path d="M41 27 L45 34"></path>
+  </g>
+
+  <!-- Pequeños detalles dorados -->
+  <g fill="#FFF0C5">
+    <circle cx="17" cy="34" r="1"></circle>
+    <circle cx="27" cy="41" r="1"></circle>
+    <circle cx="40" cy="40" r="1"></circle>
+    <circle cx="48" cy="34" r="1"></circle>
+  </g>
+</svg>

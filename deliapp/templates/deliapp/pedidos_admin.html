@@ -1,178 +1,550 @@
-{% extends 'deliapp/base.html' %}
+
 {% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#38251c">
 
-{% block title %}Gestión de pedidos | Deli Arepas JD{% endblock %}
+    <title>Gestión de pedidos | Deli Arepas JD</title>
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'deliapp/css/admin_dashboard.css' %}">
-{% endblock %}
+    <link rel="stylesheet" href="{% static 'deliapp/css/admin_dashboard.css' %}">
 
-{% block content %}
-<main class="admin-panel">
+    <style>
+        .orders-page {
+            min-height: 100vh;
+            padding: 35px 5%;
+            background: #f7f2e9;
+            color: #38251c;
+            font-family: Arial, sans-serif;
+        }
 
-    <section class="admin-welcome">
-        <div>
-            <span class="admin-eyebrow">CENTRO DE OPERACIONES</span>
-            <h1>Gestión de pedidos</h1>
-            <p>Consulta los pedidos de tus clientes y actualiza su estado de preparación y entrega.</p>
+        .orders-page * {
+            box-sizing: border-box;
+        }
+
+        .orders-page .admin-panel {
+            max-width: 1500px;
+            margin: auto;
+        }
+
+        .orders-page .admin-welcome {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            padding: 35px;
+            margin-bottom: 25px;
+            border-radius: 20px;
+            background: linear-gradient(120deg, #38251c, #68432e);
+            color: white;
+        }
+
+        .orders-page .admin-eyebrow {
+            color: #e8ae68;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .orders-page h1 {
+            margin: 12px 0;
+            font-size: clamp(28px, 4vw, 40px);
+        }
+
+        .orders-page .admin-welcome p {
+            margin: 0;
+            color: #f4e6d5;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .orders-page .admin-welcome-icon {
+            display: grid;
+            place-items: center;
+            width: 75px;
+            height: 75px;
+            flex-shrink: 0;
+            border-radius: 20px;
+            background: #ffffff20;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .orders-page .orders-back {
+            margin: 20px 0;
+        }
+
+        .orders-page .orders-back a {
+            color: #9a5426;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .orders-page .orders-back a:hover {
+            text-decoration: underline;
+        }
+
+        .orders-page .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin: 25px 0;
+        }
+
+        .orders-page .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 23px;
+            border: 1px solid #eee3d5;
+            border-radius: 17px;
+            background: #fffdf9;
+            box-shadow: 0 5px 18px #38251c0a;
+        }
+
+        .orders-page .stat-icon {
+            display: grid;
+            place-items: center;
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: #f8e6d2;
+            color: #9a5426;
+            font-weight: 800;
+        }
+
+        .orders-page .stat-card span {
+            display: block;
+            margin-bottom: 6px;
+            color: #88766b;
+            font-size: 13px;
+        }
+
+        .orders-page .stat-card strong {
+            font-size: 27px;
+        }
+
+        .orders-page .orders-container {
+            overflow: hidden;
+            padding: 28px;
+            border: 1px solid #eee3d5;
+            border-radius: 20px;
+            background: #fffdf9;
+            box-shadow: 0 8px 25px #38251c0a;
+        }
+
+        .orders-page .orders-heading h2 {
+            margin: 9px 0;
+            font-size: 25px;
+        }
+
+        .orders-page .orders-heading p {
+            color: #88766b;
+            font-size: 14px;
+        }
+
+        .orders-page .orders-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .orders-page input,
+        .orders-page select {
+            min-height: 46px;
+            padding: 0 14px;
+            border: 1px solid #e5d8c9;
+            border-radius: 10px;
+            background: white;
+            color: #38251c;
+            font-size: 14px;
+        }
+
+        .orders-page .orders-filters input {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .orders-page button {
+            min-height: 44px;
+            padding: 0 20px;
+            border: 0;
+            border-radius: 10px;
+            background: #b7652c;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .orders-page button:hover {
+            background: #91491e;
+        }
+
+        .orders-page .filter-clear {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 15px;
+            color: #8b5736;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .orders-page .orders-table-wrapper {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .orders-page .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        .orders-page .orders-table th {
+            padding: 16px 13px;
+            background: #f7f0e6;
+            color: #68432e;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .orders-page .orders-table td {
+            padding: 17px 13px;
+            border-bottom: 1px solid #eee8df;
+            font-size: 13px;
+        }
+
+        .orders-page .order-number,
+        .orders-page .order-total {
+            color: #a75b28;
+            font-weight: 800;
+        }
+
+        .orders-page .order-status {
+            display: inline-block;
+            padding: 7px 11px;
+            border-radius: 20px;
+            background: #f4e8d9;
+            color: #80512e;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .orders-page .order-update-form {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .orders-page .order-update-form select {
+            min-height: 37px;
+            max-width: 145px;
+            font-size: 12px;
+        }
+
+        .orders-page .order-update-form button {
+            min-height: 37px;
+            padding: 0 12px;
+            font-size: 12px;
+        }
+
+        .orders-page .order-detail summary {
+            color: #a75b28;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .orders-page .order-detail-content {
+            min-width: 230px;
+            padding: 14px;
+            margin-top: 10px;
+            border: 1px solid #eee3d5;
+            border-radius: 12px;
+            background: #fffaf3;
+            white-space: normal;
+        }
+
+        .orders-page .order-detail-content p {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            font-size: 13px;
+        }
+
+        .orders-page .order-detail-total {
+            padding-top: 10px;
+            border-top: 1px solid #e8dccc;
+            font-weight: 800;
+        }
+
+        .orders-page .orders-empty {
+            padding: 40px !important;
+            color: #88766b;
+            text-align: center;
+        }
+
+        .orders-page .admin-messages {
+            margin: 20px 0;
+        }
+
+        .orders-page .admin-message {
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #e6f4e8;
+            color: #27613a;
+        }
+
+        .orders-page .admin-message.error {
+            background: #fbe8e5;
+            color: #9b3026;
+        }
+
+        @media (max-width: 900px) {
+            .orders-page .admin-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .orders-page {
+                padding: 20px 12px;
+            }
+
+            .orders-page .admin-welcome {
+                padding: 24px 19px;
+            }
+
+            .orders-page .admin-welcome-icon {
+                width: 52px;
+                height: 52px;
+            }
+
+            .orders-page .admin-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-page .orders-container {
+                padding: 18px 12px;
+            }
+
+            .orders-page .orders-filters {
+                flex-direction: column;
+            }
+
+            .orders-page .orders-filters input,
+            .orders-page .orders-filters select,
+            .orders-page .orders-filters button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="orders-page">
+    <div class="admin-panel">
+
+        <section class="admin-welcome">
+            <div>
+                <span class="admin-eyebrow">CENTRO DE OPERACIONES</span>
+                <h1>Gestión de pedidos</h1>
+                <p>Consulta los pedidos de tus clientes y actualiza su estado de preparación y entrega.</p>
+            </div>
+
+            <div class="admin-welcome-icon">
+                <span>PD</span>
+            </div>
+        </section>
+
+        <div class="orders-back">
+            <a href="{% url 'admin_dashboard' %}">← Volver al panel administrativo</a>
         </div>
-        <div class="admin-welcome-icon">
-            <span>PD</span>
-        </div>
-    </section>
 
-    <div class="orders-back">
-        <a href="{% url 'admin_dashboard' %}">← Volver al panel administrativo</a>
-    </div>
-
-    {% if messages %}
-        <div class="admin-messages">
-            {% for message in messages %}
-                <div class="admin-message {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <section class="admin-stats">
-        <article class="stat-card">
-            <div class="stat-icon stat-products">PD</div>
-            <div>
-                <span>Total de pedidos</span>
-                <strong>{{ total_pedidos }}</strong>
+        {% if messages %}
+            <div class="admin-messages">
+                {% for message in messages %}
+                    <div class="admin-message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
             </div>
-        </article>
+        {% endif %}
 
-        <article class="stat-card">
-            <div class="stat-icon stat-orders">PE</div>
-            <div>
-                <span>Pendientes</span>
-                <strong>{{ pendientes }}</strong>
-            </div>
-        </article>
+        <section class="admin-stats">
 
-        <article class="stat-card">
-            <div class="stat-icon stat-users">EP</div>
-            <div>
-                <span>En preparación</span>
-                <strong>{{ en_preparacion }}</strong>
-            </div>
-        </article>
+            <article class="stat-card">
+                <div class="stat-icon">PD</div>
+                <div>
+                    <span>Total de pedidos</span>
+                    <strong>{{ total_pedidos|default:0 }}</strong>
+                </div>
+            </article>
 
-        <article class="stat-card">
-            <div class="stat-icon stat-sales">EN</div>
-            <div>
-                <span>Entregados</span>
-                <strong>{{ entregados }}</strong>
-            </div>
-        </article>
-    </section>
+            <article class="stat-card">
+                <div class="stat-icon">PE</div>
+                <div>
+                    <span>Pendientes</span>
+                    <strong>{{ pendientes|default:0 }}</strong>
+                </div>
+            </article>
 
-    <section class="orders-container">
-        <div class="orders-heading">
-            <div>
+            <article class="stat-card">
+                <div class="stat-icon">EP</div>
+                <div>
+                    <span>En preparación</span>
+                    <strong>{{ en_preparacion|default:0 }}</strong>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon">EN</div>
+                <div>
+                    <span>Entregados</span>
+                    <strong>{{ entregados|default:0 }}</strong>
+                </div>
+            </article>
+
+        </section>
+
+        <section class="orders-container">
+
+            <div class="orders-heading">
                 <span class="admin-eyebrow">REGISTROS</span>
                 <h2>Pedidos registrados</h2>
                 <p>Busca un pedido por número, cliente o teléfono.</p>
             </div>
-        </div>
 
-        <form method="get" class="orders-filters">
-            <input
-                type="search"
-                name="buscar"
-                value="{{ busqueda }}"
-                placeholder="Buscar pedido, cliente o teléfono..."
-            >
+            <form method="get" class="orders-filters">
+                <input
+                    type="search"
+                    name="buscar"
+                    value="{{ busqueda|default:'' }}"
+                    placeholder="Buscar pedido, cliente o teléfono..."
+                >
 
-            <select name="estado">
-                <option value="">Todos los estados</option>
-                {% for valor, etiqueta in estados %}
-                    <option value="{{ valor }}" {% if estado_filtro == valor %}selected{% endif %}>
-                        {{ etiqueta }}
-                    </option>
-                {% endfor %}
-            </select>
+                <select name="estado">
+                    <option value="">Todos los estados</option>
 
-            <button type="submit">Buscar</button>
-            <a href="{% url 'pedidos_admin' %}" class="filter-clear">Limpiar</a>
-        </form>
-
-        <div class="orders-table-wrapper">
-            <table class="orders-table">
-                <thead>
-                    <tr>
-                        <th>Pedido</th>
-                        <th>Cliente</th>
-                        <th>Teléfono</th>
-                        <th>Fecha</th>
-                        <th>Total</th>
-                        <th>Estado</th>
-                        <th>Actualizar estado</th>
-                        <th>Detalle</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for item in pedidos %}
-                        <tr>
-                            <td class="order-number">#{{ item.id }}</td>
-                            <td>{{ item.cliente.nombre }}</td>
-                            <td>{{ item.cliente.telefono }}</td>
-                            <td>{{ item.createdAt|date:"d/m/Y H:i" }}</td>
-                            <td class="order-total">${{ item.total|floatformat:0 }}</td>
-                            <td>
-                                <span class="order-status status-{{ item.estado|lower }}">
-                                    {{ item.get_estado_display }}
-                                </span>
-                            </td>
-                            <td>
-                                <form
-                                    method="post"
-                                    action="{% url 'actualizar_estado_pedido' item.id %}"
-                                    class="order-update-form"
-                                >
-                                    {% csrf_token %}
-                                    <select name="estado" aria-label="Nuevo estado del pedido {{ item.id }}">
-                                        {% for valor, etiqueta in estados %}
-                                            <option value="{{ valor }}" {% if item.estado == valor %}selected{% endif %}>
-                                                {{ etiqueta }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                    <button type="submit">Guardar</button>
-                                </form>
-                            </td>
-                            <td>
-                                <details class="order-detail">
-                                    <summary>Ver</summary>
-                                    <div class="order-detail-content">
-                                        <strong>Productos del pedido</strong>
-                                        {% for detalle in item.detallepedido.all %}
-                                            <p>
-                                                {{ detalle.producto.nombre }}
-                                                <span>{{ detalle.cantidad }} × ${{ detalle.precioUnit|floatformat:0 }}</span>
-                                            </p>
-                                        {% empty %}
-                                            <p>No hay productos registrados en este pedido.</p>
-                                        {% endfor %}
-                                        <div class="order-detail-total">
-                                            Total: ${{ item.total|floatformat:0 }}
-                                        </div>
-                                    </div>
-                                </details>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="8" class="orders-empty">
-                                No se encontraron pedidos con esos criterios.
-                            </td>
-                        </tr>
+                    {% for valor, etiqueta in estados %}
+                        <option value="{{ valor }}" {% if estado_filtro == valor %}selected{% endif %}>
+                            {{ etiqueta }}
+                        </option>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
+                </select>
 
+                <button type="submit">Buscar</button>
+
+                <a href="{% url 'pedidos_admin' %}" class="filter-clear">
+                    Limpiar
+                </a>
+            </form>
+
+            <div class="orders-table-wrapper">
+                <table class="orders-table">
+
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Teléfono</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Actualizar estado</th>
+                            <th>Detalle</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in pedidos %}
+                            <tr>
+                                <td class="order-number">#{{ item.id }}</td>
+                                <td>{{ item.cliente.nombre }}</td>
+                                <td>{{ item.cliente.telefono }}</td>
+                                <td>{{ item.createdAt|date:"d/m/Y H:i" }}</td>
+                                <td class="order-total">
+                                    ${{ item.total|floatformat:0 }}
+                                </td>
+
+                                <td>
+                                    <span class="order-status">
+                                        {{ item.get_estado_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <form
+                                        method="post"
+                                        action="{% url 'actualizar_estado_pedido' item.id %}"
+                                        class="order-update-form"
+                                    >
+                                        {% csrf_token %}
+
+                                        <select
+                                            name="estado"
+                                            aria-label="Nuevo estado del pedido {{ item.id }}"
+                                        >
+                                            {% for valor, etiqueta in estados %}
+                                                <option value="{{ valor }}" {% if item.estado == valor %}selected{% endif %}>
+                                                    {{ etiqueta }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <button type="submit">Guardar</button>
+                                    </form>
+                                </td>
+
+                                <td>
+                                    <details class="order-detail">
+                                        <summary>Ver detalle</summary>
+
+                                        <div class="order-detail-content">
+                                            <strong>Productos del pedido</strong>
+
+                                            {% for detalle in item.detallepedido.all %}
+                                                <p>
+                                                    {{ detalle.producto.nombre }}
+                                                    <span>
+                                                        {{ detalle.cantidad }} ×
+                                                        ${{ detalle.precioUnit|floatformat:0 }}
+                                                    </span>
+                                                </p>
+                                            {% empty %}
+                                                <p>No hay productos registrados en este pedido.</p>
+                                            {% endfor %}
+
+                                            <div class="order-detail-total">
+                                                Total: ${{ item.total|floatformat:0 }}
+                                            </div>
+                                        </div>
+                                    </details>
+                                </td>
+                            </tr>
+
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="orders-empty">
+                                    No se encontraron pedidos con esos criterios.
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </div>
 </main>
-{% endblock %}
+
+</body>
+</html>

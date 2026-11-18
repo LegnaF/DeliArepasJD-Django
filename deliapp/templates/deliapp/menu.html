@@ -1,18 +1,17 @@
-
 {% load static %}
+{% load l10n %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#38251c">
 
     <title>Nuestro Menú | Deli Arepas JD</title>
 
-    <meta name="description" content="Descubre nuestras arepas artesanales, preparadas con ingredientes seleccionados y mucho sabor.">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@700;800;900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'deliapp/css/menu.css' %}">
@@ -20,368 +19,854 @@
 
 <body class="menu-page">
 
-    <!-- ENCABEZADO ORIGINAL -->
-    <header>
-        {% include 'deliapp/components/navbar.html' %}
-    </header>
+    {% include 'deliapp/components/navbar.html' %}
 
-    <main class="menu-main">
+    <main class="menu-container">
 
-        <!-- PRESENTACIÓN DEL MENÚ -->
-        <section class="menu-hero">
-            <div class="menu-hero-overlay"></div>
+        <header class="menu-header">
+            <h1>Nuestro Menú</h1>
+            <p class="menu-subtitulo">
+                Arepas artesanales preparadas con dedicación e ingredientes de calidad.
+            </p>
+        </header>
 
-            <div class="menu-hero-content">
-                <span class="menu-eyebrow">
-                    SABOR ARTESANAL COLOMBIANO
-                </span>
+        <div class="menu-toast-notificacion" id="menuToast" role="status" aria-live="polite" hidden>
+            <span aria-hidden="true">✓</span>
+            <span id="menuToastText"></span>
+        </div>
 
-                <h1>
-                    Nuestro <span>Menú</span>
-                </h1>
-
-                <p>
-                    Preparadas con dedicación, ingredientes seleccionados
-                    y ese sabor tradicional que siempre quieres volver a disfrutar.
-                </p>
-
-                <a href="#productos" class="menu-hero-button">
-                    Descubrir nuestras arepas
-                    <span aria-hidden="true">↓</span>
-                </a>
-            </div>
-
-            <div class="hero-decoration hero-decoration-one"></div>
-            <div class="hero-decoration hero-decoration-two"></div>
-        </section>
-
-        <!-- INTRODUCCIÓN -->
-        <section class="menu-intro" id="productos">
-            <div class="menu-section-heading">
-                <span class="section-eyebrow">HECHAS PARA DISFRUTAR</span>
-
-                <h2>
-                    El sabor que nos <span>representa</span>
-                </h2>
-
-                <p>
-                    Explora nuestra selección de arepas y encuentra
-                    tu próximo sabor favorito.
-                </p>
-            </div>
-
-            <div class="menu-counter">
-                <span class="counter-number">{{ productos|length }}</span>
-                <span class="counter-label">
-                    {% if productos|length == 1 %}
-                        producto disponible
-                    {% else %}
-                        productos disponibles
-                    {% endif %}
-                </span>
-            </div>
-        </section>
-
-        <!-- FILTROS Y BÚSQUEDA -->
-        <section class="menu-controls">
-            <div class="menu-search">
+        <!-- Buscador -->
+        <div class="menu-toolbar">
+            <div class="search-input-wrapper">
                 <span class="search-icon" aria-hidden="true">⌕</span>
 
                 <input
                     type="search"
-                    id="productSearch"
-                    placeholder="¿Qué arepa estás buscando?"
-                    aria-label="Buscar productos"
+                    id="searchInput"
+                    placeholder="Buscar una arepa..."
                     autocomplete="off"
+                    aria-label="Buscar productos"
                 >
 
                 <button
                     type="button"
-                    id="clearSearch"
-                    class="clear-search"
+                    class="btn-clear-search"
+                    id="btnClearSearch"
                     aria-label="Limpiar búsqueda"
                     hidden
                 >
                     ×
                 </button>
             </div>
+        </div>
 
-            <div class="category-filters" id="categoryFilters">
-                {% for categoria in categorias %}
-                    <button
-                        type="button"
-                        class="category-button {% if forloop.first %}active{% endif %}"
-                        data-category="{{ categoria|lower }}"
+        <!-- Categorías dinámicas -->
+        <div class="menu-categorias" id="menuCategorias">
+            {% for categoria in categorias %}
+                <button
+                    type="button"
+                    class="cat-chip {% if forloop.first %}activo{% endif %}"
+                    data-categoria="{{ categoria }}"
+                    aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                >
+                    {{ categoria }}
+                </button>
+            {% endfor %}
+        </div>
+
+        <!-- Productos -->
+        {% if productos %}
+            <div class="menu-grid" id="menuGrid">
+
+                {% for prod in productos %}
+                    <article
+                        class="menu-card"
+                        data-id="{{ prod.id }}"
+                        data-nombre="{{ prod.nombre }}"
+                        data-descripcion="{{ prod.descripcion|default:'Arepa artesanal recién preparada.' }}"
+                        data-categoria="{{ prod.categoria|default:'Arepas' }}"
+                        data-precio="{{ prod.precio|unlocalize }}"
+                        data-descuento="{{ prod.descuento|default:0 }}"
+                        data-stock="{{ prod.stock }}"
+                        data-imagen="{% if prod.imagen_archivo %}{{ prod.imagen_archivo.url }}{% elif prod.imagen %}{{ prod.imagen }}{% else %}{% static 'deliapp/img/arepa3.jpg' %}{% endif %}"
                     >
-                        {{ categoria }}
-                    </button>
-                {% empty %}
-                    <button type="button" class="category-button active" data-category="todos">
-                        Todos
-                    </button>
-                {% endfor %}
-            </div>
-        </section>
 
-        <!-- CATÁLOGO -->
-        <section class="products-section">
+                        <div class="menu-card-imagen">
+                            {% if prod.imagen_archivo %}
+                                <img
+                                    src="{{ prod.imagen_archivo.url }}"
+                                    alt="{{ prod.nombre }}"
+                                    loading="lazy"
+                                >
+                            {% elif prod.imagen %}
+                                <img
+                                    src="{{ prod.imagen }}"
+                                    alt="{{ prod.nombre }}"
+                                    loading="lazy"
+                                >
+                            {% else %}
+                                <img
+                                    src="{% static 'deliapp/img/arepa3.jpg' %}"
+                                    alt="{{ prod.nombre }}"
+                                    loading="lazy"
+                                >
+                            {% endif %}
 
-            {% if productos %}
-                <div class="products-grid" id="productsGrid">
-
-                    {% for prod in productos %}
-                        <article
-                            class="product-card"
-                            data-name="{{ prod.nombre|lower }}"
-                            data-category="{{ prod.categoria|default:'Arepas'|lower }}"
-                        >
-
-                            <div class="product-image-container">
-
-                                {% if prod.imagen_archivo %}
-                                    <img
-                                        src="{{ prod.imagen_archivo.url }}"
-                                        alt="{{ prod.nombre }}"
-                                        class="product-image"
-                                        loading="lazy"
-                                    >
-                                {% elif prod.imagen %}
-                                    <img
-                                        src="{{ prod.imagen }}"
-                                        alt="{{ prod.nombre }}"
-                                        class="product-image"
-                                        loading="lazy"
-                                    >
-                                {% else %}
-                                    <img
-                                        src="{% static 'deliapp/img/arepa3.jpg' %}"
-                                        alt="{{ prod.nombre }}"
-                                        class="product-image"
-                                        loading="lazy"
-                                    >
-                                {% endif %}
-
-                                <span class="product-category">
-                                    {{ prod.categoria|default:"Arepas" }}
+                            {% if prod.descuento > 0 %}
+                                <span class="menu-badge-descuento">
+                                    -{{ prod.descuento }}%
                                 </span>
+                            {% endif %}
 
-                                {% if prod.descuento > 0 %}
-                                    <span class="product-discount">
-                                        -{{ prod.descuento }}%
-                                    </span>
-                                {% endif %}
-                            </div>
+                            {% if prod.stock <= 0 %}
+                                <span class="menu-badge-agotado">Agotado</span>
+                            {% endif %}
+                        </div>
 
-                            <div class="product-information">
+                        <div class="menu-card-info">
+                            <h3>{{ prod.nombre }}</h3>
 
-                                <div class="product-heading">
-                                    <h3>{{ prod.nombre }}</h3>
-                                </div>
+                            <p class="menu-card-descripcion">
+                                {{ prod.descripcion|default:"Arepa artesanal recién preparada." }}
+                            </p>
 
-                                <p class="product-description">
-                                    {{ prod.descripcion|default:"Una preparación artesanal con todo el sabor de Deli Arepas JD." }}
-                                </p>
-
-                                <div class="product-bottom">
-
-                                    <div class="product-price">
-                                        {% if prod.descuento > 0 %}
-                                            <span class="old-price">
-                                                ${{ prod.precio|floatformat:0 }}
-                                            </span>
-
-                                            <strong>
-                                                ${{ prod.precio|floatformat:0 }}
-                                            </strong>
-                                            <span class="discount-note">
-                                                Descuento disponible
-                                            </span>
-                                        {% else %}
-                                            <strong>
-                                                ${{ prod.precio|floatformat:0 }}
-                                            </strong>
-                                        {% endif %}
-                                    </div>
-
-                                    {% if prod.stock > 0 %}
-                                        <span class="stock-status available">
-                                            Disponible
-                                        </span>
-                                    {% else %}
-                                        <span class="stock-status unavailable">
-                                            Agotado
+                            <div class="menu-card-footer">
+                                <div class="menu-card-precio">
+                                    {% if prod.descuento > 0 %}
+                                        <span class="precio-original">
+                                            ${{ prod.precio|floatformat:0 }}
                                         </span>
                                     {% endif %}
 
+                                    <span class="precio-final" data-precio-display>
+                                        ${{ prod.precio|floatformat:0 }}
+                                    </span>
                                 </div>
 
-                                {% if prod.stock > 0 %}
-                                    <button
-                                        type="button"
-                                        class="product-button"
-                                        data-product-id="{{ prod.id }}"
-                                        data-product-name="{{ prod.nombre }}"
-                                        {% if prod.descuento > 0 %}
-                                            data-product-price="{{ prod.precio|floatformat:0 }}"
-                                            data-product-discount="{{ prod.descuento }}"
-                                        {% else %}
-                                            data-product-price="{{ prod.precio|floatformat:0 }}"
-                                            data-product-discount="0"
-                                        {% endif %}
-                                    >
-                                        Agregar al pedido
-                                        <span aria-hidden="true">+</span>
-                                    </button>
-                                {% else %}
-                                    <button type="button" class="product-button disabled" disabled>
-                                        No disponible
-                                    </button>
-                                {% endif %}
-
+                                <button
+                                    type="button"
+                                    class="btn-agregar"
+                                    {% if prod.stock <= 0 %}disabled{% endif %}
+                                >
+                                    {% if prod.stock <= 0 %}
+                                        Agotado
+                                    {% else %}
+                                        + Agregar
+                                    {% endif %}
+                                </button>
                             </div>
-                        </article>
-                    {% endfor %}
+                        </div>
+                    </article>
+                {% endfor %}
 
-                </div>
-
-                <div class="no-search-results" id="noSearchResults" hidden>
-                    <div class="empty-icon">⌕</div>
-                    <h3>No encontramos resultados</h3>
-                    <p>Intenta con otro nombre o selecciona una categoría diferente.</p>
-                </div>
-
-            {% else %}
-                <div class="empty-catalog">
-                    <div class="empty-icon">JD</div>
-                    <span class="section-eyebrow">NUESTRO CATÁLOGO</span>
-                    <h3>Estamos preparando nuestro menú</h3>
-                    <p>
-                        Muy pronto encontrarás aquí nuestras deliciosas
-                        arepas artesanales.
-                    </p>
-                </div>
-            {% endif %}
-
-        </section>
-
-        <!-- CIERRE -->
-        <section class="menu-bottom-banner">
-            <div>
-                <span class="section-eyebrow">DE NUESTRA COCINA PARA TI</span>
-                <h2>Un buen momento comienza con un buen sabor.</h2>
-                <p>Gracias por elegir Deli Arepas JD.</p>
             </div>
-        </section>
+
+            <div class="menu-vacio" id="menuSinResultados" hidden>
+                <p>No encontramos productos con esa búsqueda.</p>
+
+                <button
+                    type="button"
+                    class="btn-limpiar-filtros"
+                    id="btnResetFiltros"
+                >
+                    Ver todo el menú
+                </button>
+            </div>
+
+        {% else %}
+            <div class="menu-vacio">
+                <p>Aún no hay productos disponibles en el menú.</p>
+            </div>
+        {% endif %}
 
     </main>
 
-    <!-- FOOTER ORIGINAL -->
-    <footer>
-        {% include 'deliapp/components/footer.html' %}
-    </footer>
+    <!-- Botón flotante -->
+    <button
+        type="button"
+        class="btn-cart-float"
+        id="btnAbrirCarrito"
+        aria-label="Abrir carrito"
+        aria-controls="cartOverlay"
+    >
+        <span class="cart-icon" aria-hidden="true">🛒</span>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+
+    <!-- Fondo del carrito -->
+    <div class="cart-overlay" id="cartOverlay" hidden>
+        <section
+            class="cart-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cartDrawerTitle"
+        >
+
+            <div class="cart-header">
+                <h2 id="cartDrawerTitle">Tu Pedido (0)</h2>
+
+                <button
+                    type="button"
+                    class="cart-close"
+                    id="btnCerrarCarrito"
+                    aria-label="Cerrar carrito"
+                >
+                    ×
+                </button>
+            </div>
+
+            <!-- Pedido exitoso -->
+            <div class="cart-empty-body" id="cartSuccessView" hidden>
+                <span class="cart-empty-icon" aria-hidden="true">✓</span>
+
+                <h3 id="successClienteTitle">¡Gracias por tu compra!</h3>
+
+                <p>
+                    Tu pedido
+                    <strong id="successPedidoId">#0</strong>
+                    se registró correctamente.
+                </p>
+
+                <p id="successTotalText" class="success-total">
+                    Total: $0
+                </p>
+
+                <button
+                    type="button"
+                    class="btn-limpiar-filtros"
+                    id="btnContinuarComprando"
+                >
+                    Continuar comprando
+                </button>
+            </div>
+
+            <!-- Carrito vacío -->
+            <div class="cart-empty-body" id="cartEmptyView">
+                <span class="cart-empty-icon" aria-hidden="true">🛒</span>
+
+                <p>Tu carrito está vacío</p>
+
+                <button
+                    type="button"
+                    class="btn-limpiar-filtros"
+                    id="btnExplorarMenu"
+                >
+                    Explorar menú
+                </button>
+            </div>
+
+            <!-- Carrito con productos -->
+            <div id="cartActiveView" hidden>
+                <div class="cart-items-list" id="cartItemsList"></div>
+
+                <div class="cart-checkout-section">
+                    <div class="cart-summary-row">
+                        <span>Total:</span>
+                        <strong id="cartSubtotal">$0</strong>
+                    </div>
+
+                    <form id="checkoutForm" class="cart-form-fields">
+                        {% csrf_token %}
+
+                        <input
+                            type="text"
+                            id="nombreCliente"
+                            name="nombre"
+                            placeholder="Nombre completo *"
+                            maxlength="150"
+                            autocomplete="name"
+                            required
+                        >
+
+                        <input
+                            type="tel"
+                            id="telefonoCliente"
+                            name="telefono"
+                            placeholder="Teléfono / celular *"
+                            maxlength="30"
+                            autocomplete="tel"
+                            required
+                        >
+
+                        <input
+                            type="text"
+                            id="direccionCliente"
+                            name="direccion"
+                            placeholder="Dirección de entrega *"
+                            maxlength="250"
+                            autocomplete="street-address"
+                            required
+                        >
+
+                        <button
+                            type="submit"
+                            class="btn-confirmar-pedido"
+                            id="btnConfirmarPedido"
+                        >
+                            Confirmar pedido
+                        </button>
+                    </form>
+
+                    <button
+                        type="button"
+                        class="btn-vaciar"
+                        id="btnVaciarCarrito"
+                    >
+                        Vaciar carrito
+                    </button>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    {% include 'deliapp/components/footer.html' %}
 
     <script>
     (() => {
         "use strict";
 
-        const searchInput = document.getElementById("productSearch");
-        const clearButton = document.getElementById("clearSearch");
-        const categoryButtons = document.querySelectorAll(".category-button");
-        const productCards = document.querySelectorAll(".product-card");
-        const noResults = document.getElementById("noSearchResults");
+        const STORAGE_KEY = "deliarepas_carrito_django";
+        const FALLBACK_IMG = "{% static 'deliapp/img/arepa3.jpg' %}";
+        const URL_PEDIDOS = "{% url 'crear_pedido' %}";
 
-        let activeCategory = "todos";
+        const dineroCOP = new Intl.NumberFormat("es-CO", {
+            style: "currency",
+            currency: "COP",
+            maximumFractionDigits: 0
+        });
 
-        function filterProducts() {
-            const search = searchInput.value.trim().toLowerCase();
-            let visible = 0;
+        // Referencias del documento
+        const cards = [...document.querySelectorAll(".menu-card")];
 
-            productCards.forEach(card => {
-                const name = card.dataset.name || "";
-                const category = card.dataset.category || "";
+        const searchInput = document.getElementById("searchInput");
+        const btnClearSearch = document.getElementById("btnClearSearch");
+        const catButtons = [...document.querySelectorAll(".cat-chip")];
 
-                const matchesSearch = name.includes(search);
-                const matchesCategory =
-                    activeCategory === "todos" ||
-                    category === activeCategory;
+        const menuSinResultados = document.getElementById("menuSinResultados");
+        const btnResetFiltros = document.getElementById("btnResetFiltros");
 
-                const show = matchesSearch && matchesCategory;
+        const toastEl = document.getElementById("menuToast");
+        const toastText = document.getElementById("menuToastText");
 
-                card.hidden = !show;
+        const btnAbrirCarrito = document.getElementById("btnAbrirCarrito");
+        const btnCerrarCarrito = document.getElementById("btnCerrarCarrito");
+        const cartOverlay = document.getElementById("cartOverlay");
 
-                if (show) visible++;
-            });
+        const cartBadge = document.getElementById("cartBadge");
+        const cartDrawerTitle = document.getElementById("cartDrawerTitle");
 
-            if (noResults) {
-                noResults.hidden = visible !== 0;
+        const cartEmptyView = document.getElementById("cartEmptyView");
+        const cartActiveView = document.getElementById("cartActiveView");
+        const cartSuccessView = document.getElementById("cartSuccessView");
+
+        const cartItemsList = document.getElementById("cartItemsList");
+        const cartSubtotal = document.getElementById("cartSubtotal");
+
+        const checkoutForm = document.getElementById("checkoutForm");
+        const btnConfirmarPedido = document.getElementById("btnConfirmarPedido");
+        const btnVaciarCarrito = document.getElementById("btnVaciarCarrito");
+
+        let categoriaActiva = "Todos";
+        let toastTimer = null;
+
+        // Leer el carrito de forma segura
+        function cargarCarrito() {
+            try {
+                const guardado = JSON.parse(
+                    localStorage.getItem(STORAGE_KEY) || "[]"
+                );
+
+                if (!Array.isArray(guardado)) return [];
+
+                return guardado
+                    .filter(item =>
+                        item &&
+                        Number.isInteger(Number(item.id)) &&
+                        Number(item.id) > 0 &&
+                        Number.isInteger(Number(item.cantidad)) &&
+                        Number(item.cantidad) > 0
+                    )
+                    .map(item => ({
+                        id: Number(item.id),
+                        nombre: String(item.nombre || "Producto"),
+                        precioUnitario: Math.max(0, Number(item.precioUnitario) || 0),
+                        imagen: String(item.imagen || FALLBACK_IMG),
+                        stock: Math.max(0, Number(item.stock) || 0),
+                        cantidad: Number(item.cantidad)
+                    }));
+            } catch (error) {
+                localStorage.removeItem(STORAGE_KEY);
+                return [];
+            }
+        }
+
+        let carrito = cargarCarrito();
+
+        // Precios
+        function calcularPrecioFinal(precio, descuento) {
+            const valor = Math.max(0, Number(precio) || 0);
+            const porcentaje = Math.min(
+                100,
+                Math.max(0, Number(descuento) || 0)
+            );
+
+            return Math.round(valor * (1 - porcentaje / 100));
+        }
+
+        // Mostrar precios actualizados y preparar botones
+        cards.forEach(card => {
+            const precio = Number(card.dataset.precio || 0);
+            const descuento = Number(card.dataset.descuento || 0);
+            const precioFinal = calcularPrecioFinal(precio, descuento);
+
+            card.dataset.precioFinal = String(precioFinal);
+
+            const display = card.querySelector("[data-precio-display]");
+            const original = card.querySelector(".precio-original");
+
+            if (display) {
+                display.textContent = dineroCOP.format(precioFinal);
             }
 
-            clearButton.hidden = search.length === 0;
-        }
+            if (original) {
+                original.textContent = dineroCOP.format(precio);
+            }
 
-        if (searchInput) {
-            searchInput.addEventListener("input", filterProducts);
-        }
+            const btnAgregar = card.querySelector(".btn-agregar");
 
-        if (clearButton) {
-            clearButton.addEventListener("click", () => {
-                searchInput.value = "";
-                filterProducts();
-                searchInput.focus();
-            });
-        }
-
-        categoryButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                categoryButtons.forEach(item => item.classList.remove("active"));
-
-                button.classList.add("active");
-                activeCategory = button.dataset.category || "todos";
-
-                filterProducts();
+            btnAgregar?.addEventListener("click", () => {
+                agregarProducto({
+                    id: Number(card.dataset.id),
+                    nombre: card.dataset.nombre,
+                    precioUnitario: precioFinal,
+                    imagen: card.dataset.imagen || FALLBACK_IMG,
+                    stock: Number(card.dataset.stock || 0)
+                });
             });
         });
 
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add("visible");
-                    observer.unobserve(entry.target);
+        // Notificaciones
+        function mostrarToast(mensaje) {
+            if (!toastEl || !toastText) return;
+
+            toastText.textContent = mensaje;
+            toastEl.hidden = false;
+
+            clearTimeout(toastTimer);
+
+            toastTimer = setTimeout(() => {
+                toastEl.hidden = true;
+            }, 2800);
+        }
+
+        // Guardar carrito
+        function guardarCarrito() {
+            try {
+                localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(carrito)
+                );
+            } catch (error) {
+                mostrarToast("No se pudo guardar el carrito en este navegador.");
+            }
+
+            renderCarrito();
+        }
+
+        // Agregar producto
+        function agregarProducto(producto) {
+            if (!producto.id || producto.stock <= 0) {
+                mostrarToast("Este producto no está disponible.");
+                return;
+            }
+
+            const existente = carrito.find(
+                item => item.id === producto.id
+            );
+
+            if (existente) {
+                if (existente.cantidad >= producto.stock) {
+                    mostrarToast("Ya alcanzaste el máximo disponible.");
+                    return;
                 }
+
+                existente.cantidad += 1;
+            } else {
+                carrito.push({
+                    ...producto,
+                    cantidad: 1
+                });
+            }
+
+            guardarCarrito();
+            mostrarToast(`${producto.nombre} añadido al carrito.`);
+        }
+
+        // Cambiar cantidad
+        function cambiarCantidad(id, cambio) {
+            const producto = carrito.find(item => item.id === id);
+
+            if (!producto) return;
+
+            const nuevaCantidad = producto.cantidad + cambio;
+
+            if (nuevaCantidad <= 0) {
+                eliminarProducto(id);
+                return;
+            }
+
+            if (nuevaCantidad > producto.stock) {
+                mostrarToast("No hay más unidades disponibles.");
+                return;
+            }
+
+            producto.cantidad = nuevaCantidad;
+            guardarCarrito();
+        }
+
+        // Eliminar producto
+        function eliminarProducto(id) {
+            carrito = carrito.filter(item => item.id !== id);
+            guardarCarrito();
+        }
+
+        // Crear un elemento de texto seguro
+        function crearTexto(tag, clase, contenido) {
+            const elemento = document.createElement(tag);
+
+            if (clase) elemento.className = clase;
+
+            elemento.textContent = contenido;
+
+            return elemento;
+        }
+
+        // Dibujar productos del carrito
+        function renderCarrito() {
+            const totalItems = carrito.reduce(
+                (total, item) => total + item.cantidad,
+                0
+            );
+
+            const subtotal = carrito.reduce(
+                (total, item) =>
+                    total + item.precioUnitario * item.cantidad,
+                0
+            );
+
+            cartBadge.textContent = String(totalItems);
+            cartDrawerTitle.textContent = `Tu Pedido (${totalItems})`;
+            cartSubtotal.textContent = dineroCOP.format(subtotal);
+
+            cartSuccessView.hidden = true;
+
+            if (carrito.length === 0) {
+                cartEmptyView.hidden = false;
+                cartActiveView.hidden = true;
+                cartItemsList.replaceChildren();
+                return;
+            }
+
+            cartEmptyView.hidden = true;
+            cartActiveView.hidden = false;
+
+            cartItemsList.replaceChildren();
+
+            carrito.forEach(item => {
+                const fila = document.createElement("div");
+                fila.className = "cart-item";
+
+                const imagen = document.createElement("img");
+                imagen.className = "cart-item-img";
+                imagen.src = item.imagen || FALLBACK_IMG;
+                imagen.alt = item.nombre;
+                imagen.onerror = () => {
+                    imagen.src = FALLBACK_IMG;
+                };
+
+                const detalles = document.createElement("div");
+                detalles.className = "cart-item-details";
+
+                const nombre = crearTexto("h4", "", item.nombre);
+
+                const precio = crearTexto(
+                    "span",
+                    "cart-item-price",
+                    dineroCOP.format(item.precioUnitario * item.cantidad)
+                );
+
+                const controles = document.createElement("div");
+                controles.className = "cart-item-controls";
+
+                const menos = crearTexto("button", "", "−");
+                menos.type = "button";
+                menos.setAttribute("aria-label", "Disminuir cantidad");
+
+                const cantidad = crearTexto(
+                    "span",
+                    "",
+                    String(item.cantidad)
+                );
+
+                const mas = crearTexto("button", "", "+");
+                mas.type = "button";
+                mas.setAttribute("aria-label", "Aumentar cantidad");
+
+                menos.addEventListener("click", () => {
+                    cambiarCantidad(item.id, -1);
+                });
+
+                mas.addEventListener("click", () => {
+                    cambiarCantidad(item.id, 1);
+                });
+
+                controles.append(menos, cantidad, mas);
+
+                detalles.append(nombre, precio, controles);
+
+                const eliminar = crearTexto(
+                    "button",
+                    "cart-remove-btn",
+                    "×"
+                );
+
+                eliminar.type = "button";
+                eliminar.title = "Eliminar producto";
+                eliminar.setAttribute("aria-label", `Eliminar ${item.nombre}`);
+
+                eliminar.addEventListener("click", () => {
+                    eliminarProducto(item.id);
+                });
+
+                fila.append(imagen, detalles, eliminar);
+                cartItemsList.appendChild(fila);
             });
-        }, { threshold: 0.12 });
+        }
 
-        productCards.forEach(card => observer.observe(card));
+        // Búsqueda y categorías
+        function filtrarMenu() {
+            const texto = (searchInput?.value || "")
+                .trim()
+                .toLowerCase();
 
-        document.querySelectorAll(".product-button:not(.disabled)").forEach(button => {
+            let visibles = 0;
+
+            cards.forEach(card => {
+                const nombre = (card.dataset.nombre || "").toLowerCase();
+                const descripcion = (card.dataset.descripcion || "").toLowerCase();
+                const categoria = (card.dataset.categoria || "Arepas").toLowerCase();
+
+                const coincideCategoria =
+                    categoriaActiva === "Todos" ||
+                    categoria === categoriaActiva.toLowerCase();
+
+                const coincideTexto =
+                    nombre.includes(texto) ||
+                    descripcion.includes(texto);
+
+                const mostrar = coincideCategoria && coincideTexto;
+
+                card.hidden = !mostrar;
+
+                if (mostrar) visibles++;
+            });
+
+            if (btnClearSearch) {
+                btnClearSearch.hidden = texto.length === 0;
+            }
+
+            if (menuSinResultados) {
+                menuSinResultados.hidden = visibles > 0;
+            }
+        }
+
+        searchInput?.addEventListener("input", filtrarMenu);
+
+        btnClearSearch?.addEventListener("click", () => {
+            searchInput.value = "";
+            filtrarMenu();
+            searchInput.focus();
+        });
+
+        catButtons.forEach(button => {
             button.addEventListener("click", () => {
-                const productId = button.dataset.productId;
-                const productName = button.dataset.productName;
+                catButtons.forEach(item => {
+                    item.classList.remove("activo");
+                    item.setAttribute("aria-pressed", "false");
+                });
 
-                /*
-                 * Este botón conserva la identificación del producto.
-                 * La integración del carrito y la creación del pedido
-                 * deben conectarse con las vistas existentes del proyecto.
-                 */
-                window.dispatchEvent(new CustomEvent("deli:agregar-producto", {
-                    detail: {
-                        productoId: productId,
-                        nombre: productName,
-                        precio: Number(button.dataset.productPrice || 0),
-                        descuento: Number(button.dataset.productDiscount || 0)
-                    }
-                }));
+                button.classList.add("activo");
+                button.setAttribute("aria-pressed", "true");
 
-                button.classList.add("added");
-                const originalText = button.innerHTML;
-                button.innerHTML = 'Agregado <span aria-hidden="true">✓</span>';
+                categoriaActiva = button.dataset.categoria || "Todos";
 
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.classList.remove("added");
-                }, 1200);
+                filtrarMenu();
             });
         });
+
+        btnResetFiltros?.addEventListener("click", () => {
+            if (searchInput) searchInput.value = "";
+
+            categoriaActiva = "Todos";
+
+            catButtons.forEach(button => {
+                const activo = button.dataset.categoria === "Todos";
+
+                button.classList.toggle("activo", activo);
+                button.setAttribute("aria-pressed", String(activo));
+            });
+
+            filtrarMenu();
+        });
+
+        // Abrir y cerrar carrito
+        function abrirCarrito() {
+            renderCarrito();
+            cartOverlay.hidden = false;
+            document.body.classList.add("carrito-abierto");
+            btnCerrarCarrito.focus();
+        }
+
+        function cerrarCarrito() {
+            cartOverlay.hidden = true;
+            document.body.classList.remove("carrito-abierto");
+            btnAbrirCarrito.focus();
+        }
+
+        btnAbrirCarrito?.addEventListener("click", abrirCarrito);
+        btnCerrarCarrito?.addEventListener("click", cerrarCarrito);
+
+        document.getElementById("btnExplorarMenu")
+            ?.addEventListener("click", cerrarCarrito);
+
+        document.getElementById("btnContinuarComprando")
+            ?.addEventListener("click", cerrarCarrito);
+
+        cartOverlay?.addEventListener("click", event => {
+            if (event.target === cartOverlay) {
+                cerrarCarrito();
+            }
+        });
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape" && !cartOverlay.hidden) {
+                cerrarCarrito();
+            }
+        });
+
+        // Vaciar carrito
+        btnVaciarCarrito?.addEventListener("click", () => {
+            if (carrito.length === 0) return;
+
+            carrito = [];
+            guardarCarrito();
+            mostrarToast("Se vació tu carrito.");
+        });
+
+        // Enviar pedido a Django
+        checkoutForm?.addEventListener("submit", async event => {
+            event.preventDefault();
+
+            if (carrito.length === 0) {
+                mostrarToast("Agrega productos antes de confirmar.");
+                return;
+            }
+
+            const nombre = document.getElementById("nombreCliente").value.trim();
+            const telefono = document.getElementById("telefonoCliente").value.trim();
+            const direccion = document.getElementById("direccionCliente").value.trim();
+
+            const csrfToken = checkoutForm.querySelector(
+                "[name=csrfmiddlewaretoken]"
+            )?.value;
+
+            if (!nombre || !telefono || !direccion) {
+                mostrarToast("Completa los datos obligatorios.");
+                return;
+            }
+
+            if (!csrfToken) {
+                mostrarToast("No se pudo validar el formulario. Recarga la página.");
+                return;
+            }
+
+            const pedido = {
+                clienteNombre: nombre,
+                telefono: telefono,
+                direccion: direccion,
+
+                // El servidor calcula los precios reales.
+                items: carrito.map(item => ({
+                    productoId: item.id,
+                    cantidad: item.cantidad
+                }))
+            };
+
+            try {
+                btnConfirmarPedido.disabled = true;
+                btnConfirmarPedido.textContent = "Procesando pedido...";
+
+                const respuesta = await fetch(URL_PEDIDOS, {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: JSON.stringify(pedido)
+                });
+
+                let datos;
+
+                try {
+                    datos = await respuesta.json();
+                } catch {
+                    throw new Error("El servidor devolvió una respuesta no válida.");
+                }
+
+                if (!respuesta.ok) {
+                    throw new Error(
+                        datos.error || "No se pudo registrar el pedido."
+                    );
+                }
+
+                // Limpiar carrito y mostrar confirmación
+                carrito = [];
+                localStorage.removeItem(STORAGE_KEY);
+                checkoutForm.reset();
+
+                cartBadge.textContent = "0";
+                cartDrawerTitle.textContent = "¡Pedido confirmado!";
+
+                document.getElementById("successClienteTitle").textContent =
+                    `¡Gracias por tu compra, ${nombre}!`;
+
+                document.getElementById("successPedidoId").textContent =
+                    `#${datos.id}`;
+
+                document.getElementById("successTotalText").textContent =
+                    `Total: ${dineroCOP.format(Number(datos.total) || 0)}`;
+
+                cartEmptyView.hidden = true;
+                cartActiveView.hidden = true;
+                cartSuccessView.hidden = false;
+
+            } catch (error) {
+                mostrarToast(
+                    error.message || "Ocurrió un error al registrar el pedido."
+                );
+            } finally {
+                btnConfirmarPedido.disabled = false;
+                btnConfirmarPedido.textContent = "Confirmar pedido";
+            }
+        });
+
+        // Estado inicial
+        renderCarrito();
+        filtrarMenu();
+
     })();
     </script>
 

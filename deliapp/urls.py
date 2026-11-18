@@ -207,7 +207,7 @@ urlpatterns = [
 
     path(
         'cliente/',
-        views.home_page,
+        views.cliente_dashboard,
         name='cliente'
     ),
 

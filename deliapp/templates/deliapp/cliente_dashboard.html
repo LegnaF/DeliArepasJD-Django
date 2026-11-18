@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Cliente | Deli Arepas JD</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'deliapp/css/cliente.css' %}">
+</head>
+
+<body class="cliente-layout">
+
+    {% include 'deliapp/components/navbar.html' %}
+
+    <main class="cliente-container">
+
+        <!-- Encabezado del Panel -->
+        <header class="cliente-header">
+            <div class="cliente-header-copy">
+                <span class="cliente-eyebrow">GESTIÓN DEL CLIENTE</span>
+                <h1>Panel de Cliente</h1>
+            </div>
+
+            <div class="cliente-header-meta">
+                <span class="cliente-rol-badge">Rol: Cliente</span>
+                <strong class="cliente-bienvenida">
+                    Bienvenido, {{ nombre_cliente|default:"Cliente" }}
+                </strong>
+            </div>
+        </header>
+
+        <!-- 1. Módulos de Servicio -->
+        <section class="cliente-seccion">
+            <h2 class="cliente-titulo-seccion">Servicios del Cliente</h2>
+
+            <div class="modulos-cliente-grid">
+                <article class="modulo-cliente-card">
+                    <div>
+                        <span class="modulo-cliente-codigo">01 · CUENTA</span>
+                        <h3>Autenticación</h3>
+                        <p>Iniciar sesión, registrarse, actualizar datos o restablecer contraseña.</p>
+                    </div>
+                    <a href="{% url 'login' %}" class="btn-modulo-cliente">Ingresar →</a>
+                </article>
+
+                <article class="modulo-cliente-card">
+                    <div>
+                        <span class="modulo-cliente-codigo">02 · CATÁLOGO</span>
+                        <h3>Productos</h3>
+                        <p>Consultar menú de productos y agregarlos al carrito.</p>
+                    </div>
+                    <a href="{% url 'menu' %}" class="btn-modulo-cliente">Ingresar →</a>
+                </article>
+
+                <article class="modulo-cliente-card">
+                    <div>
+                        <span class="modulo-cliente-codigo">03 · ORDEN</span>
+                        <h3>Pedido</h3>
+                        <p>Consultar carrito, confirmar pedidos, cancelar o ver historial.</p>
+                    </div>
+                    <a href="{% url 'consultar_pedido' %}" class="btn-modulo-cliente">Ingresar →</a>
+                </article>
+
+                <article class="modulo-cliente-card">
+                    <div>
+                        <span class="modulo-cliente-codigo">04 · FACTURACIÓN</span>
+                        <h3>Pago</h3>
+                        <p>Realizar pagos seleccionando el método de pago de tu preferencia.</p>
+                    </div>
+                    <a href="{% url 'menu' %}" class="btn-modulo-cliente">Ingresar →</a>
+                </article>
+
+                <article class="modulo-cliente-card">
+                    <div>
+                        <span class="modulo-cliente-codigo">05 · ATENCIÓN</span>
+                        <h3>PQRS</h3>
+                        <p>Crear y consultar peticiones, quejas, reclamos o sugerencias.</p>
+                    </div>
+                    <a href="{% url 'inicio' %}#contacto" class="btn-modulo-cliente">Ingresar →</a>
+                </article>
+            </div>
+        </section>
+
+        <!-- 2. Historial de Pedidos -->
+        <section class="cliente-seccion" id="mis-pedidos">
+            <h2 class="cliente-titulo-seccion">Mis Pedidos</h2>
+
+            {% if pedidos %}
+                <div class="pedidos-lista">
+                    {% for p in pedidos %}
+                        <article class="tarjeta-pedido-cliente">
+                            <div class="tarjeta-cabecera">
+                                <span class="pedido-codigo">Pedido #{{ p.id }}</span>
+                                <span class="badge-cliente estado-{{ p.estado }}">
+                                    {{ p.get_estado_display }}
+                                </span>
+                            </div>
+
+                            <div class="items-cliente-lista">
+                                {% for item in p.detallepedido.all %}
+                                    <div class="item-cliente-linea">
+                                        <span>{{ item.cantidad }}x {{ item.producto.nombre }}</span>
+                                        <span>${{ item.precioUnit|floatformat:0 }} c/u</span>
+                                    </div>
+                                {% empty %}
+                                    <div class="item-cliente-linea">
+                                        <span>Sin productos detallados en esta orden.</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            {% if p.cliente.direccion %}
+                                <p class="direccion-pedido-cliente">
+                                    <strong>Dirección de entrega:</strong> {{ p.cliente.direccion }}
+                                </p>
+                            {% endif %}
+
+                            <div class="tarjeta-pie">
+                                <span class="fecha-pedido">
+                                    Fecha: {{ p.createdAt|date:"d/m/Y H:i" }}
+                                </span>
+                                <span class="monto-total">
+                                    Total: ${{ p.total|floatformat:0 }}
+                                </span>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="sin-pedidos">
+                    <h3>Aún no has realizado ningún pedido</h3>
+                    <p>Explora nuestro menú y disfruta de las mejores arepas artesanales.</p>
+                    <a href="{% url 'menu' %}" class="btn-ver-menu-cliente">
+                        Ver Menú de Productos
+                    </a>
+                </div>
+            {% endif %}
+        </section>
+
+    </main>
+
+    {% include 'deliapp/components/footer.html' %}
+
+</body>
+</html>

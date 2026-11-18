@@ -1,105 +1,262 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8f3ec">
+
     <title>{{ titulo }} | Deli Arepas JD</title>
-    <link rel="stylesheet" href="{% static 'deliapp/css/productos_admin.css' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="stylesheet" href="{% static 'deliapp/css/productos_admin.css' %}?v=20261118">
 </head>
+
 <body>
+
     <main class="form-page">
-        <a class="back-link" href="{% url 'productos_admin' %}">← Volver al catálogo</a>
+
+        <a class="back-link" href="{% url 'productos_admin' %}">
+            <span aria-hidden="true">←</span>
+            Volver al catálogo
+        </a>
+
+        <header class="form-heading">
+            <span class="eyebrow">DELI AREPAS JD · GESTIÓN DE PRODUCTOS</span>
+
+            <h1>{{ titulo }}</h1>
+
+            <p>
+                {{ descripcion }}
+                Administra la información, el precio y la disponibilidad
+                de tus productos desde un solo lugar.
+            </p>
+
+            <div class="form-heading-decoration" aria-hidden="true">
+                <span>JD</span>
+            </div>
+        </header>
 
         <section class="form-panel">
-            <header class="form-heading">
-                <span class="eyebrow">DELI AREPAS JD · CATÁLOGO</span>
-                <h1>{{ titulo }}</h1>
-                <p>{{ descripcion }}</p>
-            </header>
+
+            <div class="form-intro">
+                <div>
+                    <span class="form-overline">INFORMACIÓN DEL PRODUCTO</span>
+                    <h2>Detalles de la arepa</h2>
+                    <p>Completa los siguientes campos para mantener actualizado tu catálogo.</p>
+                </div>
+
+                <span class="form-required">
+                    <span>*</span> Campos del formulario
+                </span>
+            </div>
 
             <form method="POST" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
 
                 {% if form.non_field_errors %}
-                    <div class="form-errors">{{ form.non_field_errors }}</div>
+                    <div class="form-errors">
+                        {{ form.non_field_errors }}
+                    </div>
                 {% endif %}
 
-                <div class="field">
-                    <label for="{{ form.nombre.id_for_label }}">Nombre de la arepa</label>
-                    {{ form.nombre }}
-                    {{ form.nombre.errors }}
-                </div>
+                <div class="form-section">
 
-                <div class="field">
-                    <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
-                    {{ form.descripcion }}
-                    {{ form.descripcion.errors }}
-                </div>
-
-                <div class="form-grid">
-                    <div class="field">
-                        <label for="{{ form.precio.id_for_label }}">Precio (COP)</label>
-                        {{ form.precio }}
-                        {{ form.precio.errors }}
-                    </div>
-                    <div class="field">
-                        <label for="{{ form.stock.id_for_label }}">Unidades disponibles</label>
-                        {{ form.stock }}
-                        {{ form.stock.errors }}
-                    </div>
-                    <div class="field">
-                        <label for="{{ form.descuento.id_for_label }}">Descuento (%)</label>
-                        {{ form.descuento }}
-                        {{ form.descuento.errors }}
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label for="{{ form.imagen_archivo.id_for_label }}">Fotografía de la arepa</label>
-
-                    <div class="image-upload">
-                        <div class="image-preview">
-                            {% if producto and producto.imagen_archivo %}
-                                <img id="image-preview" src="{{ producto.imagen_archivo.url }}" alt="Fotografía actual">
-                            {% else %}
-                                <img id="image-preview" src="{% static 'deliapp/img/arepa3.jpg' %}" alt="Vista previa">
-                            {% endif %}
-                        </div>
-                        <div class="upload-copy">
-                            <strong>Selecciona una fotografía</strong>
-                            <span>Formatos JPG, PNG o WEBP. Máximo 5 MB.</span>
-                            {{ form.imagen_archivo }}
-                            {{ form.imagen_archivo.errors }}
+                    <div class="section-heading">
+                        <span class="section-number">01</span>
+                        <div>
+                            <h3>Información general</h3>
+                            <p>Nombre y descripción del producto.</p>
                         </div>
                     </div>
+
+                    <div class="field">
+                        <label for="{{ form.nombre.id_for_label }}">
+                            Nombre de la arepa
+                        </label>
+
+                        {{ form.nombre }}
+                        {{ form.nombre.errors }}
+                    </div>
+
+                    <div class="field">
+                        <label for="{{ form.descripcion.id_for_label }}">
+                            Descripción
+                        </label>
+
+                        {{ form.descripcion }}
+                        {{ form.descripcion.errors }}
+                    </div>
+
                 </div>
 
-                <label class="availability-check">
-                    {{ form.activo }}
-                    <span>
-                        <strong>Arepa disponible</strong>
-                        <small>Si está activa, podrá aparecer en el menú público.</small>
-                    </span>
-                </label>
+                <div class="form-section">
+
+                    <div class="section-heading">
+                        <span class="section-number">02</span>
+                        <div>
+                            <h3>Precio e inventario</h3>
+                            <p>Configura el valor comercial y las unidades disponibles.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div class="field">
+                            <label for="{{ form.precio.id_for_label }}">
+                                Precio (COP)
+                            </label>
+
+                            {{ form.precio }}
+                            {{ form.precio.errors }}
+                        </div>
+
+                        <div class="field">
+                            <label for="{{ form.stock.id_for_label }}">
+                                Unidades disponibles
+                            </label>
+
+                            {{ form.stock }}
+                            {{ form.stock.errors }}
+                        </div>
+
+                        <div class="field">
+                            <label for="{{ form.descuento.id_for_label }}">
+                                Descuento (%)
+                            </label>
+
+                            {{ form.descuento }}
+                            {{ form.descuento.errors }}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-section">
+
+                    <div class="section-heading">
+                        <span class="section-number">03</span>
+                        <div>
+                            <h3>Fotografía del producto</h3>
+                            <p>Utiliza una imagen clara para presentar tu arepa.</p>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="{{ form.imagen_archivo.id_for_label }}">
+                            Imagen de la arepa
+                        </label>
+
+                        <div class="image-upload">
+
+                            <div class="image-preview">
+                                {% if producto and producto.imagen_archivo %}
+                                    <img
+                                        id="image-preview"
+                                        src="{{ producto.imagen_archivo.url }}"
+                                        alt="Fotografía actual de {{ producto.nombre }}"
+                                    >
+                                {% else %}
+                                    <img
+                                        id="image-preview"
+                                        src="{% static 'deliapp/img/arepa3.jpg' %}"
+                                        alt="Vista previa de la fotografía"
+                                    >
+                                {% endif %}
+                            </div>
+
+                            <div class="upload-copy">
+                                <strong>Selecciona una fotografía</strong>
+
+                                <span>
+                                    Sube una imagen de tu producto en formato JPG,
+                                    PNG o WEBP. Tamaño máximo recomendado: 5 MB.
+                                </span>
+
+                                <div class="upload-input">
+                                    {{ form.imagen_archivo }}
+                                </div>
+
+                                {{ form.imagen_archivo.errors }}
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-section availability-section">
+
+                    <div class="section-heading">
+                        <span class="section-number">04</span>
+                        <div>
+                            <h3>Disponibilidad</h3>
+                            <p>Controla si el producto puede mostrarse en el menú.</p>
+                        </div>
+                    </div>
+
+                    <label class="availability-check">
+                        {{ form.activo }}
+
+                        <span class="availability-indicator" aria-hidden="true"></span>
+
+                        <span class="availability-copy">
+                            <strong>Arepa disponible</strong>
+                            <small>
+                                Si está activa, podrá aparecer en el menú público
+                                para que tus clientes puedan consultarla.
+                            </small>
+                        </span>
+                    </label>
+
+                    {{ form.activo.errors }}
+
+                </div>
 
                 <div class="form-actions">
-                    <a class="secondary-button" href="{% url 'productos_admin' %}">Cancelar</a>
-                    <button class="primary-button" type="submit">{{ accion }}</button>
+
+                    <a class="secondary-button" href="{% url 'productos_admin' %}">
+                        Cancelar
+                    </a>
+
+                    <button class="primary-button" type="submit">
+                        {{ accion }}
+                        <span aria-hidden="true">→</span>
+                    </button>
+
                 </div>
+
             </form>
+
         </section>
+
+        <footer class="form-footer">
+            <span>DELI AREPAS JD</span>
+            <span>Calidad y tradición en cada arepa</span>
+        </footer>
+
     </main>
 
     <script>
-        const imageInput = document.getElementById('id_imagen_archivo');
-        const imagePreview = document.getElementById('image-preview');
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageInput = document.getElementById('id_imagen_archivo');
+            const imagePreview = document.getElementById('image-preview');
 
-        if (imageInput && imagePreview) {
+            let previousImageUrl = null;
+
+            if (!imageInput || !imagePreview) {
+                return;
+            }
+
             imageInput.addEventListener('change', function () {
                 const file = this.files && this.files[0];
 
-                if (!file) return;
+                if (!file) {
+                    return;
+                }
 
                 if (!file.type.startsWith('image/')) {
                     alert('Selecciona un archivo de imagen válido.');
@@ -107,9 +264,27 @@
                     return;
                 }
 
-                imagePreview.src = URL.createObjectURL(file);
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('La imagen no puede superar los 5 MB.');
+                    this.value = '';
+                    return;
+                }
+
+                if (previousImageUrl) {
+                    URL.revokeObjectURL(previousImageUrl);
+                }
+
+                previousImageUrl = URL.createObjectURL(file);
+                imagePreview.src = previousImageUrl;
             });
-        }
+
+            window.addEventListener('beforeunload', function () {
+                if (previousImageUrl) {
+                    URL.revokeObjectURL(previousImageUrl);
+                }
+            });
+        });
     </script>
+
 </body>
 </html>

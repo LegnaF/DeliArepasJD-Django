@@ -214,199 +214,184 @@ def detalle_producto(request, id):
 # REGISTRO DE PEDIDOS
 # =========================================================
 
-@require_http_methods(['POST'])
+import json
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+from django.db import transaction
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
+from .models import cliente, producto, pedido, detallepedido
+
+
+@require_POST
 def crear_pedido(request):
-    """
-    Registra un pedido desde el carrito.
-    """
-
     try:
-        data = json.loads(request.body or '{}')
-
+        datos = json.loads(request.body or "{}")
     except (json.JSONDecodeError, UnicodeDecodeError):
         return JsonResponse(
-            {'error': 'La información enviada no tiene un formato válido.'},
+            {"error": "Los datos enviados no tienen un formato válido."},
             status=400
         )
 
-    if not isinstance(data, dict):
+    nombre = str(datos.get("clienteNombre", "")).strip()
+    telefono = str(datos.get("telefono", "")).strip()
+    direccion = str(datos.get("direccion", "")).strip()
+    items = datos.get("items", [])
+
+    if not nombre or not telefono or not direccion:
         return JsonResponse(
-            {'error': 'Los datos del pedido no son válidos.'},
-            status=400
-        )
-
-    cliente_nombre = str(
-        data.get('clienteNombre', '')
-    ).strip()
-
-    telefono = str(
-        data.get('telefono', '')
-    ).strip()
-
-    direccion = str(
-        data.get('direccion', '')
-    ).strip()
-
-    items = data.get('items', [])
-
-    if not cliente_nombre or not direccion or not telefono:
-        return JsonResponse(
-            {
-                'error': 'Ingresa tu nombre, teléfono y dirección de entrega.'
-            },
+            {"error": "Debes completar nombre, teléfono y dirección."},
             status=400
         )
 
     if not isinstance(items, list) or not items:
         return JsonResponse(
-            {'error': 'El carrito está vacío.'},
+            {"error": "Tu carrito no contiene productos."},
             status=400
         )
 
-    cantidades = defaultdict(int)
+    # Unificar productos repetidos y validar cantidades.
+    cantidades = {}
 
     for item in items:
-
         if not isinstance(item, dict):
             return JsonResponse(
-                {'error': 'Hay información inválida en el carrito.'},
+                {"error": "Hay un producto con información incorrecta."},
                 status=400
             )
 
         try:
-            producto_id = int(item.get('productoId'))
-            cantidad = int(item.get('cantidad', 1))
-
+            producto_id = int(item.get("productoId"))
+            cantidad = int(item.get("cantidad"))
         except (TypeError, ValueError):
             return JsonResponse(
-                {'error': 'Hay información inválida en el carrito.'},
+                {"error": "Hay un producto con identificación o cantidad inválida."},
                 status=400
             )
 
         if producto_id <= 0 or cantidad <= 0:
             return JsonResponse(
-                {'error': 'Los productos y cantidades deben ser válidos.'},
+                {"error": "Las cantidades de los productos deben ser mayores que cero."},
                 status=400
             )
 
-        cantidades[producto_id] += cantidad
+        cantidades[producto_id] = cantidades.get(producto_id, 0) + cantidad
 
     try:
-
         with transaction.atomic():
 
-            productos_bloqueados = (
-                producto.objects
-                .select_for_update()
-                .filter(
-                    id__in=list(cantidades.keys()),
-                    activo=True
-                )
-                .order_by('id')
+            productos = producto.objects.select_for_update().filter(
+                id__in=cantidades.keys()
             )
 
             productos_por_id = {
-                prod.id: prod
-                for prod in productos_bloqueados
+                prod.id: prod for prod in productos
             }
 
             if len(productos_por_id) != len(cantidades):
                 return JsonResponse(
-                    {
-                        'error': 'Uno o varios productos ya no están disponibles.'
-                    },
+                    {"error": "Uno o más productos ya no están disponibles."},
                     status=400
                 )
 
-            total_acumulado = 0.0
+            total = Decimal("0.00")
             detalles = []
 
+            # Validar disponibilidad y calcular precios desde la base de datos.
             for producto_id, cantidad in cantidades.items():
-
                 prod = productos_por_id[producto_id]
 
-                if prod.stock < cantidad:
+                if not prod.activo:
+                    return JsonResponse(
+                        {"error": f"El producto {prod.nombre} ya no está disponible."},
+                        status=400
+                    )
+
+                if cantidad > prod.stock:
                     return JsonResponse(
                         {
-                            'error': (
-                                f'No hay suficiente inventario de {prod.nombre}. '
-                                f'Disponibles: {prod.stock}.'
+                            "error": (
+                                f"No hay suficientes unidades de {prod.nombre}. "
+                                f"Disponibles: {prod.stock}."
                             )
                         },
                         status=400
                     )
 
-                precio_unitario = float(prod.precio)
-
-                if precio_unitario < 0:
+                try:
+                    precio = Decimal(str(prod.precio))
+                    descuento = Decimal(str(prod.descuento or 0))
+                except (InvalidOperation, TypeError, ValueError):
                     return JsonResponse(
-                        {
-                            'error': f'El precio de {prod.nombre} no es válido.'
-                        },
+                        {"error": f"El precio de {prod.nombre} no es válido."},
                         status=400
                     )
 
-                subtotal = precio_unitario * cantidad
+                if precio < 0 or descuento < 0 or descuento > 100:
+                    return JsonResponse(
+                        {"error": f"El precio o descuento de {prod.nombre} no es válido."},
+                        status=400
+                    )
 
-                total_acumulado += subtotal
+                precio_final = (
+                    precio * (Decimal("1") - descuento / Decimal("100"))
+                ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+                subtotal_producto = precio_final * cantidad
+                total += subtotal_producto
 
                 detalles.append({
-                    'producto': prod,
-                    'cantidad': cantidad,
-                    'precio': precio_unitario,
+                    "producto": prod,
+                    "cantidad": cantidad,
+                    "precio": precio_final
                 })
 
+            total = total.quantize(
+                Decimal("0.01"),
+                rounding=ROUND_HALF_UP
+            )
+
+            # Crear cliente y pedido.
             nuevo_cliente = cliente.objects.create(
-                nombre=cliente_nombre,
+                nombre=nombre,
                 telefono=telefono,
                 direccion=direccion
             )
 
             nuevo_pedido = pedido.objects.create(
                 cliente=nuevo_cliente,
-                estado=PedidoEstado.PENDIENTE,
-                total=round(total_acumulado, 2)
+                total=float(total)
             )
 
-            for item in detalles:
-
-                prod = item['producto']
-                cantidad = item['cantidad']
-
-                prod.stock -= cantidad
-
-                prod.save(
-                    update_fields=['stock']
-                )
+            # Guardar detalles y descontar inventario.
+            for detalle in detalles:
+                prod = detalle["producto"]
 
                 detallepedido.objects.create(
                     pedido=nuevo_pedido,
                     producto=prod,
-                    cantidad=cantidad,
-                    precioUnit=item['precio']
+                    cantidad=detalle["cantidad"],
+                    precioUnit=float(detalle["precio"])
                 )
 
-        return JsonResponse({
-            'ok': True,
-            'id': nuevo_pedido.id,
-            'total': nuevo_pedido.total,
-            'cliente': nuevo_cliente.nombre,
-            'estado': nuevo_pedido.estado,
-            'message': 'Tu pedido fue registrado correctamente.'
-        })
+                prod.stock -= detalle["cantidad"]
+                prod.save(update_fields=["stock"])
+
+        return JsonResponse(
+            {
+                "mensaje": "Pedido registrado correctamente.",
+                "id": nuevo_pedido.id,
+                "total": float(total)
+            },
+            status=201
+        )
 
     except Exception:
         return JsonResponse(
-            {
-                'error': (
-                    'Ocurrió un problema al registrar el pedido. '
-                    'Inténtalo nuevamente.'
-                )
-            },
+            {"error": "Ocurrió un error al registrar el pedido. Intenta nuevamente."},
             status=500
         )
-
-
 # =========================================================
 # GESTIÓN DE PQR
 # =========================================================
@@ -1433,3 +1418,43 @@ def api_gestion_pedidos(request):
         })
 
     return JsonResponse(lista, safe=False)
+
+# =========================================================
+# PANEL DE CLIENTE
+# =========================================================
+
+def cliente_dashboard(request):
+    """
+    Panel principal del cliente con acceso a servicios e historial de pedidos.
+    """
+    if request.user.is_authenticated:
+        nombre_cliente = (
+            request.user.get_full_name().strip()
+            or request.user.first_name.strip()
+            or request.user.username
+        )
+
+        pedidos_cliente = (
+            pedido.objects
+            .select_related('cliente')
+            .prefetch_related('detallepedido__producto')
+            .filter(
+                Q(cliente__nombre__iexact=nombre_cliente) |
+                Q(cliente__nombre__iexact=request.user.username)
+            )
+            .order_by('-createdAt')
+        )
+    else:
+        nombre_cliente = "Cliente"
+        pedidos_cliente = pedido.objects.none()
+
+    context = {
+        'nombre_cliente': nombre_cliente,
+        'pedidos': pedidos_cliente,
+    }
+
+    return render(
+        request,
+        'deliapp/cliente_dashboard.html',
+        context
+    )

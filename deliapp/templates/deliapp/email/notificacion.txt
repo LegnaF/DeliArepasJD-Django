@@ -1,10 +1,12 @@
 
 DELI AREPAS JD
-Sabor tradicional
+CALIDAD Y TRADICIÓN
 
 {{ titulo }}
 
-{% if nombre %}Hola, {{ nombre }}.{% endif %}
+{% if nombre %}
+Hola, {{ nombre }}.
+{% endif %}
 
 {{ mensaje }}
 
@@ -12,7 +14,7 @@ Sabor tradicional
 {{ detalle }}
 {% endif %}
 
-{% if boton_url %}
+{% if boton_url and boton_texto %}
 {{ boton_texto }}:
 {{ boton_url }}
 {% endif %}
@@ -21,7 +23,9 @@ Sabor tradicional
 {{ nota }}
 {% endif %}
 
-Gracias por elegir Deli Arepas JD.
+Gracias por confiar en Deli Arepas JD.
+
+El sabor que reúne momentos.
 
 Este es un mensaje automático.
 © Deli Arepas JD.

@@ -241,6 +241,10 @@ main.main {
     box-shadow: 0 9px 22px rgba(230, 126, 34, 0.3);
 }
 
+
+
+
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
 /* ==========================================
@@ -2050,7 +2054,7 @@ main.main,
 }
 
 /* =========================================================
-   NAVBAR
+   NAVBAR DE CAMBIO DE COLOR
    ========================================================= */
 
 .navbar {
@@ -2064,7 +2068,7 @@ main.main,
     gap: 9px;
     min-height: 39px;
     padding: 0 13px;
-    border: 1px solid rgba(255, 255, 255, .23);
+    border: 1px solid rgb(255, 255, 255);
     border-radius: 11px;
     background: rgba(255, 255, 255, .10);
     color: #FFFFFF;
@@ -2320,3 +2324,4 @@ html[data-theme="dark"] .pagination {
         animation-iteration-count: 1 !important;
     }
 }
+

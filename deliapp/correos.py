@@ -25,12 +25,12 @@ def enviar_correo_deli(
     }
 
     html = render_to_string(
-        "deliapp/emails/notificacion.html",
+        "email/notificacion.html",
         contexto
     )
 
     texto = render_to_string(
-        "deliapp/emails/notificacion.txt",
+        "email/notificacion.txt",
         contexto
     )
 

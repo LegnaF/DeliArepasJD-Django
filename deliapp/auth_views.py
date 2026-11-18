@@ -193,16 +193,9 @@ def recuperar_password(request):
                     form.save(
                         request=request,
                         use_https=request.is_secure(),
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        email_template_name=(
-                            'registration/password_reset_email.txt'
-                        ),
-                        subject_template_name=(
-                            'registration/password_reset_subject.txt'
-                        ),
-                        html_email_template_name=(
-                            'registration/password_reset_email.html'
-                        ),
+                        email_template_name='deliapp/registration/password_reset_email.txt',
+                        subject_template_name='deliapp/registration/password_reset_subject.txt',
+                        html_email_template_name='deliapp/registration/password_reset_email.html',
                         extra_email_context={
                             'nombre_negocio': 'Deli Arepas JD',
                             'dominio': request.get_host(),
@@ -219,6 +212,7 @@ def recuperar_password(request):
                     return redirect('password_reset_done')
 
                 except TemplateDoesNotExist:
+
                     logger.exception(
                         'No se encontró una plantilla de recuperación '
                         'de contraseña.'
@@ -231,6 +225,7 @@ def recuperar_password(request):
                     )
 
                 except BadHeaderError:
+
                     logger.exception(
                         'Error en el encabezado del correo de recuperación.'
                     )
@@ -241,6 +236,7 @@ def recuperar_password(request):
                     )
 
                 except (SMTPException, OSError):
+
                     logger.exception(
                         'Error de conexión al enviar el correo de recuperación.'
                     )
@@ -252,6 +248,7 @@ def recuperar_password(request):
                     )
 
                 except Exception:
+
                     logger.exception(
                         'Error inesperado durante la recuperación '
                         'de contraseña.'

@@ -203,7 +203,7 @@
                     <div class="stat-info">
                         <span class="stat-label">Pedidos registrados</span>
                         <strong class="stat-number">{{ stats.pedidos|default:0 }}</strong>
-                        <a href="{% url 'pedidos_admin' %}" class="stat-link">
+                        <a href="{% url 'gestion' %}" class="stat-link">
                             Gestionar pedidos <span>↗</span>
                         </a>
                     </div>
@@ -299,7 +299,7 @@
                     </span>
                 </a>
 
-                <a href="{% url 'pedidos_admin' %}" class="module-card module-orders">
+                <a href="{% url 'gestion' %}" class="module-card module-orders">
                     <div class="module-top">
                         <span class="module-icon purple">
                             <svg viewBox="0 0 24 24">
