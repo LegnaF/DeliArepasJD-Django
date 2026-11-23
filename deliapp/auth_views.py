@@ -1,30 +1,86 @@
-
 import logging
+from smtplib import SMTPException
 
 from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import (
+    authenticate,
     get_user_model,
     login,
     logout,
 )
 from django.contrib.auth.forms import (
-    AuthenticationForm,
-    UserCreationForm,
     PasswordResetForm,
+    UserCreationForm,
 )
-from django.core.mail import BadHeaderError
 from django.core.exceptions import ValidationError
-from django.template import TemplateDoesNotExist
-from smtplib import SMTPException
+from django.core.mail import BadHeaderError
 from django.shortcuts import redirect, render
+from django.template import TemplateDoesNotExist
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
+
+
+# =====================================================
+# FORMULARIO DE INICIO DE SESIÓN POR CORREO
+# =====================================================
+
+class EmailAuthenticationForm(forms.Form):
+    email = forms.EmailField(
+        required=True,
+        label='Correo electrónico',
+    )
+    password = forms.CharField(
+        required=True,
+        label='Contraseña',
+        strip=False,
+        widget=forms.PasswordInput,
+    )
+
+    def __init__(self, request=None, *args, **kwargs):
+        self.request = request
+        self.user_cache = None
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email', '').strip().lower()
+        password = cleaned_data.get('password')
+
+        if email and password:
+            usuario_obj = (
+                User.objects.filter(email__iexact=email).first()
+                or User.objects.filter(username__iexact=email).first()
+            )
+
+            if usuario_obj is not None:
+                self.user_cache = authenticate(
+                    self.request,
+                    username=usuario_obj.username,
+                    password=password,
+                )
+
+            if self.user_cache is None:
+                raise ValidationError(
+                    'Correo electrónico o contraseña incorrectos.',
+                    code='invalid_login',
+                )
+
+            if not self.user_cache.is_active:
+                raise ValidationError(
+                    'Esta cuenta se encuentra inactiva.',
+                    code='inactive',
+                )
+
+        return cleaned_data
+
+    def get_user(self):
+        return self.user_cache
 
 
 # =====================================================
@@ -67,7 +123,7 @@ def login_usuario(request):
     if request.user.is_authenticated:
         return redirect('inicio')
 
-    form = AuthenticationForm(
+    form = EmailAuthenticationForm(
         request,
         data=request.POST or None
     )
@@ -102,7 +158,7 @@ def login_usuario(request):
 
         messages.error(
             request,
-            'No pudimos iniciar sesión. Revisa tu usuario y contraseña.'
+            'No pudimos iniciar sesión. Revisa tu correo electrónico y contraseña.'
         )
 
     return render(

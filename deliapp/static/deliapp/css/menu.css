@@ -1,12 +1,11 @@
-
 /* =========================================================
    DELI AREPAS JD
    MENÚ PREMIUM — DISEÑO RESPONSIVE
-   Tipografía, catálogo, tarjetas y carrito
+   Tipografía, catálogo, tarjetas, carrito y pasarela de pago
    ========================================================= */
 
 /* =========================================================
-   01. VARIABLES Y CONFIGURACIÓN GENERAL
+01. VARIABLES Y CONFIGURACIÓN GENERAL
    ========================================================= */
 
 .menu-page {
@@ -75,7 +74,7 @@
 }
 
 /* =========================================================
-   02. FONDO DECORATIVO
+02. FONDO DECORATIVO
    ========================================================= */
 
 .menu-page::before,
@@ -126,7 +125,7 @@
 }
 
 /* =========================================================
-   03. CONTENEDOR PRINCIPAL
+03. CONTENEDOR PRINCIPAL
    ========================================================= */
 
 .menu-container {
@@ -140,7 +139,7 @@
 }
 
 /* =========================================================
-   04. ENCABEZADO DEL MENÚ
+04. ENCABEZADO DEL MENÚ
    ========================================================= */
 
 .menu-header {
@@ -238,7 +237,7 @@
 }
 
 /* =========================================================
-   05. NOTIFICACIONES
+05. NOTIFICACIONES
    ========================================================= */
 
 .menu-toast-notificacion {
@@ -313,7 +312,7 @@
 }
 
 /* =========================================================
-   06. BUSCADOR
+06. BUSCADOR
    ========================================================= */
 
 .menu-toolbar {
@@ -470,7 +469,7 @@
 }
 
 /* =========================================================
-   07. CATEGORÍAS
+07. CATEGORÍAS
    ========================================================= */
 
 .menu-categorias {
@@ -553,7 +552,7 @@
 }
 
 /* =========================================================
-   08. CUADRÍCULA DE PRODUCTOS
+08. CUADRÍCULA DE PRODUCTOS
    ========================================================= */
 
 .menu-grid {
@@ -569,7 +568,7 @@
 }
 
 /* =========================================================
-   09. TARJETAS DE PRODUCTOS
+09. TARJETAS DE PRODUCTOS
    ========================================================= */
 
 .menu-card {
@@ -665,7 +664,7 @@
 }
 
 /* =========================================================
-   10. IMÁGENES
+10. IMÁGENES
    ========================================================= */
 
 .menu-card-imagen {
@@ -722,7 +721,7 @@
 }
 
 /* =========================================================
-   11. ETIQUETAS DE PRODUCTOS
+11. ETIQUETAS DE PRODUCTOS
    ========================================================= */
 
 .menu-badge-descuento,
@@ -757,7 +756,7 @@
 }
 
 /* =========================================================
-   12. INFORMACIÓN DEL PRODUCTO
+12. INFORMACIÓN DEL PRODUCTO
    ========================================================= */
 
 .menu-card-info {
@@ -801,7 +800,7 @@
 }
 
 /* =========================================================
-   13. PRECIO Y PIE DE TARJETA
+13. PRECIO Y PIE DE TARJETA
    ========================================================= */
 
 .menu-card-footer {
@@ -848,7 +847,7 @@
 }
 
 /* =========================================================
-   14. BOTÓN AGREGAR
+14. BOTÓN AGREGAR
    ========================================================= */
 
 .btn-agregar {
@@ -908,7 +907,7 @@
 }
 
 /* =========================================================
-   15. ESTADOS VACÍOS Y MENSAJES
+15. ESTADOS VACÍOS Y MENSAJES
    ========================================================= */
 
 .menu-cargando,
@@ -960,7 +959,7 @@
 }
 
 /* =========================================================
-   16. INDICADOR DE CARGA
+16. INDICADOR DE CARGA
    ========================================================= */
 
 .spinner {
@@ -982,7 +981,7 @@
 }
 
 /* =========================================================
-   17. BOTONES GENERALES
+17. BOTONES GENERALES
    ========================================================= */
 
 .btn-reintentar,
@@ -1029,7 +1028,7 @@
 }
 
 /* =========================================================
-   18. BOTÓN FLOTANTE DEL CARRITO
+18. BOTÓN FLOTANTE DEL CARRITO
    ========================================================= */
 
 .btn-cart-float {
@@ -1120,7 +1119,7 @@
 }
 
 /* =========================================================
-   19. FONDO DEL CARRITO
+19. FONDO DEL CARRITO
    ========================================================= */
 
 .cart-overlay {
@@ -1153,7 +1152,7 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   20. PANEL LATERAL
+20. PANEL LATERAL
    ========================================================= */
 
 .cart-drawer {
@@ -1185,7 +1184,7 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   21. ENCABEZADO DEL CARRITO
+21. ENCABEZADO DEL CARRITO
    ========================================================= */
 
 .cart-header {
@@ -1197,7 +1196,7 @@ body.carrito-abierto {
 
     flex-shrink: 0;
 
-    padding: 23px 25px;
+    padding: 21px 25px;
 
     border-bottom: 1px solid var(--menu-border);
 
@@ -1266,7 +1265,7 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   22. VISTAS VACÍAS Y CONFIRMACIÓN
+22. VISTAS VACÍAS Y CONFIRMACIÓN
    ========================================================= */
 
 .cart-empty-body {
@@ -1335,6 +1334,17 @@ body.carrito-abierto {
     box-shadow: 0 10px 25px rgba(217, 119, 6, 0.08);
 }
 
+.success-metodo {
+    margin-top: 8px !important;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: var(--menu-primary-dark);
+    font-size: 0.85rem !important;
+    font-weight: 700;
+}
+
 .success-total {
     margin: 12px 0 18px !important;
 
@@ -1345,7 +1355,7 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   23. CONTENEDOR DEL CARRITO ACTIVO
+23. CONTENEDOR DEL CARRITO ACTIVO
    ========================================================= */
 
 #cartActiveView {
@@ -1354,43 +1364,42 @@ body.carrito-abierto {
     flex: 1;
 
     min-height: 0;
-    overflow: hidden;
-}
-
-/* =========================================================
-   24. LISTA DE PRODUCTOS DEL CARRITO
-   ========================================================= */
-
-.cart-items-list {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-
-    min-height: 0;
     overflow-y: auto;
-
-    gap: 14px;
-    padding: 20px 21px;
 
     scrollbar-width: thin;
     scrollbar-color: #d8c8b8 #f7f2ec;
 }
 
-.cart-items-list::-webkit-scrollbar {
+#cartActiveView::-webkit-scrollbar {
     width: 6px;
 }
 
-.cart-items-list::-webkit-scrollbar-track {
+#cartActiveView::-webkit-scrollbar-track {
     background: #f7f2ec;
 }
 
-.cart-items-list::-webkit-scrollbar-thumb {
+#cartActiveView::-webkit-scrollbar-thumb {
     border-radius: 99px;
     background: #d8c8b8;
 }
 
 /* =========================================================
-   25. ELEMENTO INDIVIDUAL DEL CARRITO
+24. LISTA DE PRODUCTOS DEL CARRITO
+   ========================================================= */
+
+.cart-items-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+
+    min-height: 120px;
+
+    gap: 12px;
+    padding: 18px 21px;
+}
+
+/* =========================================================
+25. ELEMENTO INDIVIDUAL DEL CARRITO
    ========================================================= */
 
 .cart-item {
@@ -1401,7 +1410,7 @@ body.carrito-abierto {
 
     gap: 13px;
 
-    padding: 13px;
+    padding: 12px;
 
     border: 1px solid #eee5da;
     border-radius: 14px;
@@ -1441,8 +1450,8 @@ body.carrito-abierto {
 .cart-item-img {
     display: block;
 
-    width: 75px;
-    height: 75px;
+    width: 68px;
+    height: 68px;
     flex-shrink: 0;
 
     border-radius: 11px;
@@ -1458,13 +1467,13 @@ body.carrito-abierto {
 }
 
 .cart-item-details h4 {
-    margin: 0 0 5px;
+    margin: 0 0 4px;
 
     overflow: hidden;
 
     color: var(--menu-brown);
 
-    font-size: 0.96rem;
+    font-size: 0.95rem;
     font-weight: 800;
     line-height: 1.35;
 
@@ -1477,7 +1486,7 @@ body.carrito-abierto {
 
     color: var(--menu-primary-dark);
 
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 850;
 }
 
@@ -1486,7 +1495,7 @@ body.carrito-abierto {
     align-items: center;
 
     gap: 10px;
-    margin-top: 9px;
+    margin-top: 8px;
 }
 
 .cart-item-controls button {
@@ -1494,8 +1503,8 @@ body.carrito-abierto {
     align-items: center;
     justify-content: center;
 
-    width: 29px;
-    height: 29px;
+    width: 28px;
+    height: 28px;
 
     border: 1px solid #eadfd1;
     border-radius: 8px;
@@ -1561,7 +1570,7 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   26. RESUMEN Y CHECKOUT
+26. RESUMEN, MÉTODOS DE PAGO Y CHECKOUT
    ========================================================= */
 
 .cart-checkout-section {
@@ -1569,9 +1578,9 @@ body.carrito-abierto {
     flex-direction: column;
 
     flex-shrink: 0;
-    gap: 13px;
+    gap: 12px;
 
-    padding: 19px 21px 22px;
+    padding: 18px 21px 22px;
 
     border-top: 1px solid var(--menu-border);
 
@@ -1584,29 +1593,50 @@ body.carrito-abierto {
     box-shadow: 0 -8px 25px rgba(43, 26, 18, 0.035);
 }
 
+.cart-summary-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--menu-border);
+}
+
+.cart-summary-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--menu-brown-light);
+}
+
+.envio-gratis-tag {
+    font-weight: 800;
+    color: var(--menu-green);
+}
+
 .cart-summary-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    padding-bottom: 5px;
+    padding-top: 4px;
 
     color: var(--menu-brown);
 
-    font-size: 1.08rem;
-    font-weight: 650;
+    font-size: 1.05rem;
+    font-weight: 700;
 }
 
 .cart-summary-row strong {
     color: var(--menu-primary-dark);
 
-    font-size: 1.5rem;
+    font-size: 1.45rem;
     font-weight: 900;
     letter-spacing: -0.5px;
 }
 
 /* =========================================================
-   27. FORMULARIO DE DATOS
+27. FORMULARIO Y MÉTODOS DE PAGO
    ========================================================= */
 
 .cart-form-fields {
@@ -1615,14 +1645,15 @@ body.carrito-abierto {
     gap: 10px;
 }
 
-.cart-form-fields input,
+.cart-form-fields input[type="text"],
+.cart-form-fields input[type="tel"],
 .cart-form-fields textarea {
     display: block;
 
     width: 100%;
-    min-height: 45px;
+    min-height: 44px;
 
-    padding: 12px 14px;
+    padding: 11px 14px;
 
     border: 1px solid var(--menu-border);
     border-radius: 10px;
@@ -1643,12 +1674,14 @@ body.carrito-abierto {
         background 0.25s ease;
 }
 
-.cart-form-fields input:hover,
+.cart-form-fields input[type="text"]:hover,
+.cart-form-fields input[type="tel"]:hover,
 .cart-form-fields textarea:hover {
     border-color: #d7c4af;
 }
 
-.cart-form-fields input:focus,
+.cart-form-fields input[type="text"]:focus,
+.cart-form-fields input[type="tel"]:focus,
 .cart-form-fields textarea:focus {
     border-color: var(--menu-primary);
 
@@ -1663,8 +1696,81 @@ body.carrito-abierto {
     font-weight: 400;
 }
 
+/* Selector Efectivo vs Pago en línea */
+.payment-method-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 2px;
+}
+
+.payment-method-label {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--menu-brown);
+}
+
+.payment-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+}
+
+.payment-option-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 11px 12px;
+    border: 1.5px solid var(--menu-border);
+    border-radius: 11px;
+    background: #ffffff;
+    cursor: pointer;
+    user-select: none;
+    transition:
+        border-color 0.22s ease,
+        background 0.22s ease,
+        transform 0.2s ease,
+        box-shadow 0.22s ease;
+}
+
+.payment-option-card:hover {
+    border-color: #d7b894;
+    transform: translateY(-1px);
+}
+
+.payment-option-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.payment-option-card.seleccionado,
+.payment-option-card:has(input:checked) {
+    border-color: var(--menu-primary);
+    background: #fffbeb;
+    box-shadow: 0 5px 14px rgba(217, 119, 6, 0.13);
+}
+
+.payment-option-title {
+    font-size: 0.86rem;
+    font-weight: 800;
+    color: var(--menu-brown);
+}
+
+.payment-option-card.seleccionado .payment-option-title,
+.payment-option-card:has(input:checked) .payment-option-title {
+    color: var(--menu-primary-dark);
+}
+
+.payment-option-desc {
+    font-size: 0.73rem;
+    line-height: 1.3;
+    color: var(--menu-muted);
+}
+
 /* =========================================================
-   28. BOTÓN CONFIRMAR PEDIDO
+28. BOTÓN CONFIRMAR PEDIDO
    ========================================================= */
 
 .btn-confirmar-pedido {
@@ -1676,9 +1782,10 @@ body.carrito-abierto {
     justify-content: center;
 
     width: 100%;
-    min-height: 51px;
+    min-height: 50px;
+    margin-top: 2px;
 
-    padding: 14px 18px;
+    padding: 13px 18px;
 
     border: none;
     border-radius: 11px;
@@ -1691,7 +1798,7 @@ body.carrito-abierto {
 
     color: #ffffff;
 
-    font-size: 0.98rem;
+    font-size: 0.96rem;
     font-weight: 850;
 
     cursor: pointer;
@@ -1723,20 +1830,20 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   29. BOTÓN VACIAR CARRITO
+29. BOTÓN VACIAR CARRITO
    ========================================================= */
 
 .btn-vaciar {
     align-self: center;
 
-    padding: 5px 10px;
+    padding: 4px 10px;
 
     border: none;
     background: transparent;
 
     color: #978a7e;
 
-    font-size: 0.86rem;
+    font-size: 0.85rem;
     font-weight: 650;
 
     cursor: pointer;
@@ -1752,7 +1859,7 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   30. TABLETS Y PORTÁTILES
+30. TABLETS Y PORTÁTILES
    ========================================================= */
 
 @media (max-width: 1100px) {
@@ -1808,7 +1915,7 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   31. MÓVILES
+31. MÓVILES
    ========================================================= */
 
 @media (max-width: 600px) {
@@ -1954,7 +2061,7 @@ body.carrito-abierto {
     }
 
     .cart-checkout-section {
-        gap: 11px;
+        gap: 10px;
         padding: 15px 16px 18px;
     }
 
@@ -1966,16 +2073,22 @@ body.carrito-abierto {
         gap: 8px;
     }
 
-    .cart-form-fields input,
+    .cart-form-fields input[type="text"],
+    .cart-form-fields input[type="tel"],
     .cart-form-fields textarea {
-        min-height: 43px;
+        min-height: 42px;
         padding: 10px 12px;
         font-size: 0.9rem;
     }
 
+    .payment-options-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
     .btn-confirmar-pedido {
         min-height: 48px;
-        font-size: 0.94rem;
+        font-size: 0.93rem;
     }
 
     .menu-toast-notificacion {
@@ -1993,7 +2106,7 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   32. MÓVILES PEQUEÑOS
+32. MÓVILES PEQUEÑOS
    ========================================================= */
 
 @media (max-width: 380px) {
@@ -2052,10 +2165,14 @@ body.carrito-abierto {
         width: 29px;
         height: 29px;
     }
+
+    .payment-options-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* =========================================================
-   33. PANTALLAS BAJAS
+33. PANTALLAS BAJAS
    ========================================================= */
 
 @media (max-height: 750px) and (min-width: 601px) {
@@ -2069,7 +2186,8 @@ body.carrito-abierto {
         gap: 7px;
     }
 
-    .cart-form-fields input {
+    .cart-form-fields input[type="text"],
+    .cart-form-fields input[type="tel"] {
         min-height: 39px;
         padding-top: 8px;
         padding-bottom: 8px;
@@ -2082,7 +2200,7 @@ body.carrito-abierto {
 }
 
 /* =========================================================
-   34. ACCESIBILIDAD
+34. ACCESIBILIDAD
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {

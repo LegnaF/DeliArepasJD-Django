@@ -1,4 +1,3 @@
-
 from django.contrib.auth import views as django_auth_views
 from django.urls import path
 
@@ -34,13 +33,31 @@ urlpatterns = [
     ),
 
     # =====================================================
-    # PEDIDOS Y CONSULTA PÚBLICA
+    # PEDIDOS, PAGOS Y CONSULTA PÚBLICA
     # =====================================================
 
     path(
         'api/pedidos/',
         views.crear_pedido,
         name='crear_pedido'
+    ),
+
+    path(
+        'api/pagos/iniciar/',
+        views.api_iniciar_pago,
+        name='api_iniciar_pago'
+    ),
+
+    path(
+        'pagos/retorno/',
+        views.retorno_pago,
+        name='retorno_pago'
+    ),
+
+    path(
+        'api/pagos/webhook/',
+        views.api_webhook_pago,
+        name='api_webhook_pago'
     ),
 
     path(
@@ -107,6 +124,12 @@ urlpatterns = [
         'admin-dashboard/pedidos/<int:pedido_id>/estado/',
         views.actualizar_estado_pedido,
         name='actualizar_estado_pedido'
+    ),
+
+        path(
+        'admin-dashboard/pedidos/<int:pedido_id>/editar/',
+        views.api_editar_pedido_admin,
+        name='api_editar_pedido_admin'
     ),
 
     # =====================================================

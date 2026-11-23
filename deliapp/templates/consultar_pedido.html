@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#38251c">
+
+    <title>Consultar Pedido | Deli Arepas JD</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'deliapp/css/consultar_pedido.css' %}">
+</head>
+
+<body class="consulta-body">
+
+    {% include 'deliapp/components/navbar.html' %}
+
+    <main class="consulta-page">
+        <div class="consulta-container">
+            <header class="consulta-header">
+                <h1>Consultar estado de pedido</h1>
+                <p>Ingresa el número de tu pedido y el teléfono registrado al momento de la compra.</p>
+            </header>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="consulta-alert {% if message.tags %}{{ message.tags }}{% else %}info{% endif %}" role="status">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if error %}
+                <div class="consulta-alert error" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <div class="consulta-card">
+                <form method="post" class="consulta-form">
+                    {% csrf_token %}
+                    <div class="consulta-field">
+                        <label for="pedido_id">Número de pedido</label>
+                        <input
+                            type="text"
+                            id="pedido_id"
+                            name="pedido_id"
+                            value="{{ pedido_id }}"
+                            placeholder="Ej. 9"
+                            inputmode="numeric"
+                            required
+                        >
+                    </div>
+
+                    <div class="consulta-field">
+                        <label for="telefono">Teléfono registrado</label>
+                        <input
+                            type="tel"
+                            id="telefono"
+                            name="telefono"
+                            value="{{ telefono }}"
+                            placeholder="Ej. 3001234567"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="consulta-btn">Buscar pedido</button>
+                </form>
+            </div>
+
+            {% if pedido %}
+                <div class="consulta-card">
+                    <div class="pedido-resultado-header">
+                        <h2>Pedido #{{ pedido.id }}</h2>
+                        <span class="estado-pill">{{ pedido.get_estado_display }}</span>
+                    </div>
+
+                    <div class="pedido-datos">
+                        <p><strong>Cliente:</strong> {{ pedido.cliente.nombre }}</p>
+                        <p><strong>Teléfono:</strong> {{ pedido.cliente.telefono }}</p>
+                        <p><strong>Dirección:</strong> {{ pedido.cliente.direccion }}</p>
+                        <p><strong>Fecha:</strong> {{ pedido.createdAt|date:"d/m/Y H:i" }}</p>
+                    </div>
+
+                    <table class="pedido-items-tabla">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cant.</th>
+                                <th>Precio unit.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in pedido.detallepedido.all %}
+                                <tr>
+                                    <td>{{ item.producto.nombre }}</td>
+                                    <td>{{ item.cantidad }}</td>
+                                    <td>${{ item.precioUnit|floatformat:0 }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <p class="pedido-total-final">Total: ${{ pedido.total|floatformat:0 }}</p>
+                </div>
+            {% endif %}
+
+            <a href="{% url 'menu' %}" class="consulta-volver">&larr; Volver al menú</a>
+        </div>
+    </main>
+
+    {% include 'deliapp/components/footer.html' %}
+
+</body>
+</html>

@@ -5,546 +5,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#38251c">
-
     <title>Gestión de pedidos | Deli Arepas JD</title>
 
     <link rel="stylesheet" href="{% static 'deliapp/css/admin_dashboard.css' %}">
-
-    <style>
-        .orders-page {
-            min-height: 100vh;
-            padding: 35px 5%;
-            background: #f7f2e9;
-            color: #38251c;
-            font-family: Arial, sans-serif;
-        }
-
-        .orders-page * {
-            box-sizing: border-box;
-        }
-
-        .orders-page .admin-panel {
-            max-width: 1500px;
-            margin: auto;
-        }
-
-        .orders-page .admin-welcome {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 25px;
-            padding: 35px;
-            margin-bottom: 25px;
-            border-radius: 20px;
-            background: linear-gradient(120deg, #38251c, #68432e);
-            color: white;
-        }
-
-        .orders-page .admin-eyebrow {
-            color: #e8ae68;
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 2px;
-        }
-
-        .orders-page h1 {
-            margin: 12px 0;
-            font-size: clamp(28px, 4vw, 40px);
-        }
-
-        .orders-page .admin-welcome p {
-            margin: 0;
-            color: #f4e6d5;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        .orders-page .admin-welcome-icon {
-            display: grid;
-            place-items: center;
-            width: 75px;
-            height: 75px;
-            flex-shrink: 0;
-            border-radius: 20px;
-            background: #ffffff20;
-            font-size: 24px;
-            font-weight: 800;
-        }
-
-        .orders-page .orders-back {
-            margin: 20px 0;
-        }
-
-        .orders-page .orders-back a {
-            color: #9a5426;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .orders-page .orders-back a:hover {
-            text-decoration: underline;
-        }
-
-        .orders-page .admin-stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 18px;
-            margin: 25px 0;
-        }
-
-        .orders-page .stat-card {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 23px;
-            border: 1px solid #eee3d5;
-            border-radius: 17px;
-            background: #fffdf9;
-            box-shadow: 0 5px 18px #38251c0a;
-        }
-
-        .orders-page .stat-icon {
-            display: grid;
-            place-items: center;
-            width: 48px;
-            height: 48px;
-            flex-shrink: 0;
-            border-radius: 14px;
-            background: #f8e6d2;
-            color: #9a5426;
-            font-weight: 800;
-        }
-
-        .orders-page .stat-card span {
-            display: block;
-            margin-bottom: 6px;
-            color: #88766b;
-            font-size: 13px;
-        }
-
-        .orders-page .stat-card strong {
-            font-size: 27px;
-        }
-
-        .orders-page .orders-container {
-            overflow: hidden;
-            padding: 28px;
-            border: 1px solid #eee3d5;
-            border-radius: 20px;
-            background: #fffdf9;
-            box-shadow: 0 8px 25px #38251c0a;
-        }
-
-        .orders-page .orders-heading h2 {
-            margin: 9px 0;
-            font-size: 25px;
-        }
-
-        .orders-page .orders-heading p {
-            color: #88766b;
-            font-size: 14px;
-        }
-
-        .orders-page .orders-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin: 25px 0;
-        }
-
-        .orders-page input,
-        .orders-page select {
-            min-height: 46px;
-            padding: 0 14px;
-            border: 1px solid #e5d8c9;
-            border-radius: 10px;
-            background: white;
-            color: #38251c;
-            font-size: 14px;
-        }
-
-        .orders-page .orders-filters input {
-            flex: 1;
-            min-width: 220px;
-        }
-
-        .orders-page button {
-            min-height: 44px;
-            padding: 0 20px;
-            border: 0;
-            border-radius: 10px;
-            background: #b7652c;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .orders-page button:hover {
-            background: #91491e;
-        }
-
-        .orders-page .filter-clear {
-            display: inline-flex;
-            align-items: center;
-            padding: 0 15px;
-            color: #8b5736;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .orders-page .orders-table-wrapper {
-            overflow-x: auto;
-            width: 100%;
-        }
-
-        .orders-page .orders-table {
-            width: 100%;
-            border-collapse: collapse;
-            white-space: nowrap;
-        }
-
-        .orders-page .orders-table th {
-            padding: 16px 13px;
-            background: #f7f0e6;
-            color: #68432e;
-            font-size: 12px;
-            text-align: left;
-        }
-
-        .orders-page .orders-table td {
-            padding: 17px 13px;
-            border-bottom: 1px solid #eee8df;
-            font-size: 13px;
-        }
-
-        .orders-page .order-number,
-        .orders-page .order-total {
-            color: #a75b28;
-            font-weight: 800;
-        }
-
-        .orders-page .order-status {
-            display: inline-block;
-            padding: 7px 11px;
-            border-radius: 20px;
-            background: #f4e8d9;
-            color: #80512e;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .orders-page .order-update-form {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-        .orders-page .order-update-form select {
-            min-height: 37px;
-            max-width: 145px;
-            font-size: 12px;
-        }
-
-        .orders-page .order-update-form button {
-            min-height: 37px;
-            padding: 0 12px;
-            font-size: 12px;
-        }
-
-        .orders-page .order-detail summary {
-            color: #a75b28;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .orders-page .order-detail-content {
-            min-width: 230px;
-            padding: 14px;
-            margin-top: 10px;
-            border: 1px solid #eee3d5;
-            border-radius: 12px;
-            background: #fffaf3;
-            white-space: normal;
-        }
-
-        .orders-page .order-detail-content p {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            font-size: 13px;
-        }
-
-        .orders-page .order-detail-total {
-            padding-top: 10px;
-            border-top: 1px solid #e8dccc;
-            font-weight: 800;
-        }
-
-        .orders-page .orders-empty {
-            padding: 40px !important;
-            color: #88766b;
-            text-align: center;
-        }
-
-        .orders-page .admin-messages {
-            margin: 20px 0;
-        }
-
-        .orders-page .admin-message {
-            padding: 14px 18px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            background: #e6f4e8;
-            color: #27613a;
-        }
-
-        .orders-page .admin-message.error {
-            background: #fbe8e5;
-            color: #9b3026;
-        }
-
-        @media (max-width: 900px) {
-            .orders-page .admin-stats {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 600px) {
-            .orders-page {
-                padding: 20px 12px;
-            }
-
-            .orders-page .admin-welcome {
-                padding: 24px 19px;
-            }
-
-            .orders-page .admin-welcome-icon {
-                width: 52px;
-                height: 52px;
-            }
-
-            .orders-page .admin-stats {
-                grid-template-columns: 1fr;
-            }
-
-            .orders-page .orders-container {
-                padding: 18px 12px;
-            }
-
-            .orders-page .orders-filters {
-                flex-direction: column;
-            }
-
-            .orders-page .orders-filters input,
-            .orders-page .orders-filters select,
-            .orders-page .orders-filters button {
-                width: 100%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'deliapp/css/pedidos_admin.css' %}">
 </head>
 
 <body>
 
-<main class="orders-page">
-    <div class="admin-panel">
+<div class="orders-page">
 
-        <section class="admin-welcome">
+    <div class="orders-background-decoration"></div>
+
+    <!-- ENCABEZADO -->
+    <header class="orders-header">
+        <div class="orders-header-content">
             <div>
-                <span class="admin-eyebrow">CENTRO DE OPERACIONES</span>
-                <h1>Gestión de pedidos</h1>
-                <p>Consulta los pedidos de tus clientes y actualiza su estado de preparación y entrega.</p>
+                <div class="orders-eyebrow">
+                    <span class="eyebrow-line"></span>
+                    CENTRO DE OPERACIONES
+                </div>
+
+                <h1>Gestión de <span>pedidos</span></h1>
+
+                <p>
+                    Administra, supervisa y actualiza los pedidos de tus clientes
+                    desde un solo lugar.
+                </p>
             </div>
 
-            <div class="admin-welcome-icon">
-                <span>PD</span>
-            </div>
-        </section>
-
-        <div class="orders-back">
-            <a href="{% url 'admin_dashboard' %}">← Volver al panel administrativo</a>
+            <a href="{% url 'admin_dashboard' %}" class="orders-back-button">
+                <span class="back-arrow">←</span>
+                Volver al panel
+            </a>
         </div>
+    </header>
 
-        {% if messages %}
-            <div class="admin-messages">
-                {% for message in messages %}
-                    <div class="admin-message {{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+    <!-- INDICADORES -->
+    <section class="orders-stats">
+
+        <article class="order-stat-card stat-total">
+            <div class="stat-top">
+                <span class="stat-label">Pedidos registrados</span>
+                <span class="stat-icon">01</span>
             </div>
-        {% endif %}
+            <strong>{{ total_pedidos }}</strong>
+            <span class="stat-description">Total histórico de pedidos</span>
+            <div class="stat-decoration"></div>
+        </article>
 
-        <section class="admin-stats">
+        <article class="order-stat-card stat-pending">
+            <div class="stat-top">
+                <span class="stat-label">Pendientes</span>
+                <span class="stat-icon">02</span>
+            </div>
+            <strong>{{ pendientes }}</strong>
+            <span class="stat-description">Esperando atención</span>
+            <div class="stat-decoration"></div>
+        </article>
 
-            <article class="stat-card">
-                <div class="stat-icon">PD</div>
+        <article class="order-stat-card stat-preparing">
+            <div class="stat-top">
+                <span class="stat-label">En preparación</span>
+                <span class="stat-icon">03</span>
+            </div>
+            <strong>{{ en_preparacion }}</strong>
+            <span class="stat-description">Pedidos en proceso</span>
+            <div class="stat-decoration"></div>
+        </article>
+
+        <article class="order-stat-card stat-completed">
+            <div class="stat-top">
+                <span class="stat-label">Listos</span>
+                <span class="stat-icon">04</span>
+            </div>
+            <strong>{{ entregados }}</strong>
+            <span class="stat-description">Pedidos entregados</span>
+            <div class="stat-decoration"></div>
+        </article>
+
+        <article class="order-stat-card stat-cancelled">
+            <div class="stat-top">
+                <span class="stat-label">Cancelados</span>
+                <span class="stat-icon">05</span>
+            </div>
+            <strong>{{ cancelados }}</strong>
+            <span class="stat-description">Pedidos cancelados</span>
+            <div class="stat-decoration"></div>
+        </article>
+
+    </section>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="orders-main">
+
+        <section class="orders-toolbar">
+
+            <div class="toolbar-heading">
                 <div>
-                    <span>Total de pedidos</span>
-                    <strong>{{ total_pedidos|default:0 }}</strong>
+                    <span class="section-kicker">CONTROL ADMINISTRATIVO</span>
+                    <h2>Todos los pedidos</h2>
+                    <p>Consulta y gestiona cada solicitud de tus clientes.</p>
                 </div>
-            </article>
 
-            <article class="stat-card">
-                <div class="stat-icon">PE</div>
-                <div>
-                    <span>Pendientes</span>
-                    <strong>{{ pendientes|default:0 }}</strong>
+                <div class="orders-counter">
+                    <strong>{{ pedidos|length }}</strong>
+                    <span>resultados</span>
                 </div>
-            </article>
-
-            <article class="stat-card">
-                <div class="stat-icon">EP</div>
-                <div>
-                    <span>En preparación</span>
-                    <strong>{{ en_preparacion|default:0 }}</strong>
-                </div>
-            </article>
-
-            <article class="stat-card">
-                <div class="stat-icon">EN</div>
-                <div>
-                    <span>Entregados</span>
-                    <strong>{{ entregados|default:0 }}</strong>
-                </div>
-            </article>
-
-        </section>
-
-        <section class="orders-container">
-
-            <div class="orders-heading">
-                <span class="admin-eyebrow">REGISTROS</span>
-                <h2>Pedidos registrados</h2>
-                <p>Busca un pedido por número, cliente o teléfono.</p>
             </div>
 
-            <form method="get" class="orders-filters">
-                <input
-                    type="search"
-                    name="buscar"
-                    value="{{ busqueda|default:'' }}"
-                    placeholder="Buscar pedido, cliente o teléfono..."
-                >
+            <!-- FILTROS -->
+            <form method="GET" class="orders-filters" id="ordersFilterForm">
 
-                <select name="estado">
-                    <option value="">Todos los estados</option>
+                <div class="search-box">
+                    <span class="search-symbol">⌕</span>
+                    <input
+                        type="search"
+                        name="buscar"
+                        id="ordersSearch"
+                        value="{{ busqueda }}"
+                        placeholder="Buscar por cliente, teléfono o número..."
+                        autocomplete="off"
+                    >
+                    <button type="button" id="clearSearch" aria-label="Limpiar búsqueda">
+                        ×
+                    </button>
+                </div>
 
-                    {% for valor, etiqueta in estados %}
-                        <option value="{{ valor }}" {% if estado_filtro == valor %}selected{% endif %}>
-                            {{ etiqueta }}
-                        </option>
-                    {% endfor %}
-                </select>
+                <div class="filter-select-box">
+                    <select name="estado" id="ordersStatusFilter">
+                        <option value="">Todos los estados</option>
+                        {% for valor, etiqueta in estados %}
+                            <option value="{{ valor }}"
+                                {% if estado_filtro == valor %}selected{% endif %}>
+                                {% if valor == 'ENTREGADO' %}
+                                    Listo
+                                {% else %}
+                                    {{ etiqueta|title }}
+                                {% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-                <button type="submit">Buscar</button>
+                <button type="submit" class="filter-button">
+                    Filtrar pedidos
+                </button>
 
-                <a href="{% url 'pedidos_admin' %}" class="filter-clear">
-                    Limpiar
+                <a href="{% url 'pedidos_admin' %}" class="show-all-button">
+                    Ver todo
                 </a>
+
             </form>
 
-            <div class="orders-table-wrapper">
-                <table class="orders-table">
+        </section>
+
+        <!-- TABLA -->
+        <section class="orders-table-card">
+
+            <div class="table-heading">
+                <div>
+                    <h3>Registro de pedidos</h3>
+                    <p>Información detallada de las solicitudes recibidas.</p>
+                </div>
+
+                <span class="live-indicator">
+                    <span></span>
+                    Panel administrativo
+                </span>
+            </div>
+
+            <div class="orders-table-scroll">
+
+                <table class="orders-table" id="ordersTable">
 
                     <thead>
                         <tr>
                             <th>Pedido</th>
                             <th>Cliente</th>
-                            <th>Teléfono</th>
-                            <th>Fecha</th>
+                            <th>Fecha de solicitud</th>
+                            <th>Productos</th>
                             <th>Total</th>
                             <th>Estado</th>
-                            <th>Actualizar estado</th>
-                            <th>Detalle</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody id="ordersTableBody">
 
                         {% for item in pedidos %}
-                            <tr>
-                                <td class="order-number">#{{ item.id }}</td>
-                                <td>{{ item.cliente.nombre }}</td>
-                                <td>{{ item.cliente.telefono }}</td>
-                                <td>{{ item.createdAt|date:"d/m/Y H:i" }}</td>
-                                <td class="order-total">
-                                    ${{ item.total|floatformat:0 }}
-                                </td>
 
-                                <td>
-                                    <span class="order-status">
-                                        {{ item.get_estado_display }}
+                        <tr class="order-row">
+
+                            <td>
+                                <div class="order-id">
+                                    <span class="order-id-symbol">#</span>
+                                    {{ item.id }}
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="customer-cell">
+                                    <div class="customer-avatar">
+                                        {{ item.cliente.nombre|first|upper }}
+                                    </div>
+
+                                    <div>
+                                        <strong>{{ item.cliente.nombre }}</strong>
+                                        <span>{{ item.cliente.telefono }}</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="date-cell">
+                                    <strong>{{ item.createdAt|date:"d/m/Y" }}</strong>
+                                    <span>{{ item.createdAt|date:"h:i A" }}</span>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="products-cell">
+                                    <strong>{{ item.detallepedido.all|length }}</strong>
+                                    <span>
+                                        {% if item.detallepedido.all|length == 1 %}
+                                            producto
+                                        {% else %}
+                                            productos
+                                        {% endif %}
                                     </span>
-                                </td>
+                                </div>
+                            </td>
 
-                                <td>
-                                    <form
-                                        method="post"
-                                        action="{% url 'actualizar_estado_pedido' item.id %}"
-                                        class="order-update-form"
+                            <td>
+                                <strong class="order-total">
+                                    ${{ item.total|floatformat:0 }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                <span class="status-badge status-{{ item.estado|lower }}">
+                                    {% if item.estado == 'ENTREGADO' %}
+                                        Listo
+                                    {% else %}
+                                        {{ item.get_estado_display|title }}
+                                    {% endif %}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="order-actions">
+
+                                    <button
+                                        type="button"
+                                        class="action-button edit-order-button"
+                                        data-order-id="{{ item.id }}"
+                                        title="Editar pedido"
                                     >
-                                        {% csrf_token %}
+                                        Editar
+                                    </button>
 
-                                        <select
-                                            name="estado"
-                                            aria-label="Nuevo estado del pedido {{ item.id }}"
-                                        >
-                                            {% for valor, etiqueta in estados %}
-                                                <option value="{{ valor }}" {% if item.estado == valor %}selected{% endif %}>
-                                                    {{ etiqueta }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
+                                    <details class="order-details">
+                                        <summary title="Ver detalles">Ver</summary>
 
-                                        <button type="submit">Guardar</button>
-                                    </form>
-                                </td>
+                                        <div class="order-details-popover">
+                                            <h4>Detalle del pedido #{{ item.id }}</h4>
 
-                                <td>
-                                    <details class="order-detail">
-                                        <summary>Ver detalle</summary>
-
-                                        <div class="order-detail-content">
-                                            <strong>Productos del pedido</strong>
-
-                                            {% for detalle in item.detallepedido.all %}
-                                                <p>
-                                                    {{ detalle.producto.nombre }}
-                                                    <span>
-                                                        {{ detalle.cantidad }} ×
-                                                        ${{ detalle.precioUnit|floatformat:0 }}
-                                                    </span>
-                                                </p>
-                                            {% empty %}
-                                                <p>No hay productos registrados en este pedido.</p>
-                                            {% endfor %}
-
-                                            <div class="order-detail-total">
-                                                Total: ${{ item.total|floatformat:0 }}
+                                            <div class="detail-customer">
+                                                <span>Dirección</span>
+                                                <strong>{{ item.cliente.direccion|default:"No registrada" }}</strong>
                                             </div>
+
+                                            <div class="detail-products">
+                                                {% for detalle in item.detallepedido.all %}
+                                                    <div class="detail-product-row">
+                                                        <span>
+                                                            {{ detalle.cantidad }} ×
+                                                            {{ detalle.producto.nombre }}
+                                                        </span>
+                                                        <strong>
+                                                            ${{ detalle.precioUnit|floatformat:0 }}
+                                                        </strong>
+                                                    </div>
+                                                {% empty %}
+                                                    <p>No hay productos registrados.</p>
+                                                {% endfor %}
+                                            </div>
+
+                                            {% if item.observaciones %}
+                                                <div class="detail-observations">
+                                                    <span>Observaciones</span>
+                                                    <p>{{ item.observaciones }}</p>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </details>
-                                </td>
-                            </tr>
+
+                                </div>
+                            </td>
+
+                        </tr>
 
                         {% empty %}
-                            <tr>
-                                <td colspan="8" class="orders-empty">
-                                    No se encontraron pedidos con esos criterios.
-                                </td>
-                            </tr>
+
+                        <tr>
+                            <td colspan="7">
+                                <div class="orders-empty">
+                                    <div class="empty-illustration">—</div>
+                                    <h3>No hay pedidos registrados</h3>
+                                    <p>
+                                        Cuando recibas nuevos pedidos aparecerán
+                                        aquí para que puedas administrarlos.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+
                         {% endfor %}
 
                     </tbody>
+
                 </table>
+
+            </div>
+
+            <div class="table-footer">
+                <span>Información de pedidos de Deli Arepas JD</span>
+                <span>Gestión administrativa</span>
             </div>
 
         </section>
 
-    </div>
-</main>
+    </main>
+
+</div>
+
+<!-- =====================================================
+     MODAL DE EDICIÓN
+===================================================== -->
+
+<div class="order-modal-overlay" id="orderModal" aria-hidden="true">
+
+    <section class="order-modal" role="dialog" aria-modal="true"
+             aria-labelledby="modalTitle">
+
+        <header class="modal-header">
+
+            <div>
+                <span class="section-kicker">EDICIÓN ADMINISTRATIVA</span>
+                <h2 id="modalTitle">Editar pedido</h2>
+                <p>Actualiza los productos y la información del pedido.</p>
+            </div>
+
+            <button type="button" class="modal-close" id="closeOrderModal"
+                    aria-label="Cerrar modal">×</button>
+
+        </header>
+
+        <div class="modal-body">
+
+            <div class="modal-order-reference">
+                <div>
+                    <span>Número de pedido</span>
+                    <strong id="modalOrderNumber">#—</strong>
+                </div>
+
+                <div>
+                    <span>Cliente</span>
+                    <strong id="modalCustomerName">Cargando...</strong>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <div class="modal-section-heading">
+                    <div>
+                        <h3>Estado del pedido</h3>
+                        <p>Selecciona el estado actual.</p>
+                    </div>
+                </div>
+
+                <select id="modalOrderStatus" class="modal-input">
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="EN_PREPARACION">En preparación</option>
+                    <option value="ENTREGADO">Listo</option>
+                    <option value="CANCELADO">Cancelado</option>
+                </select>
+            </div>
+
+            <div class="modal-section">
+
+                <div class="modal-section-heading">
+                    <div>
+                        <h3>Productos del pedido</h3>
+                        <p>Modifica cantidades, precios y descuentos.</p>
+                    </div>
+
+                    <button type="button" id="addOrderProduct"
+                            class="add-product-button">
+                        + Agregar producto
+                    </button>
+                </div>
+
+                <div class="order-product-editor" id="orderProductEditor">
+
+                    <div class="editor-empty">
+                        Los productos aparecerán aquí al cargar el pedido.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="order-total-panel">
+
+                <div>
+                    <span>Total del pedido</span>
+                    <p>Importe calculado automáticamente</p>
+                </div>
+
+                <strong id="modalOrderTotal">$0</strong>
+
+            </div>
+
+        </div>
+
+        <footer class="modal-footer">
+
+            <span id="modalFeedback" class="modal-feedback"></span>
+
+            <div class="modal-footer-actions">
+                <button type="button" class="modal-cancel-button"
+                        id="cancelOrderEdit">
+                    Cancelar
+                </button>
+
+                <button type="button" class="modal-save-button"
+                        id="saveOrderChanges">
+                    Guardar cambios
+                </button>
+            </div>
+
+        </footer>
+
+    </section>
+
+</div>
+
+<!-- MENSAJE FLOTANTE -->
+<div class="orders-toast" id="ordersToast" role="status"></div>
+
+<script>
+    window.ORDERS_ADMIN_CONFIG = {
+        editUrlTemplate: "{% url 'api_editar_pedido_admin' 0 %}",
+        csrfToken: "{{ csrf_token }}"
+    };
+</script>
+
+<script src="{% static 'deliapp/js/pedidos_admin.js' %}"></script>
 
 </body>
 </html>

@@ -1,534 +1,692 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Empleados - Deli Arepas JD</title>
-    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'deliapp/css/empleado_pedidos.css' %}">
+    <meta name="theme-color" content="#fbf7f0">
+    <title>Gestión de pedidos | Deli Arepas JD</title>
+
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}?v=20261123">
+    <link rel="stylesheet" href="{% static 'deliapp/css/empleado_pedidos.css' %}?v=20261123">
 </head>
-<body>
-    <div id="empleado-layout" class="empleado-layout tema-claro">
-        <header>
-            {% include 'deliapp/components/navbar.html' %}
-        </header>
 
-        <main class="empleado-content">
-            <!-- HERO -->
-            <section class="empleado-hero">
-                <div class="hero-decoration hero-decoration-one"></div>
-                <div class="hero-decoration hero-decoration-two"></div>
-                <div class="hero-decoration hero-decoration-three"></div>
+<body class="empleado-body">
+<div id="empleado-layout" class="empleado-layout tema-claro">
 
-                <div class="hero-main">
-                    <span class="empleado-eyebrow">
-                        <span class="eyebrow-line"></span>
-                        GESTIÓN OPERATIVA
-                    </span>
+    <header>
+        {% include 'deliapp/components/navbar.html' %}
+    </header>
 
-                    <h1 class="empleado-title">
-                        Panel de <span>Empleados</span>
-                    </h1>
+    <main class="empleado-content">
 
-                    <p class="empleado-description">
-                        Administra las operaciones de Deli Arepas JD desde un solo lugar.
-                        Consulta productos, pedidos y las herramientas disponibles para tu jornada.
-                    </p>
+        <!-- ENCABEZADO PRINCIPAL -->
+        <section class="empleado-hero">
+            <div class="hero-decoration hero-decoration-one"></div>
+            <div class="hero-decoration hero-decoration-two"></div>
 
-                    <div class="hero-actions">
-                        <a href="#modulos" class="hero-scroll-button">
-                            Explorar módulos
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
+            <div class="hero-main">
+                <span class="empleado-eyebrow">
+                    <span class="eyebrow-line"></span>
+                    CENTRO DE OPERACIONES
+                </span>
 
-                        <button type="button" id="btn-theme-toggle" class="theme-toggle" aria-label="Cambiar tema">
-                            <span id="theme-icon" class="theme-toggle-icon">
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z" /></svg>
-                            </span>
-                            <span id="theme-text">Modo noche</span>
-                        </button>
-                    </div>
-                </div>
+                <h1 class="empleado-title">
+                    Gestión de <span>pedidos</span>
+                </h1>
 
-                <div class="empleado-profile">
-                    <div class="profile-glow"></div>
-                    <div class="profile-icon">
+                <p class="empleado-description">
+                    Supervisa los pedidos, consulta la información de tus clientes
+                    y controla cada etapa de preparación y entrega.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#pedidos" class="hero-scroll-button">
+                        Ver pedidos
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <circle cx="12" cy="8" r="3.5" />
-                            <path d="M5 20c.8-3.2 3.2-5 7-5s6.2 1.8 7 5" />
+                            <path d="M5 12h14M13 6l6 6-6 6"/>
                         </svg>
-                    </div>
-                    <div class="profile-content">
-                        <span class="profile-label">Sesión activa</span>
-                        <strong>{{ request.user.first_name|default:request.user.username }}</strong>
-                        <span class="profile-role">
-                            <span class="role-dot"></span>
-                            {% if request.user.is_superuser %}Administrador{% else %}Empleado{% endif %}
+                    </a>
+
+                    <button type="button" id="btn-theme-toggle" class="theme-toggle">
+                        <span id="theme-icon" class="theme-toggle-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z"/>
+                            </svg>
                         </span>
-                    </div>
+                        <span id="theme-text">Modo noche</span>
+                    </button>
                 </div>
-            </section>
+            </div>
 
-            <!-- ESTADÍSTICAS -->
-            <section class="estadisticas-grid" aria-label="Resumen de pedidos">
+            <aside class="empleado-profile">
+                <div class="profile-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="8" r="3.5"/>
+                        <path d="M5 20c.8-3.2 3.2-5 7-5s6.2 1.8 7 5"/>
+                    </svg>
+                </div>
+
+                <div class="profile-content">
+                    <span class="profile-label">Sesión activa</span>
+                    <strong>{{ request.user.first_name|default:request.user.username }}</strong>
+                    <span class="profile-role">
+                        <span class="role-dot"></span>
+                        {% if request.user.is_superuser %}Administrador{% else %}Empleado{% endif %}
+                    </span>
+                </div>
+            </aside>
+        </section>
+
+        <!-- RESUMEN -->
+        <section class="resumen-section" aria-label="Resumen de pedidos">
+            <div class="section-heading resumen-heading">
+                <div>
+                    <span class="section-kicker">VISTA GENERAL</span>
+                    <h2 class="seccion-titulo">Resumen de actividad</h2>
+                    <p>Estado actual de los pedidos registrados en el sistema.</p>
+                </div>
+                <span class="resumen-fecha">Panel operativo</span>
+            </div>
+
+            <div class="estadisticas-grid">
+
                 <article class="estadistica-card estadistica-total">
-                    <div class="estadistica-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z" />
-                            <path d="M4 7.5 12 11l8-3.5M12 11v9" />
-                        </svg>
+                    <div class="estadistica-top">
+                        <span class="estadistica-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z"/>
+                                <path d="M4 7.5 12 11l8-3.5M12 11v9"/>
+                            </svg>
+                        </span>
+                        <span class="estadistica-caption">REGISTRO GENERAL</span>
                     </div>
                     <div class="estadistica-info">
-                        <span>Total de pedidos</span>
                         <strong id="stat-total">{{ total_pedidos|default:0 }}</strong>
+                        <span>Total de pedidos</span>
                     </div>
                     <div class="estadistica-linea"></div>
                 </article>
 
                 <article class="estadistica-card estadistica-pendiente">
-                    <div class="estadistica-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <circle cx="12" cy="12" r="8" />
-                            <path d="M12 7v5l3 2" />
-                        </svg>
+                    <div class="estadistica-top">
+                        <span class="estadistica-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="12" r="8"/>
+                                <path d="M12 7v5l3 2"/>
+                            </svg>
+                        </span>
+                        <span class="estadistica-caption">POR ATENDER</span>
                     </div>
                     <div class="estadistica-info">
-                        <span>Pendientes</span>
                         <strong id="stat-pendientes">{{ pendientes|default:0 }}</strong>
+                        <span>Pendientes</span>
                     </div>
                     <div class="estadistica-linea"></div>
                 </article>
 
                 <article class="estadistica-card estadistica-preparacion">
-                    <div class="estadistica-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M20 11a8 8 0 0 0-14.9-4M4 5v5h5" />
-                            <path d="M4 13a8 8 0 0 0 14.9 4M20 19v-5h-5" />
-                        </svg>
+                    <div class="estadistica-top">
+                        <span class="estadistica-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 11a8 8 0 0 0-14.9-4M4 5v5h5"/>
+                                <path d="M4 13a8 8 0 0 0 14.9 4M20 19v-5h-5"/>
+                            </svg>
+                        </span>
+                        <span class="estadistica-caption">EN PROCESO</span>
                     </div>
                     <div class="estadistica-info">
+                        <strong id="stat-preparacion">{{ en_preparacion|default:preparacion|default:0 }}</strong>
                         <span>En preparación</span>
-                        <strong id="stat-preparacion">{{ preparacion|default:0 }}</strong>
                     </div>
                     <div class="estadistica-linea"></div>
                 </article>
 
                 <article class="estadistica-card estadistica-completado">
-                    <div class="estadistica-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M5 12h14M13 6l6 6-6 6" />
-                        </svg>
+                    <div class="estadistica-top">
+                        <span class="estadistica-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m5 12 4 4L19 6"/>
+                            </svg>
+                        </span>
+                        <span class="estadistica-caption">FINALIZADOS</span>
                     </div>
                     <div class="estadistica-info">
-                        <span>Completados</span>
-                        <strong id="stat-completados">{{ completados|default:0 }}</strong>
+                        <strong id="stat-completados">{{ entregados|default:completados|default:0 }}</strong>
+                        <span>Entregados</span>
                     </div>
                     <div class="estadistica-linea"></div>
                 </article>
-            </section>
 
-            <!-- MÓDULOS -->
-            <section id="modulos" class="modulos-seccion">
-                <div class="section-heading">
-                    <div>
-                        <span class="section-kicker">HERRAMIENTAS</span>
-                        <h2 class="seccion-titulo">Módulos del sistema</h2>
+                <article class="estadistica-card estadistica-cancelado">
+                    <div class="estadistica-top">
+                        <span class="estadistica-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="12" r="8"/>
+                                <path d="m9 9 6 6m0-6-6 6"/>
+                            </svg>
+                        </span>
+                        <span class="estadistica-caption">NO ACTIVOS</span>
                     </div>
-                    <p class="section-description">
-                        Accede rápidamente a las principales funciones disponibles para el equipo.
-                    </p>
+                    <div class="estadistica-info">
+                        <strong id="stat-cancelados">{{ cancelados|default:0 }}</strong>
+                        <span>Cancelados</span>
+                    </div>
+                    <div class="estadistica-linea"></div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- ADMINISTRACIÓN DE PEDIDOS -->
+        <section id="pedidos" class="pedidos-seccion">
+
+            <div class="pedidos-header">
+                <div class="pedidos-heading">
+                    <span class="section-kicker">GESTIÓN Y SEGUIMIENTO</span>
+                    <div class="pedidos-title-row">
+                        <h2 class="seccion-titulo">Pedidos registrados</h2>
+                        <span class="live-indicator"><span></span> EN SISTEMA</span>
+                    </div>
+                    <p>Busca, filtra y administra los pedidos de tus clientes.</p>
                 </div>
 
-                <div class="modulos-grid">
-                    <!-- Productos -->
-                    <article class="modulo-card" style="--animation-delay: 0ms;">
-                        <div class="modulo-top">
-                            <div class="modulo-icono modulo-icono-productos">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M5 8.5 12 5l7 3.5v8L12 20l-7-3.5z" />
-                                    <path d="M5 8.5 12 12l7-3.5M12 12v8" />
-                                    <path d="M8.5 6.75 15.5 10.25" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="modulo-body">
-                            <h3 class="modulo-titulo">Productos</h3>
-                            <p class="modulo-descripcion">Gestiona el catálogo, actualiza precios, existencias y disponibilidad.</p>
-                        </div>
-                        <a href="{% url 'menu' %}" class="btn-modulo btn-modulo-activo">
-                            <span>Gestionar módulo</span>
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
-                    </article>
+                <button type="button" id="btn-actualizar" class="btn-actualizar">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20 11a8 8 0 0 0-14.9-4M4 5v5h5"/>
+                        <path d="M4 13a8 8 0 0 0 14.9 4M20 19v-5h-5"/>
+                    </svg>
+                    <span>Actualizar lista</span>
+                </button>
+            </div>
 
-                    <!-- Pedidos -->
-                    <article class="modulo-card" style="--animation-delay: 80ms;">
-                        <div class="modulo-top">
-                            <div class="modulo-icono modulo-icono-pedidos">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M6 7h12l1 13H5L6 7Z" />
-                                    <path d="M9 7a3 3 0 0 1 6 0" />
-                                    <path d="M9 12h.01M15 12h.01" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="modulo-body">
-                            <h3 class="modulo-titulo">Pedidos</h3>
-                            <p class="modulo-descripcion">Consulta, actualiza y realiza seguimiento al estado de los pedidos.</p>
-                        </div>
-                        <a href="{% url 'gestion' %}" class="btn-modulo btn-modulo-activo">
-                            <span>Gestionar módulo</span>
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
-                    </article>
-
-                    <!-- Facturación -->
-                    <article class="modulo-card" style="--animation-delay: 160ms;">
-                        <div class="modulo-top">
-                            <div class="modulo-icono modulo-icono-facturacion">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <rect x="4" y="3" width="16" height="18" rx="2" />
-                                    <path d="M8 7h8M8 11h8M8 15h3M14 15h2" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="modulo-body">
-                            <h3 class="modulo-titulo">Facturación</h3>
-                            <p class="modulo-descripcion">Genera facturas de venta y consulta los comprobantes de pago.</p>
-                        </div>
-                        <a href="{% url 'facturacion' %}" class="btn-modulo btn-modulo-activo">
-                            <span>Gestionar módulo</span>
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
-                    </article>
-
-                    <!-- Reporte de Ventas -->
-                    <article class="modulo-card" style="--animation-delay: 240ms;">
-                        <div class="modulo-top">
-                            <div class="modulo-icono modulo-icono-ventas">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M4 19V5M4 19h17" />
-                                    <path d="M7 15v-3M11 15V8M15 15v-5M19 15v-8" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="modulo-body">
-                            <h3 class="modulo-titulo">Reporte de Ventas</h3>
-                            <p class="modulo-descripcion">Consulta información general e informes relacionados con las ventas.</p>
-                        </div>
-                        <a href="{% url 'gestion' %}" class="btn-modulo btn-modulo-activo">
-                            <span>Gestionar módulo</span>
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
-                    </article>
-
-                    <!-- Gestión de PQRS -->
-                    <article class="modulo-card" style="--animation-delay: 320ms;">
-                        <div class="modulo-top">
-                            <div class="modulo-icono modulo-icono-pqrs">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M4 6h16v12H4z" />
-                                    <path d="m4 7 8 6 8-6" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="modulo-body">
-                            <h3 class="modulo-titulo">Gestión de PQRS</h3>
-                            <p class="modulo-descripcion">Atiende, consulta y realiza seguimiento a peticiones y reclamos.</p>
-                        </div>
-                        <a href="{% url 'gestion_pqr' %}" class="btn-modulo btn-modulo-activo">
-                            <span>Gestionar módulo</span>
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
-                    </article>
-                </div>
-            </section>
-
-            <!-- PEDIDOS EN TIEMPO REAL -->
-            <section class="pedidos-seccion">
-                <div class="pedidos-header">
-                    <div class="pedidos-heading">
-                        <span class="section-kicker">OPERACIÓN</span>
-                        <div class="pedidos-title-row">
-                            <h2 class="seccion-titulo">Pedidos en tiempo real</h2>
-                            <span class="live-indicator">
-                                <span></span>
-                                ACTIVO
-                            </span>
-                        </div>
-                        <p>Consulta y actualiza el estado de los pedidos registrados en el sistema.</p>
-                    </div>
-
-                    <button type="button" id="btn-actualizar" class="btn-actualizar" onclick="window.location.reload()">
+            <!-- HERRAMIENTAS -->
+            <div class="pedidos-toolbar">
+                <div class="filtro-busqueda">
+                    <label for="buscar-pedido">Buscar pedidos</label>
+                    <div class="input-search-wrap">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M20 11a8 8 0 0 0-14.9-4M4 5v5h5" />
-                            <path d="M4 13a8 8 0 0 0 14.9 4M20 19v-5h-5" />
+                            <circle cx="10.8" cy="10.8" r="6.8"/>
+                            <path d="m16 16 4.5 4.5"/>
                         </svg>
-                        <span>Actualizar lista</span>
+                        <input
+                            type="search"
+                            id="buscar-pedido"
+                            placeholder="Número, cliente, teléfono o producto..."
+                            autocomplete="off"
+                        >
+                    </div>
+                </div>
+
+                <div class="filtro-estado">
+                    <label for="filtrar-estado">Estado del pedido</label>
+                    <select id="filtrar-estado">
+                        <option value="TODOS">Todos los estados</option>
+                        <option value="PENDIENTE">Pendientes</option>
+                        <option value="EN_PREPARACION">En preparación</option>
+                        <option value="ENTREGADO">Entregados</option>
+                        <option value="CANCELADO">Cancelados</option>
+                    </select>
+                </div>
+
+                <div class="toolbar-count">
+                    <span class="toolbar-count-label">Mostrando</span>
+                    <strong id="pedidos-visibles">{{ total_pedidos|default:0 }}</strong>
+                    <span class="toolbar-count-label">pedidos</span>
+                </div>
+            </div>
+
+            {% if not pedidos %}
+                <div class="pedidos-vacio">
+                    <div class="vacio-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z"/>
+                            <path d="M4 7.5 12 11l8-3.5M12 11v9"/>
+                        </svg>
+                    </div>
+                    <h3>Aún no hay pedidos</h3>
+                    <p>Cuando se registren pedidos, aparecerán aquí para su seguimiento y administración.</p>
+                    <button type="button" class="btn-vacio" onclick="window.location.reload()">
+                        Actualizar información
                     </button>
                 </div>
+            {% else %}
 
-                {% if not pedidos %}
-                    <div class="pedidos-vacio">
-                        <div class="vacio-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z" />
-                                <path d="M4 7.5 12 11l8-3.5M12 11v9" />
-                            </svg>
-                        </div>
-                        <h3>No hay pedidos registrados</h3>
-                        <p>Actualmente no existen pedidos disponibles para gestionar en el sistema.</p>
-                        <button type="button" class="btn-vacio" onclick="window.location.reload()">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M20 11a8 8 0 0 0-14.9-4M4 5v5h5" />
-                                <path d="M4 13a8 8 0 0 0 14.9 4M20 19v-5h-5" />
-                            </svg>
-                            Actualizar
-                        </button>
-                    </div>
-                {% else %}
-                    <div class="pedidos-grid">
-                        {% for item_pedido in pedidos %}
-                            <article class="pedido-card" data-pedido-id="{{ item_pedido.id }}" style="--animation-delay: {{ forloop.counter0 }}00ms;">
-                                <div class="pedido-card-top">
-                                    <div>
-                                        <span class="pedido-label">PEDIDO</span>
-                                        <strong class="pedido-id">#{{ item_pedido.id }}</strong>
-                                    </div>
+                <div class="pedidos-grid" id="pedidos-grid">
 
-                                    <span id="badge-{{ item_pedido.id }}" class="badge-estado estado-{% if item_pedido.estado == 'EN_PREPARACION' %}preparacion{% elif item_pedido.estado == 'ENTREGADO' %}completado{% else %}{{ item_pedido.estado|lower }}{% endif %}">
-                                        <span class="estado-dot"></span>
-                                        <span class="estado-texto">
-                                            {% if item_pedido.estado == "EN_PREPARACION" %}En preparación
-                                            {% elif item_pedido.estado == "ENTREGADO" %}Completado
-                                            {% elif item_pedido.estado == "CANCELADO" %}Cancelado
-                                            {% else %}Pendiente{% endif %}
-                                        </span>
+                    {% for item_pedido in pedidos %}
+                        <article
+                            class="pedido-card"
+                            data-pedido-id="{{ item_pedido.id }}"
+                            data-estado="{{ item_pedido.estado }}"
+                            data-cliente="{{ item_pedido.cliente.nombre|default:''|lower }}"
+                            data-telefono="{{ item_pedido.cliente.telefono|default:'' }}"
+                            data-productos="{% for det in item_pedido.detallepedido.all %}{{ det.producto.nombre|lower }} {% endfor %}"
+                            style="--animation-delay: {{ forloop.counter0 }}00ms;"
+                        >
+
+                            <div class="pedido-card-top">
+                                <div class="pedido-identificacion">
+                                    <span class="pedido-label">PEDIDO</span>
+                                    <strong class="pedido-id">#{{ item_pedido.id }}</strong>
+                                    <span class="pedido-fecha">{{ item_pedido.createdAt|date:"d/m/Y · H:i" }}</span>
+                                </div>
+
+                                <span
+                                    id="badge-{{ item_pedido.id }}"
+                                    class="badge-estado estado-{% if item_pedido.estado == 'EN_PREPARACION' %}preparacion{% elif item_pedido.estado == 'ENTREGADO' %}completado{% else %}{{ item_pedido.estado|lower }}{% endif %}"
+                                >
+                                    <span class="estado-dot"></span>
+                                    <span class="estado-texto">
+                                        {% if item_pedido.estado == "EN_PREPARACION" %}
+                                            En preparación
+                                        {% elif item_pedido.estado == "ENTREGADO" %}
+                                            Entregado
+                                        {% elif item_pedido.estado == "CANCELADO" %}
+                                            Cancelado
+                                        {% else %}
+                                            Pendiente
+                                        {% endif %}
                                     </span>
-                                </div>
+                                </span>
+                            </div>
 
-                                <div class="pedido-separador"></div>
+                            <div class="pedido-card-body">
 
-                                <div class="pedido-datos">
-                                    <div class="dato-pedido">
-                                        <div class="dato-icon">
+                                <section class="pedido-cliente-section">
+                                    <div class="card-section-title">
+                                        <span class="section-icon">
                                             <svg viewBox="0 0 24 24" aria-hidden="true">
-                                                <circle cx="12" cy="8" r="3.5" />
-                                                <path d="M5 20c.8-3.2 3.2-5 7-5s6.2 1.8 7 5" />
+                                                <circle cx="12" cy="8" r="3.5"/>
+                                                <path d="M5 20c.8-3.2 3.2-5 7-5s6.2 1.8 7 5"/>
                                             </svg>
-                                        </div>
-                                        <div>
-                                            <span>Cliente</span>
-                                            <strong>{{ item_pedido.cliente.nombre }}</strong>
-                                        </div>
-                                    </div>
-
-                                    <div class="dato-pedido">
-                                        <div class="dato-icon">
-                                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M19 10c0 5-7 10-7 10S5 15 5 10a7 7 0 1 1 14 0Z" />
-                                                <circle cx="12" cy="10" r="2.3" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <span>Dirección</span>
-                                            <strong>{{ item_pedido.cliente.direccion }}</strong>
-                                        </div>
-                                    </div>
-
-                                    <div class="dato-pedido">
-                                        <div class="dato-icon">
-                                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                                <circle cx="12" cy="12" r="8" />
-                                                <path d="M12 7v5l3 2" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <span>Hora del pedido</span>
-                                            <strong>{{ item_pedido.createdAt|date:"d/m/Y H:i" }}</strong>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="items-container">
-                                    <div class="items-heading">
-                                        <span>Detalle del pedido</span>
-                                        <span>
-                                            {{ item_pedido.detallepedido.count }}
-                                            {% if item_pedido.detallepedido.count == 1 %}producto{% else %}productos{% endif %}
                                         </span>
+                                        <h3>Información del cliente</h3>
+                                    </div>
+
+                                    <div class="pedido-datos">
+                                        <div class="dato-pedido dato-cliente">
+                                            <span>Nombre completo</span>
+                                            <strong>{{ item_pedido.cliente.nombre|default:"Cliente no disponible" }}</strong>
+                                        </div>
+
+                                        <div class="dato-pedido">
+                                            <span>Teléfono</span>
+                                            <strong>{{ item_pedido.cliente.telefono|default:"No registrado" }}</strong>
+                                        </div>
+
+                                        <div class="dato-pedido dato-direccion">
+                                            <span>Dirección de entrega</span>
+                                            <strong>{{ item_pedido.cliente.direccion|default:"Sin dirección registrada" }}</strong>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section class="items-container">
+                                    <div class="card-section-title items-heading">
+                                        <span class="section-icon">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z"/>
+                                                <path d="M4 7.5 12 11l8-3.5M12 11v9"/>
+                                            </svg>
+                                        </span>
+                                        <h3>Productos solicitados</h3>
+                                        <span class="items-count">{{ item_pedido.detallepedido.count }} {% if item_pedido.detallepedido.count == 1 %}producto{% else %}productos{% endif %}</span>
                                     </div>
 
                                     <div class="items-lista">
                                         {% for det in item_pedido.detallepedido.all %}
-                                            <div class="item-row">
+                                            <div
+                                                class="item-row"
+                                                data-cantidad="{{ det.cantidad }}"
+                                                data-precio="{{ det.precioUnit }}"
+                                            >
                                                 <span class="item-cantidad">{{ det.cantidad }}x</span>
                                                 <span class="item-nombre">{{ det.producto.nombre }}</span>
+                                                <div class="item-valores">
+                                                    <span class="item-precio-unitario">
+                                                        ${{ det.precioUnit|floatformat:0 }} c/u
+                                                    </span>
+                                                    <strong class="item-subtotal">
+                                                        ${{ det.cantidad|floatformat:0 }}
+                                                    </strong>
+                                                </div>
                                             </div>
+                                        {% empty %}
+                                            <p class="sin-productos">Este pedido no tiene productos asociados.</p>
                                         {% endfor %}
                                     </div>
+                                </section>
+
+                                <section class="pedido-observaciones">
+                                    <span>Observaciones</span>
+                                    <p>
+                                        {% if item_pedido.observaciones %}
+                                            {{ item_pedido.observaciones }}
+                                        {% else %}
+                                            Sin observaciones registradas.
+                                        {% endif %}
+                                    </p>
+                                </section>
+
+                            </div>
+
+                            <div class="pedido-footer">
+                                <div class="pedido-total">
+                                    <span>Total del pedido</span>
+                                    <strong>${{ item_pedido.total|floatformat:0 }}</strong>
                                 </div>
 
-                                <div class="pedido-footer">
-                                    <div class="pedido-total">
-                                        <span>Total</span>
-                                        <strong>${{ item_pedido.total|floatformat:0 }}</strong>
-                                    </div>
-
-                                    <div class="acciones-pedido">
-                                        <label for="estado-{{ item_pedido.id }}">Actualizar estado</label>
-                                        <select
-                                            id="estado-{{ item_pedido.id }}"
-                                            class="select-estado"
-                                            data-estado-anterior="{{ item_pedido.estado }}"
-                                            onchange="cambiarEstadoPedido('{{ item_pedido.id }}', this)"
-                                        >
-                                            <option value="PENDIENTE" {% if item_pedido.estado == "PENDIENTE" %}selected{% endif %}>Pendiente</option>
-                                            <option value="EN_PREPARACION" {% if item_pedido.estado == "EN_PREPARACION" %}selected{% endif %}>En preparación</option>
-                                            <option value="ENTREGADO" {% if item_pedido.estado == "ENTREGADO" %}selected{% endif %}>Completado</option>
-                                            <option value="CANCELADO" {% if item_pedido.estado == "CANCELADO" %}selected{% endif %}>Cancelado</option>
-                                        </select>
-                                    </div>
+                                <div class="acciones-pedido">
+                                    <label for="estado-{{ item_pedido.id }}">Cambiar estado</label>
+                                    <select
+                                        id="estado-{{ item_pedido.id }}"
+                                        class="select-estado"
+                                        data-estado-anterior="{{ item_pedido.estado }}"
+                                        onchange="cambiarEstadoPedido('{{ item_pedido.id }}', this)"
+                                    >
+                                        <option value="PENDIENTE" {% if item_pedido.estado == "PENDIENTE" %}selected{% endif %}>Pendiente</option>
+                                        <option value="EN_PREPARACION" {% if item_pedido.estado == "EN_PREPARACION" %}selected{% endif %}>En preparación</option>
+                                        <option value="ENTREGADO" {% if item_pedido.estado == "ENTREGADO" %}selected{% endif %}>Entregado</option>
+                                        <option value="CANCELADO" {% if item_pedido.estado == "CANCELADO" %}selected{% endif %}>Cancelado</option>
+                                    </select>
                                 </div>
-                            </article>
-                        {% endfor %}
+                            </div>
+
+                            <div class="pedido-mensaje" id="mensaje-{{ item_pedido.id }}" aria-live="polite"></div>
+                        </article>
+                    {% endfor %}
+
+                </div>
+
+                <div id="sin-resultados" class="pedidos-vacio" hidden>
+                    <div class="vacio-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="10.8" cy="10.8" r="6.8"/>
+                            <path d="m16 16 4.5 4.5"/>
+                        </svg>
                     </div>
-                {% endif %}
-            </section>
-        </main>
+                    <h3>No se encontraron pedidos</h3>
+                    <p>Prueba con otro término de búsqueda o cambia el filtro seleccionado.</p>
+                    <button type="button" class="btn-vacio" id="limpiar-filtros">Limpiar filtros</button>
+                </div>
+            {% endif %}
 
-        <button type="button" id="btn-volver-arriba" class="volver-arriba" aria-label="Volver arriba">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m6 14 6-6 6 6" />
-                <path d="M12 8v10" />
-            </svg>
-        </button>
+        </section>
+    </main>
 
-        <footer>
-            {% include 'deliapp/components/footer.html' %}
-        </footer>
-    </div>
+    <button type="button" id="btn-volver-arriba" class="volver-arriba" aria-label="Volver arriba">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 14 6-6 6 6M12 8v10"/>
+        </svg>
+    </button>
 
-    {% csrf_token %}
+    <footer>
+        {% include 'deliapp/components/footer.html' %}
+    </footer>
+</div>
 
-    <script>
-        document.documentElement.style.scrollBehavior = "smooth";
+{% csrf_token %}
 
-        // 1. MODO OSCURO / DÍA
-        const layout = document.getElementById("empleado-layout");
-        const btnTheme = document.getElementById("btn-theme-toggle");
-        const themeIcon = document.getElementById("theme-icon");
-        const themeText = document.getElementById("theme-text");
+<script>
+(() => {
+    "use strict";
 
-        const iconSol = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" /></svg>`;
-        const iconLuna = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z" /></svg>`;
+    const layout = document.getElementById("empleado-layout");
+    const btnTheme = document.getElementById("btn-theme-toggle");
+    const themeIcon = document.getElementById("theme-icon");
+    const themeText = document.getElementById("theme-text");
 
-        function aplicarTema(oscuro) {
-            if (oscuro) {
-                layout.classList.remove("tema-claro");
-                layout.classList.add("tema-oscuro");
-                document.body.classList.add("empleado-dark-body");
-                themeIcon.innerHTML = iconSol;
-                themeText.textContent = "Modo día";
-            } else {
-                layout.classList.remove("tema-oscuro");
-                layout.classList.add("tema-claro");
-                document.body.classList.remove("empleado-dark-body");
-                themeIcon.innerHTML = iconLuna;
-                themeText.textContent = "Modo noche";
+    const iconSol = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42
+            M17.65 17.65l1.42 1.42M2 12h2M20 12h2
+            M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>
+        </svg>`;
+
+    const iconLuna = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4
+            8.5 8.5 0 1 0 20 15.2Z"/>
+        </svg>`;
+
+    function aplicarTema(oscuro) {
+        layout.classList.toggle("tema-oscuro", oscuro);
+        layout.classList.toggle("tema-claro", !oscuro);
+        document.body.classList.toggle("empleado-dark-body", oscuro);
+
+        themeIcon.innerHTML = oscuro ? iconSol : iconLuna;
+        themeText.textContent = oscuro ? "Modo día" : "Modo noche";
+    }
+
+    let temaGuardado = "light";
+    try {
+        temaGuardado = localStorage.getItem("admin-theme") || "light";
+    } catch (error) {
+        console.warn("No se pudo recuperar el tema guardado.");
+    }
+
+    aplicarTema(temaGuardado === "dark");
+
+    btnTheme?.addEventListener("click", () => {
+        const oscuro = !layout.classList.contains("tema-oscuro");
+        aplicarTema(oscuro);
+
+        try {
+            localStorage.setItem("admin-theme", oscuro ? "dark" : "light");
+        } catch (error) {
+            console.warn("No se pudo guardar el tema.");
+        }
+    });
+
+    /* Volver arriba */
+    const btnArriba = document.getElementById("btn-volver-arriba");
+
+    function controlarBotonArriba() {
+        btnArriba?.classList.toggle("volver-arriba-visible", window.scrollY > 350);
+    }
+
+    window.addEventListener("scroll", controlarBotonArriba, { passive: true });
+    controlarBotonArriba();
+
+    btnArriba?.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    /* Estados */
+    const ETIQUETAS_ESTADO = {
+        PENDIENTE: "Pendiente",
+        EN_PREPARACION: "En preparación",
+        ENTREGADO: "Entregado",
+        CANCELADO: "Cancelado"
+    };
+
+    const CLASES_CSS_ESTADO = {
+        PENDIENTE: "pendiente",
+        EN_PREPARACION: "preparacion",
+        ENTREGADO: "completado",
+        CANCELADO: "cancelado"
+    };
+
+    const tarjetas = () => [...document.querySelectorAll(".pedido-card")];
+
+    /* Estadísticas: cuentan todos los pedidos, aunque haya filtros activos */
+    function recalcularEstadisticas() {
+        const lista = tarjetas();
+        const conteo = {
+            PENDIENTE: 0,
+            EN_PREPARACION: 0,
+            ENTREGADO: 0,
+            CANCELADO: 0
+        };
+
+        lista.forEach(tarjeta => {
+            const estado = tarjeta.dataset.estado;
+            if (Object.prototype.hasOwnProperty.call(conteo, estado)) {
+                conteo[estado]++;
             }
+        });
+
+        document.getElementById("stat-total").textContent = lista.length;
+        document.getElementById("stat-pendientes").textContent = conteo.PENDIENTE;
+        document.getElementById("stat-preparacion").textContent = conteo.EN_PREPARACION;
+        document.getElementById("stat-completados").textContent = conteo.ENTREGADO;
+        document.getElementById("stat-cancelados").textContent = conteo.CANCELADO;
+    }
+
+    /* Subtotales */
+    function calcularSubtotales() {
+        document.querySelectorAll(".item-row").forEach(fila => {
+            const cantidad = Number(fila.dataset.cantidad || 0);
+            const precio = Number(fila.dataset.precio || 0);
+            const subtotal = cantidad * precio;
+            const elemento = fila.querySelector(".item-subtotal");
+
+            if (elemento) {
+                elemento.textContent = subtotal.toLocaleString("es-CO", {
+                    style: "currency",
+                    currency: "COP",
+                    maximumFractionDigits: 0
+                });
+            }
+        });
+    }
+
+    /* Búsqueda y filtros */
+    const campoBusqueda = document.getElementById("buscar-pedido");
+    const filtroEstado = document.getElementById("filtrar-estado");
+    const sinResultados = document.getElementById("sin-resultados");
+    const contadorVisibles = document.getElementById("pedidos-visibles");
+
+    function aplicarFiltros() {
+        const texto = (campoBusqueda?.value || "").trim().toLocaleLowerCase("es");
+        const estadoSeleccionado = filtroEstado?.value || "TODOS";
+        let visibles = 0;
+
+        tarjetas().forEach(tarjeta => {
+            const contenido = [
+                tarjeta.dataset.pedidoId,
+                tarjeta.dataset.cliente,
+                tarjeta.dataset.telefono,
+                tarjeta.dataset.productos,
+                tarjeta.textContent
+            ].join(" ").toLocaleLowerCase("es");
+
+            const coincideTexto = !texto || contenido.includes(texto);
+            const coincideEstado =
+                estadoSeleccionado === "TODOS" ||
+                tarjeta.dataset.estado === estadoSeleccionado;
+
+            const mostrar = coincideTexto && coincideEstado;
+            tarjeta.hidden = !mostrar;
+
+            if (mostrar) visibles++;
+        });
+
+        if (sinResultados) sinResultados.hidden = visibles !== 0;
+        if (contadorVisibles) contadorVisibles.textContent = visibles;
+    }
+
+    campoBusqueda?.addEventListener("input", aplicarFiltros);
+    filtroEstado?.addEventListener("change", aplicarFiltros);
+
+    document.getElementById("limpiar-filtros")?.addEventListener("click", () => {
+        if (campoBusqueda) campoBusqueda.value = "";
+        if (filtroEstado) filtroEstado.value = "TODOS";
+        aplicarFiltros();
+    });
+
+    /* Actualizar la lista */
+    document.getElementById("btn-actualizar")?.addEventListener("click", () => {
+        const boton = document.getElementById("btn-actualizar");
+        boton.classList.add("actualizando");
+        boton.disabled = true;
+        window.location.reload();
+    });
+
+    /* Cambio de estado */
+    window.cambiarEstadoPedido = async function(pedidoId, selectElement) {
+        const nuevoEstado = selectElement.value;
+        const estadoAnterior = selectElement.dataset.estadoAnterior;
+        const tarjeta = selectElement.closest(".pedido-card");
+        const badge = document.getElementById(`badge-${pedidoId}`);
+        const mensaje = document.getElementById(`mensaje-${pedidoId}`);
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+
+        if (!csrfToken || !badge || !tarjeta) {
+            alert("No se pudo preparar la actualización del pedido.");
+            selectElement.value = estadoAnterior;
+            return;
         }
 
-        const temaGuardado = localStorage.getItem("admin-theme") === "dark";
-        aplicarTema(temaGuardado);
+        if (nuevoEstado === estadoAnterior) return;
 
-        btnTheme.addEventListener("click", () => {
-            const esOscuro = !layout.classList.contains("tema-oscuro");
-            aplicarTema(esOscuro);
-            localStorage.setItem("admin-theme", esOscuro ? "dark" : "light");
-        });
+        selectElement.disabled = true;
+        tarjeta.classList.add("pedido-actualizando");
 
-        // 2. BOTÓN VOLVER ARRIBA
-        const btnArriba = document.getElementById("btn-volver-arriba");
-        window.addEventListener("scroll", () => {
-            if (window.scrollY > 450) {
-                btnArriba.classList.add("volver-arriba-visible");
-            } else {
-                btnArriba.classList.remove("volver-arriba-visible");
-            }
-        });
-        btnArriba.addEventListener("click", () => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        });
+        if (mensaje) {
+            mensaje.textContent = "Actualizando estado del pedido...";
+            mensaje.className = "pedido-mensaje mensaje-cargando";
+        }
 
-        // 3. ACTUALIZAR ESTADO DEL PEDIDO EN TIEMPO REAL
-        const ETIQUETAS_ESTADO = {
-            PENDIENTE: "Pendiente",
-            EN_PREPARACION: "En preparación",
-            ENTREGADO: "Completado",
-            CANCELADO: "Cancelado"
-        };
-
-        const CLASES_CSS_ESTADO = {
-            PENDIENTE: "pendiente",
-            EN_PREPARACION: "preparacion",
-            ENTREGADO: "completado",
-            CANCELADO: "cancelado"
-        };
-
-        function recalcularEstadisticas() {
-            const selects = document.querySelectorAll(".select-estado");
-            let total = selects.length;
-            let pendientes = 0, preparacion = 0, completados = 0;
-
-            selects.forEach(sel => {
-                if (sel.value === "PENDIENTE") pendientes++;
-                if (sel.value === "EN_PREPARACION") preparacion++;
-                if (sel.value === "ENTREGADO") completados++;
+        try {
+            const respuesta = await fetch(`/api/empleado/pedidos/${pedidoId}/`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: JSON.stringify({ estado: nuevoEstado })
             });
 
-            document.getElementById("stat-total").textContent = total;
-            document.getElementById("stat-pendientes").textContent = pendientes;
-            document.getElementById("stat-preparacion").textContent = preparacion;
-            document.getElementById("stat-completados").textContent = completados;
-        }
+            const resultado = await respuesta.json().catch(() => ({}));
 
-        async function cambiarEstadoPedido(pedidoId, selectElement) {
-            const nuevoEstado = selectElement.value;
-            const estadoAnterior = selectElement.dataset.estadoAnterior;
-            const badge = document.getElementById(`badge-${pedidoId}`);
-            const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-
-            // Actualización optimista en pantalla
-            badge.className = `badge-estado estado-${CLASES_CSS_ESTADO[nuevoEstado]}`;
-            badge.querySelector(".estado-texto").textContent = ETIQUETAS_ESTADO[nuevoEstado];
-            recalcularEstadisticas();
-
-            try {
-                const res = await fetch(`/api/empleado/pedidos/${pedidoId}/`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": csrfToken
-                    },
-                    body: JSON.stringify({ estado: nuevoEstado })
-                });
-
-                if (res.ok) {
-                    selectElement.dataset.estadoAnterior = nuevoEstado;
-                } else {
-                    throw new Error("Error en el servidor");
-                }
-            } catch (error) {
-                console.error("Error al actualizar estado:", error);
-                selectElement.value = estadoAnterior;
-                badge.className = `badge-estado estado-${CLASES_CSS_ESTADO[estadoAnterior]}`;
-                badge.querySelector(".estado-texto").textContent = ETIQUETAS_ESTADO[estadoAnterior];
-                recalcularEstadisticas();
-                alert("No se pudo actualizar el estado del pedido.");
+            if (!respuesta.ok || resultado.ok === false) {
+                throw new Error(
+                    resultado.error ||
+                    resultado.mensaje ||
+                    "No fue posible actualizar el estado."
+                );
             }
+
+            selectElement.dataset.estadoAnterior = nuevoEstado;
+            tarjeta.dataset.estado = nuevoEstado;
+
+            badge.className = `badge-estado estado-${CLASES_CSS_ESTADO[nuevoEstado]}`;
+            badge.querySelector(".estado-texto").textContent =
+                resultado.estado_display || ETIQUETAS_ESTADO[nuevoEstado];
+
+            recalcularEstadisticas();
+            aplicarFiltros();
+
+            if (mensaje) {
+                mensaje.textContent = "El estado se actualizó correctamente.";
+                mensaje.className = "pedido-mensaje mensaje-exito";
+            }
+
+        } catch (error) {
+            selectElement.value = estadoAnterior;
+
+            if (mensaje) {
+                mensaje.textContent = error.message || "No se pudo actualizar el pedido.";
+                mensaje.className = "pedido-mensaje mensaje-error";
+            }
+
+            console.error("Error al actualizar el pedido:", error);
+        } finally {
+            selectElement.disabled = false;
+            tarjeta.classList.remove("pedido-actualizando");
         }
-    </script>
+    };
+
+    calcularSubtotales();
+    recalcularEstadisticas();
+    aplicarFiltros();
+})();
+</script>
+
 </body>
 </html>

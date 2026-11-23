@@ -1,9 +1,10 @@
+
 {% load static %}
 
 <nav class="navbar">
 
     <!-- MARCA -->
-    <div class="navbar-brand">
+    <a href="{% url 'inicio' %}" class="navbar-brand">
         <div class="navbar-logo-box">
             <img
                 src="{% static 'deliapp/img/logo.jpeg' %}"
@@ -16,17 +17,32 @@
             <span class="navbar-titulo">Deli Arepas</span>
             <span class="navbar-subtitulo">JD · Sabor tradicional</span>
         </div>
-    </div>
+    </a>
 
-    <!-- NAVEGACIÓN -->
-    <div class="navbar-links">
+    <!-- BOTÓN EXCLUSIVO PARA MÓVIL -->
+    <button
+        type="button"
+        class="mobile-menu-toggle"
+        id="mobileMenuToggle"
+        aria-label="Abrir menú de navegación"
+        aria-expanded="false"
+        aria-controls="mobileMenuPanel"
+    >
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- NAVEGACIÓN DE ESCRITORIO -->
+    <div class="navbar-links desktop-navigation">
+
         <a href="{% url 'inicio' %}" class="nav-link">Inicio</a>
         <a href="{% url 'inicio' %}#pqr" class="nav-link">PQR</a>
         <a href="{% url 'menu' %}" class="nav-link">Productos</a>
 
         {% if request.user.is_authenticated %}
+
             {% if request.user.is_superuser %}
-                <!-- ADMINISTRADOR -->
                 <a href="{% url 'admin_dashboard' %}" class="nav-link">Panel Admin</a>
                 <a href="{% url 'empleado_pedidos' %}" class="nav-link">Empleados</a>
                 <a href="{% url 'gestion' %}" class="nav-link">Gestión Pedidos</a>
@@ -35,24 +51,24 @@
                 <a href="{% url 'gestion_pqr' %}" class="nav-link">Gestión PQRS</a>
 
             {% elif request.user.is_staff %}
-                <!-- EMPLEADO -->
                 <a href="{% url 'empleado_pedidos' %}" class="nav-link">Empleados</a>
                 <a href="{% url 'gestion' %}" class="nav-link">Gestión Pedidos</a>
                 <a href="{% url 'facturacion' %}" class="nav-link">Facturas</a>
 
             {% else %}
-                <!-- CLIENTE / USUARIO -->
                 <a href="{% url 'cliente' %}" class="nav-link">Mis Pedidos</a>
             {% endif %}
+
         {% endif %}
     </div>
 
-    <!-- USUARIO -->
-    <div class="navbar-login">
+    <!-- ACCIONES DE ESCRITORIO -->
+    <div class="navbar-actions desktop-actions">
+
         {% if request.user.is_authenticated %}
+
             <div class="user-container">
 
-                <!-- PERFIL -->
                 <div class="user-profile">
                     <div class="user-avatar">
                         {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
@@ -66,22 +82,188 @@
                     </div>
                 </div>
 
-                <!-- CERRAR SESIÓN -->
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn-logout">
                         Cerrar sesión
                     </button>
                 </form>
+
             </div>
+
         {% else %}
 
-            <!-- INICIAR SESIÓN -->
-            <a href="{% url 'login' %}" class="btn-login">
-                Iniciar sesión
-            </a>
+            <div class="navbar-login">
+                <a href="{% url 'login' %}" class="btn-login">
+                    Iniciar sesión
+                </a>
+            </div>
 
         {% endif %}
     </div>
 
+    <!-- MENÚ EXCLUSIVO PARA MÓVIL -->
+    <div class="mobile-menu-panel" id="mobileMenuPanel">
+
+        <div class="mobile-menu-heading">
+            <span>NAVEGACIÓN</span>
+        </div>
+
+        <a href="{% url 'inicio' %}" class="mobile-menu-link">
+            <span>Inicio</span>
+            <span class="mobile-menu-arrow">›</span>
+        </a>
+
+        <a href="{% url 'inicio' %}#pqr" class="mobile-menu-link">
+            <span>Peticiones y reclamos</span>
+            <span class="mobile-menu-arrow">›</span>
+        </a>
+
+        <a href="{% url 'menu' %}" class="mobile-menu-link">
+            <span>Productos</span>
+            <span class="mobile-menu-arrow">›</span>
+        </a>
+
+        {% if request.user.is_authenticated %}
+
+            {% if request.user.is_superuser or request.user.is_staff %}
+
+                <details class="mobile-modules">
+                    <summary>
+                        <span>Módulos</span>
+                        <span class="mobile-modules-arrow">⌄</span>
+                    </summary>
+
+                    <div class="mobile-modules-content">
+
+                        {% if request.user.is_superuser %}
+                            <a href="{% url 'admin_dashboard' %}">
+                                Panel administrativo
+                            </a>
+                            <a href="{% url 'empleado_pedidos' %}">
+                                Empleados
+                            </a>
+                            <a href="{% url 'gestion' %}">
+                                Gestión de pedidos
+                            </a>
+                            <a href="{% url 'facturacion' %}">
+                                Facturación
+                            </a>
+                            <a href="{% url 'usuarios' %}">
+                                Usuarios
+                            </a>
+                            <a href="{% url 'gestion_pqr' %}">
+                                Gestión PQRS
+                            </a>
+
+                        {% elif request.user.is_staff %}
+                            <a href="{% url 'empleado_pedidos' %}">
+                                Empleados
+                            </a>
+                            <a href="{% url 'gestion' %}">
+                                Gestión de pedidos
+                            </a>
+                            <a href="{% url 'facturacion' %}">
+                                Facturación
+                            </a>
+                        {% endif %}
+
+                    </div>
+                </details>
+
+            {% else %}
+
+                <a href="{% url 'cliente' %}" class="mobile-menu-link">
+                    <span>Mis pedidos</span>
+                    <span class="mobile-menu-arrow">›</span>
+                </a>
+
+            {% endif %}
+
+        {% endif %}
+
+        <div class="mobile-menu-divider"></div>
+
+        <!-- USUARIO EN MÓVIL -->
+        {% if request.user.is_authenticated %}
+
+            <div class="mobile-user-card">
+                <div class="user-avatar">
+                    {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                </div>
+
+                <div class="mobile-user-info">
+                    <span>Sesión activa</span>
+                    <strong>
+                        {{ request.user.first_name|default:request.user.username }}
+                    </strong>
+                </div>
+            </div>
+
+            <form method="POST" action="{% url 'logout' %}" class="mobile-logout-form">
+                {% csrf_token %}
+                <button type="submit" class="mobile-logout-button">
+                    Cerrar sesión
+                </button>
+            </form>
+
+        {% else %}
+
+            <a href="{% url 'login' %}" class="mobile-login-button">
+                Iniciar sesión
+            </a>
+
+        {% endif %}
+
+    </div>
+
 </nav>
+
+<script>
+(() => {
+    const boton = document.getElementById("mobileMenuToggle");
+    const panel = document.getElementById("mobileMenuPanel");
+
+    if (!boton || !panel) return;
+
+    function cerrarMenu() {
+        boton.classList.remove("active");
+        panel.classList.remove("is-open");
+        boton.setAttribute("aria-expanded", "false");
+        boton.setAttribute("aria-label", "Abrir menú de navegación");
+    }
+
+    function abrirMenu() {
+        boton.classList.add("active");
+        panel.classList.add("is-open");
+        boton.setAttribute("aria-expanded", "true");
+        boton.setAttribute("aria-label", "Cerrar menú de navegación");
+    }
+
+    boton.addEventListener("click", () => {
+        const estaAbierto = panel.classList.contains("is-open");
+
+        if (estaAbierto) {
+            cerrarMenu();
+        } else {
+            abrirMenu();
+        }
+    });
+
+    panel.querySelectorAll("a").forEach(enlace => {
+        enlace.addEventListener("click", cerrarMenu);
+    });
+
+    document.addEventListener("keydown", evento => {
+        if (evento.key === "Escape") {
+            cerrarMenu();
+        }
+    });
+
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 850) {
+            cerrarMenu();
+        }
+    });
+})();
+</script>

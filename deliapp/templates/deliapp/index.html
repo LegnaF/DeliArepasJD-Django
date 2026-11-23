@@ -2,40 +2,23 @@
 <!DOCTYPE html>
 <html lang="es">
 
-{% load static %}
-<!DOCTYPE html>
-<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#FFF8E7">
+    <meta name="theme-color" content="#492b1d">
 
     <title>Deli Arepas JD | Artesanal y Delicioso</title>
 
     <!-- ICONO DE LA PESTAÑA -->
-
     <link
-            rel="icon"
-            type="image/svg+xml"
-            href="{% static 'deliapp/img/favicon.svg' %}?v=3"
-        >
+        rel="icon"
+        type="image/svg+xml"
+        href="{% static 'deliapp/img/favicon.svg' %}?v=3"
+    >
 
     <!-- ESTILOS -->
     <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
-
-    <script>
-        (() => {
-            try {
-                const temaGuardado = localStorage.getItem('deli-tema');
-                const tema = temaGuardado === 'dark' ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', tema);
-            } catch (error) {
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        })();
-    </script>
 </head>
-
 
 <body>
 
@@ -44,37 +27,13 @@
         {% include 'deliapp/components/navbar.html' %}
     </header>
 
-    <!-- BOTÓN DE MODO DÍA / NOCHE -->
-    <button
-        type="button"
-        class="theme-toggle"
-        id="themeToggle"
-        aria-label="Activar modo noche"
-        aria-pressed="false"
-    >
-        <svg id="themeIcon" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2"></path>
-            <path d="M12 20v2"></path>
-            <path d="m4.93 4.93 1.42 1.42"></path>
-            <path d="m17.65 17.65 1.42 1.42"></path>
-            <path d="M2 12h2"></path>
-            <path d="M20 12h2"></path>
-            <path d="m6.35 17.65-1.42 1.42"></path>
-            <path d="m19.07 4.93-1.42 1.42"></path>
-        </svg>
-        <span id="themeText">Modo noche</span>
-    </button>
-
     <main class="main">
 
         <!-- SECCIÓN HERO -->
         <section class="hero">
             <div class="glassCard">
                 <span class="badge">100% Maíz Seleccionado</span>
+
                 <h1 class="title">DELI AREPAS</h1>
                 <h2 class="subtitle">Artesanal y Delicioso</h2>
 
@@ -85,18 +44,26 @@
                 </p>
 
                 <div class="heroButtons">
-                    <a href="{% url 'menu' %}" class="btnPrimary">Ver Productos</a>
-                    <a href="#nuestra-historia" class="btnSecondary">Nuestra Historia</a>
+                    <a href="{% url 'menu' %}" class="btnPrimary">
+                        Ver Productos
+                    </a>
+
+                    <a href="#nuestra-historia" class="btnSecondary">
+                        Nuestra Historia
+                    </a>
                 </div>
             </div>
         </section>
 
         <!-- SECCIÓN NUESTROS CIMIENTOS -->
         <section class="cimientosSection" id="nuestra-historia">
+
             <div class="subtag">Nuestros Cimientos</div>
+
             <h2 class="sectionTitle">Tradición y Compromiso</h2>
 
             <div class="cardsGrid">
+
                 <div class="infoCard">
                     <div class="cardHeader">
                         <div class="iconContainer">◎</div>
@@ -121,15 +88,21 @@
                         horizontes.
                     </p>
                 </div>
+
             </div>
         </section>
 
         <!-- SECCIÓN PQRS -->
         <section class="pqrSection" id="pqr">
+
             <div class="pqrContainer">
 
                 <div class="pqrInfo">
-                    <div class="pqrTag">Peticiones, Quejas y Reclamos</div>
+
+                    <div class="pqrTag">
+                        Peticiones, Quejas y Reclamos
+                    </div>
+
                     <h2 class="pqrTitle">Contáctanos</h2>
 
                     <p class="pqrDesc">
@@ -140,25 +113,39 @@
 
                     <div class="contactoItem">
                         <div class="contactoIcono">📞</div>
+
                         <div>
-                            <p class="contactoLabel">Llámanos o escríbenos</p>
-                            <p class="contactoValor">+57 321 423 1438</p>
+                            <p class="contactoLabel">
+                                Llámanos o escríbenos
+                            </p>
+
+                            <p class="contactoValor">
+                                +57 321 423 1438
+                            </p>
                         </div>
                     </div>
 
                     <div class="contactoItem">
                         <div class="contactoIcono">📍</div>
+
                         <div>
-                            <p class="contactoLabel">Dirección Principal</p>
+                            <p class="contactoLabel">
+                                Dirección Principal
+                            </p>
+
                             <p class="contactoValor">
                                 Carrera 15c 27 - 69s, Soacha, Cundinamarca
                             </p>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="pqrCard">
-                    <h3 class="formTitle">Envíanos un mensaje</h3>
+
+                    <h3 class="formTitle">
+                        Envíanos un mensaje
+                    </h3>
 
                     {% if messages %}
                         {% for message in messages %}
@@ -168,104 +155,62 @@
                         {% endfor %}
                     {% endif %}
 
-                    <form method="POST" action="{% url 'inicio' %}#pqr" class="pqrForm">
+                    <form
+                        method="POST"
+                        action="{% url 'inicio' %}#pqr"
+                        class="pqrForm"
+                    >
                         {% csrf_token %}
 
                         <div class="formGroup">
-                            <label class="formLabel" for="{{ form.nombre.id_for_label }}">
+                            <label
+                                class="formLabel"
+                                for="{{ form.nombre.id_for_label }}"
+                            >
                                 Nombre Completo
                             </label>
+
                             {{ form.nombre }}
                         </div>
 
                         <div class="formGroup">
-                            <label class="formLabel" for="{{ form.contacto.id_for_label }}">
+                            <label
+                                class="formLabel"
+                                for="{{ form.contacto.id_for_label }}"
+                            >
                                 Correo Electrónico o Celular
                             </label>
+
                             {{ form.contacto }}
                         </div>
 
                         <div class="formGroup">
-                            <label class="formLabel" for="{{ form.mensaje.id_for_label }}">
+                            <label
+                                class="formLabel"
+                                for="{{ form.mensaje.id_for_label }}"
+                            >
                                 ¿Cómo podemos ayudarte?
                             </label>
+
                             {{ form.mensaje }}
                         </div>
 
                         <button type="submit" class="btnContactar">
                             Contactar
                         </button>
+
                     </form>
                 </div>
 
             </div>
         </section>
+
     </main>
 
     <!-- FOOTER -->
     <footer>
         {% include 'deliapp/components/footer.html' %}
     </footer>
-
-    <script>
-        (() => {
-            const boton = document.getElementById('themeToggle');
-            const texto = document.getElementById('themeText');
-            const icono = document.getElementById('themeIcon');
-            const raiz = document.documentElement;
-
-            if (!boton || !texto || !icono) return;
-
-            const iconoSol = `
-                <circle cx="12" cy="12" r="4"></circle>
-                <path d="M12 2v2"></path>
-                <path d="M12 20v2"></path>
-                <path d="m4.93 4.93 1.42 1.42"></path>
-                <path d="m17.65 17.65 1.42 1.42"></path>
-                <path d="M2 12h2"></path>
-                <path d="M20 12h2"></path>
-                <path d="m6.35 17.65-1.42 1.42"></path>
-                <path d="m19.07 4.93-1.42 1.42"></path>
-            `;
-
-            const iconoLuna = `
-                <path d="M20.9 13A9 9 0 0 1 11 3.1
-                         9 9 0 1 0 20.9 13Z"></path>
-            `;
-
-            function actualizarBoton() {
-                const modoNoche = raiz.getAttribute('data-theme') === 'dark';
-
-                texto.textContent = modoNoche ? 'Modo día' : 'Modo noche';
-                icono.innerHTML = modoNoche ? iconoLuna : iconoSol;
-                boton.setAttribute('aria-pressed', String(modoNoche));
-                boton.setAttribute(
-                    'aria-label',
-                    modoNoche ? 'Activar modo día' : 'Activar modo noche'
-                );
-
-                document.querySelector('meta[name="theme-color"]')
-                    ?.setAttribute('content', modoNoche ? '#171A20' : '#FFF8E7');
-            }
-
-            boton.addEventListener('click', () => {
-                const modoActual = raiz.getAttribute('data-theme');
-                const nuevoTema = modoActual === 'dark' ? 'light' : 'dark';
-
-                raiz.setAttribute('data-theme', nuevoTema);
-
-                try {
-                    localStorage.setItem('deli-tema', nuevoTema);
-                } catch (error) {
-                    // El tema seguirá funcionando durante esta visita.
-                }
-
-                actualizarBoton();
-            });
-
-            actualizarBoton();
-        })();
-    </script>
 
 </body>
 </html>

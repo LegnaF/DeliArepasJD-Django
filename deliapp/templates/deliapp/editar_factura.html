@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Editar {{ numero_factura }} | Deli Arepas JD</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'deliapp/css/facturacion.css' %}">
+    <link rel="stylesheet" href="{% static 'deliapp/css/editar_factura.css' %}">
+    <link rel="stylesheet" href="{% static 'deliapp/css/styles.css' %}">
+</head>
+
+<body>
+
+    {% include 'deliapp/components/navbar.html' %}
+
+    <div class="facturas-page-container">
+
+        <main class="facturas-page">
+
+            <div class="facturas-decoracion decoracion-1"></div>
+            <div class="facturas-decoracion decoracion-2"></div>
+            <div class="facturas-decoracion decoracion-3"></div>
+            <div class="facturas-decoracion decoracion-4"></div>
+
+            <section class="contenido editar-factura-contenido">
+
+                <!-- =====================================
+                    ENCABEZADO
+                ====================================== -->
+                <header class="titulo">
+
+                    <div class="titulo-copy">
+
+                        <a href="{% url 'facturacion' %}" class="btn-volver-facturas">
+                            ← Volver a Facturación
+                        </a>
+
+                        <span class="eyebrow">
+                            <span class="eyebrow-line"></span>
+                            MODIFICAR DOCUMENTO Y PEDIDO
+                        </span>
+
+                        <h1>
+                            Editar {{ numero_factura }}
+                            <span class="titulo-punto">.</span>
+                        </h1>
+
+                        <p>
+                            Actualiza el titular, datos de entrega, productos y estado
+                            del pedido #{{ factura.id }} asociado a esta factura.
+                        </p>
+
+                    </div>
+
+                    <div class="titulo-lado">
+
+                        <div class="estado-sistema">
+
+                            <span class="estado-sistema-punto"></span>
+
+                            <div>
+                                <strong>Pedido #{{ factura.id }}</strong>
+                                <span>Total actual: ${{ factura.total|floatformat:0 }}</span>
+                            </div>
+
+                            <span class="estado-check">
+                                ✎
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </header>
+
+                <!-- =====================================
+                    MENSAJES DJANGO
+                ====================================== -->
+                {% if messages %}
+                    <div class="mensajes-container">
+                        {% for message in messages %}
+                            <div class="mensaje mensaje-{{ message.tags }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- =====================================
+                    TARJETA DE EDICIÓN Y RESUMEN
+                ====================================== -->
+                <div class="editar-factura-grid">
+
+                    <!-- Formulario completo -->
+                    <section class="tabla editar-card">
+
+                        <div class="tabla-header">
+                            <div class="tabla-heading">
+                                <span class="tabla-eyebrow">DATOS EDITABLES</span>
+                                <h2>Información de la factura y pedido</h2>
+                                <p>Modifica los datos del cliente, el estado o los productos solicitados.</p>
+                            </div>
+                        </div>
+
+                        <form method="POST" class="editar-form" id="formEditarFactura">
+                            {% csrf_token %}
+
+                            <!-- Datos del Cliente y Estado -->
+                            <div class="editar-campos-grid">
+                                <div class="editar-field">
+                                    <label for="cliente">Nombre del cliente</label>
+                                    <input
+                                        type="text"
+                                        id="cliente"
+                                        name="cliente"
+                                        value="{{ factura.cliente.nombre }}"
+                                        placeholder="Nombre completo del cliente"
+                                        required
+                                    >
+                                </div>
+
+                                <div class="editar-field">
+                                    <label for="telefono">Teléfono registrado</label>
+                                    <input
+                                        type="text"
+                                        id="telefono"
+                                        name="telefono"
+                                        value="{{ factura.cliente.telefono }}"
+                                        placeholder="Número de contacto"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="editar-campos-grid">
+                                <div class="editar-field">
+                                    <label for="direccion">Dirección de entrega</label>
+                                    <input
+                                        type="text"
+                                        id="direccion"
+                                        name="direccion"
+                                        value="{{ factura.cliente.direccion }}"
+                                        placeholder="Dirección del pedido"
+                                    >
+                                </div>
+
+                                <div class="editar-field">
+                                    <label for="estado">Estado del pedido / factura</label>
+                                    <select id="estado" name="estado" required>
+                                        {% for valor, etiqueta in estados %}
+                                            <option value="{{ valor }}" {% if factura.estado == valor %}selected{% endif %}>
+                                                {{ etiqueta }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Editor de Productos del Pedido -->
+                            <div class="editar-productos-bloque">
+                                <div class="editar-productos-header">
+                                    <div>
+                                        <span class="tabla-eyebrow">PRODUCTOS DEL PEDIDO</span>
+                                        <h3>Detalle de ítems</h3>
+                                    </div>
+                                    <button type="button" class="btn-agregar-item" id="btnAgregarLinea">
+                                        + Agregar producto
+                                    </button>
+                                </div>
+
+                                <div class="lista-items-editables" id="listaItemsEditables">
+                                    {% for detalle in factura.detallepedido.all %}
+                                        <div class="item-editable-row">
+                                            <select name="producto_id[]" class="select-producto-item" required>
+                                                {% for prod in productos_disponibles %}
+                                                    <option
+                                                        value="{{ prod.id }}"
+                                                        data-precio="{% if prod.id == detalle.producto.id %}{{ detalle.precioUnit|stringformat:'f' }}{% else %}{{ prod.precio|stringformat:'f' }}{% endif %}"
+                                                        data-descuento="{% if prod.id == detalle.producto.id %}0{% else %}{{ prod.descuento|default:0|stringformat:'f' }}{% endif %}"
+                                                        {% if prod.id == detalle.producto.id %}selected{% endif %}
+                                                    >
+                                                        {{ prod.nombre }} (${{ prod.precio|floatformat:0 }} · Stock: {{ prod.stock }})
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+
+                                            <input
+                                                type="number"
+                                                name="cantidad[]"
+                                                class="input-cantidad-item"
+                                                value="{{ detalle.cantidad }}"
+                                                min="1"
+                                                required
+                                            >
+
+                                            <span class="item-subtotal-live">$0</span>
+
+                                            <button
+                                                type="button"
+                                                class="btn-quitar-item"
+                                                title="Quitar producto"
+                                            >
+                                                🗑
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="editar-acciones">
+                                <a href="{% url 'facturacion' %}" class="btn-cancelar-edicion">
+                                    Cancelar
+                                </a>
+
+                                <button type="submit" class="btn-guardar-edicion">
+                                    Guardar cambios
+                                </button>
+                            </div>
+                        </form>
+
+                    </section>
+
+                    <!-- Resumen del documento -->
+                    <aside class="tabla resumen-card">
+
+                        <div class="tabla-header">
+                            <div class="tabla-heading">
+                                <span class="tabla-eyebrow">RESUMEN DEL DOCUMENTO</span>
+                                <h2>{{ numero_factura }}</h2>
+                            </div>
+                        </div>
+
+                        <div class="resumen-meta-list">
+                            <div class="resumen-meta-row">
+                                <span>Fecha de emisión</span>
+                                <strong>{{ factura.createdAt|date:"d/m/Y H:i" }}</strong>
+                            </div>
+                            <div class="resumen-meta-row">
+                                <span>Teléfono registrado</span>
+                                <strong id="resumenTelefono">{{ factura.cliente.telefono|default:"Sin teléfono" }}</strong>
+                            </div>
+                            <div class="resumen-meta-row">
+                                <span>Dirección de entrega</span>
+                                <strong id="resumenDireccion">{{ factura.cliente.direccion|default:"Sin dirección" }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="productos resumen-productos" id="resumenProductosLive">
+                            {% for detalle in factura.detallepedido.all %}
+                                <div class="producto">
+                                    <div class="producto-info">
+                                        <span class="producto-index">
+                                            {{ forloop.counter|stringformat:"02d" }}
+                                        </span>
+                                        <div>
+                                            <strong>{{ detalle.producto.nombre }}</strong>
+                                            <span>Cant: {{ detalle.cantidad }} × ${{ detalle.precioUnit|floatformat:0 }}</span>
+                                        </div>
+                                    </div>
+                                    <strong>${{ detalle.precioUnit|floatformat:0 }}</strong>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="resumen-total-box">
+                            <span>Total actualizado</span>
+                            <strong id="resumenTotalLive">${{ factura.total|floatformat:0 }}</strong>
+                        </div>
+
+                    </aside>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- Plantilla oculta para nuevas filas -->
+    <template id="templateNuevaLinea">
+        <div class="item-editable-row">
+            <select name="producto_id[]" class="select-producto-item" required>
+                {% for prod in productos_disponibles %}
+                    <option
+                        value="{{ prod.id }}"
+                        data-precio="{{ prod.precio|stringformat:'f' }}"
+                        data-descuento="{{ prod.descuento|default:0|stringformat:'f' }}"
+                    >
+                        {{ prod.nombre }} (${{ prod.precio|floatformat:0 }} · Stock: {{ prod.stock }})
+                    </option>
+                {% endfor %}
+            </select>
+
+            <input
+                type="number"
+                name="cantidad[]"
+                class="input-cantidad-item"
+                value="1"
+                min="1"
+                required
+            >
+
+            <span class="item-subtotal-live">$0</span>
+
+            <button
+                type="button"
+                class="btn-quitar-item"
+                title="Quitar producto"
+            >
+                🗑
+            </button>
+        </div>
+    </template>
+
+    <script>
+    (() => {
+        const lista = document.getElementById("listaItemsEditables");
+        const btnAgregar = document.getElementById("btnAgregarLinea");
+        const tpl = document.getElementById("templateNuevaLinea");
+        const resumenProductos = document.getElementById("resumenProductosLive");
+        const resumenTotal = document.getElementById("resumenTotalLive");
+
+        const inputTel = document.getElementById("telefono");
+        const inputDir = document.getElementById("direccion");
+        const resumenTel = document.getElementById("resumenTelefono");
+        const resumenDir = document.getElementById("resumenDireccion");
+
+        const formatoCOP = new Intl.NumberFormat("es-CO", {
+            style: "currency",
+            currency: "COP",
+            maximumFractionDigits: 0
+        });
+
+        inputTel?.addEventListener("input", () => {
+            resumenTel.textContent = inputTel.value.trim() || "Sin teléfono";
+        });
+
+        inputDir?.addEventListener("input", () => {
+            resumenDir.textContent = inputDir.value.trim() || "Sin dirección";
+        });
+
+        function recalcular() {
+            const filas = Array.from(lista.querySelectorAll(".item-editable-row"));
+            let totalGeneral = 0;
+            resumenProductos.innerHTML = "";
+
+            filas.forEach((fila, index) => {
+                const select = fila.querySelector(".select-producto-item");
+                const inputCant = fila.querySelector(".input-cantidad-item");
+                const spanSub = fila.querySelector(".item-subtotal-live");
+
+                const opt = select.options[select.selectedIndex];
+                const precioBase = Number(String(opt?.dataset.precio || "0").replace(",", ".")) || 0;
+                const descuento = Number(String(opt?.dataset.descuento || "0").replace(",", ".")) || 0;
+                const precioFinal = Math.round(precioBase * (1 - descuento / 100));
+                const cant = Math.max(0, Number(inputCant.value || 0));
+                const subtotal = precioFinal * cant;
+
+                totalGeneral += subtotal;
+                spanSub.textContent = formatoCOP.format(subtotal);
+
+                const nombreLimpio = (opt?.textContent || "").split("($")[0].trim();
+                const idxStr = String(index + 1).padStart(2, "0");
+
+                const itemResumen = document.createElement("div");
+                itemResumen.className = "producto";
+                itemResumen.innerHTML = `
+                    <div class="producto-info">
+                        <span class="producto-index">${idxStr}</span>
+                        <div>
+                            <strong>${nombreLimpio}</strong>
+                            <span>Cant: ${cant} × ${formatoCOP.format(precioFinal)}</span>
+                        </div>
+                    </div>
+                    <strong>${formatoCOP.format(subtotal)}</strong>
+                `;
+                resumenProductos.appendChild(itemResumen);
+            });
+
+            resumenTotal.textContent = formatoCOP.format(totalGeneral);
+        }
+
+        function enlazarFila(fila) {
+            fila.querySelector(".select-producto-item")?.addEventListener("change", recalcular);
+            fila.querySelector(".input-cantidad-item")?.addEventListener("input", recalcular);
+            fila.querySelector(".btn-quitar-item")?.addEventListener("click", () => {
+                if (lista.querySelectorAll(".item-editable-row").length <= 1) {
+                    alert("El pedido debe tener al menos un producto.");
+                    return;
+                }
+                fila.remove();
+                recalcular();
+            });
+        }
+
+        lista.querySelectorAll(".item-editable-row").forEach(enlazarFila);
+
+        btnAgregar?.addEventListener("click", () => {
+            const clon = tpl.content.firstElementChild.cloneNode(true);
+            lista.appendChild(clon);
+            enlazarFila(clon);
+            recalcular();
+        });
+
+        recalcular();
+    })();
+    </script>
+
+</body>
+</html>

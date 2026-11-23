@@ -227,6 +227,8 @@
                     se registró correctamente.
                 </p>
 
+                <p id="successMetodoText" class="success-metodo"></p>
+
                 <p id="successTotalText" class="success-total">
                     Total: $0
                 </p>
@@ -260,9 +262,19 @@
                 <div class="cart-items-list" id="cartItemsList"></div>
 
                 <div class="cart-checkout-section">
-                    <div class="cart-summary-row">
-                        <span>Total:</span>
-                        <strong id="cartSubtotal">$0</strong>
+                    <div class="cart-summary-breakdown">
+                        <div class="cart-summary-line">
+                            <span>Productos (<span id="cartTotalUnidades">0</span>)</span>
+                            <span id="cartSubtotalItems">$0</span>
+                        </div>
+                        <div class="cart-summary-line">
+                            <span>Domicilio</span>
+                            <span class="envio-gratis-tag">Gratis</span>
+                        </div>
+                        <div class="cart-summary-row">
+                            <span>Total a pagar:</span>
+                            <strong id="cartSubtotal">$0</strong>
+                        </div>
                     </div>
 
                     <form id="checkoutForm" class="cart-form-fields">
@@ -275,6 +287,7 @@
                             placeholder="Nombre completo *"
                             maxlength="150"
                             autocomplete="name"
+                            value="{% if request.user.is_authenticated %}{{ request.user.get_full_name|default:request.user.username }}{% endif %}"
                             required
                         >
 
@@ -298,12 +311,40 @@
                             required
                         >
 
+                        <!-- Selector de método de pago -->
+                        <div class="payment-method-group" role="radiogroup" aria-label="Método de pago">
+                            <span class="payment-method-label">Método de pago *</span>
+
+                            <div class="payment-options-grid">
+                                <label class="payment-option-card" id="labelPagoEfectivo">
+                                    <input
+                                        type="radio"
+                                        name="metodoPago"
+                                        value="EFECTIVO"
+                                        checked
+                                    >
+                                    <span class="payment-option-title">Efectivo</span>
+                                    <small class="payment-option-desc">Pagas al recibir tu pedido</small>
+                                </label>
+
+                                <label class="payment-option-card" id="labelPagoOnline">
+                                    <input
+                                        type="radio"
+                                        name="metodoPago"
+                                        value="ONLINE"
+                                    >
+                                    <span class="payment-option-title">Pago en línea</span>
+                                    <small class="payment-option-desc">Tarjeta, PSE o Nequi</small>
+                                </label>
+                            </div>
+                        </div>
+
                         <button
                             type="submit"
                             class="btn-confirmar-pedido"
                             id="btnConfirmarPedido"
                         >
-                            Confirmar pedido
+                            Confirmar pedido en efectivo
                         </button>
                     </form>
 
@@ -329,6 +370,7 @@
         const STORAGE_KEY = "deliarepas_carrito_django";
         const FALLBACK_IMG = "{% static 'deliapp/img/arepa3.jpg' %}";
         const URL_PEDIDOS = "{% url 'crear_pedido' %}";
+        const URL_INICIAR_PAGO = "{% url 'api_iniciar_pago' %}";
 
         const dineroCOP = new Intl.NumberFormat("es-CO", {
             style: "currency",
@@ -336,7 +378,6 @@
             maximumFractionDigits: 0
         });
 
-        // Referencias del documento
         const cards = [...document.querySelectorAll(".menu-card")];
 
         const searchInput = document.getElementById("searchInput");
@@ -362,15 +403,41 @@
 
         const cartItemsList = document.getElementById("cartItemsList");
         const cartSubtotal = document.getElementById("cartSubtotal");
+        const cartSubtotalItems = document.getElementById("cartSubtotalItems");
+        const cartTotalUnidades = document.getElementById("cartTotalUnidades");
 
         const checkoutForm = document.getElementById("checkoutForm");
         const btnConfirmarPedido = document.getElementById("btnConfirmarPedido");
         const btnVaciarCarrito = document.getElementById("btnVaciarCarrito");
+        const radiosMetodoPago = [...document.querySelectorAll('input[name="metodoPago"]')];
 
         let categoriaActiva = "Todos";
         let toastTimer = null;
 
-        // Leer el carrito de forma segura
+        function obtenerMetodoPagoSeleccionado() {
+            const seleccionado = radiosMetodoPago.find(r => r.checked);
+            return seleccionado ? seleccionado.value : "EFECTIVO";
+        }
+
+        function actualizarBotonPago() {
+            const metodo = obtenerMetodoPagoSeleccionado();
+            document.getElementById("labelPagoEfectivo")
+                ?.classList.toggle("seleccionado", metodo === "EFECTIVO");
+            document.getElementById("labelPagoOnline")
+                ?.classList.toggle("seleccionado", metodo === "ONLINE");
+
+            if (!btnConfirmarPedido.disabled) {
+                btnConfirmarPedido.textContent =
+                    metodo === "ONLINE"
+                        ? "Continuar al pago en línea"
+                        : "Confirmar pedido en efectivo";
+            }
+        }
+
+        radiosMetodoPago.forEach(radio => {
+            radio.addEventListener("change", actualizarBotonPago);
+        });
+
         function cargarCarrito() {
             try {
                 const guardado = JSON.parse(
@@ -403,7 +470,6 @@
 
         let carrito = cargarCarrito();
 
-        // Precios
         function calcularPrecioFinal(precio, descuento) {
             const valor = Math.max(0, Number(precio) || 0);
             const porcentaje = Math.min(
@@ -414,7 +480,6 @@
             return Math.round(valor * (1 - porcentaje / 100));
         }
 
-        // Mostrar precios actualizados y preparar botones
         cards.forEach(card => {
             const precio = Number(card.dataset.precio || 0);
             const descuento = Number(card.dataset.descuento || 0);
@@ -446,7 +511,6 @@
             });
         });
 
-        // Notificaciones
         function mostrarToast(mensaje) {
             if (!toastEl || !toastText) return;
 
@@ -460,7 +524,6 @@
             }, 2800);
         }
 
-        // Guardar carrito
         function guardarCarrito() {
             try {
                 localStorage.setItem(
@@ -474,7 +537,6 @@
             renderCarrito();
         }
 
-        // Agregar producto
         function agregarProducto(producto) {
             if (!producto.id || producto.stock <= 0) {
                 mostrarToast("Este producto no está disponible.");
@@ -503,7 +565,6 @@
             mostrarToast(`${producto.nombre} añadido al carrito.`);
         }
 
-        // Cambiar cantidad
         function cambiarCantidad(id, cambio) {
             const producto = carrito.find(item => item.id === id);
 
@@ -525,24 +586,18 @@
             guardarCarrito();
         }
 
-        // Eliminar producto
         function eliminarProducto(id) {
             carrito = carrito.filter(item => item.id !== id);
             guardarCarrito();
         }
 
-        // Crear un elemento de texto seguro
         function crearTexto(tag, clase, contenido) {
             const elemento = document.createElement(tag);
-
             if (clase) elemento.className = clase;
-
             elemento.textContent = contenido;
-
             return elemento;
         }
 
-        // Dibujar productos del carrito
         function renderCarrito() {
             const totalItems = carrito.reduce(
                 (total, item) => total + item.cantidad,
@@ -558,6 +613,8 @@
             cartBadge.textContent = String(totalItems);
             cartDrawerTitle.textContent = `Tu Pedido (${totalItems})`;
             cartSubtotal.textContent = dineroCOP.format(subtotal);
+            if (cartSubtotalItems) cartSubtotalItems.textContent = dineroCOP.format(subtotal);
+            if (cartTotalUnidades) cartTotalUnidades.textContent = String(totalItems);
 
             cartSuccessView.hidden = true;
 
@@ -622,7 +679,6 @@
                 });
 
                 controles.append(menos, cantidad, mas);
-
                 detalles.append(nombre, precio, controles);
 
                 const eliminar = crearTexto(
@@ -642,9 +698,10 @@
                 fila.append(imagen, detalles, eliminar);
                 cartItemsList.appendChild(fila);
             });
+
+            actualizarBotonPago();
         }
 
-        // Búsqueda y categorías
         function filtrarMenu() {
             const texto = (searchInput?.value || "")
                 .trim()
@@ -668,7 +725,6 @@
                 const mostrar = coincideCategoria && coincideTexto;
 
                 card.hidden = !mostrar;
-
                 if (mostrar) visibles++;
             });
 
@@ -700,19 +756,16 @@
                 button.setAttribute("aria-pressed", "true");
 
                 categoriaActiva = button.dataset.categoria || "Todos";
-
                 filtrarMenu();
             });
         });
 
         btnResetFiltros?.addEventListener("click", () => {
             if (searchInput) searchInput.value = "";
-
             categoriaActiva = "Todos";
 
             catButtons.forEach(button => {
                 const activo = button.dataset.categoria === "Todos";
-
                 button.classList.toggle("activo", activo);
                 button.setAttribute("aria-pressed", String(activo));
             });
@@ -720,7 +773,6 @@
             filtrarMenu();
         });
 
-        // Abrir y cerrar carrito
         function abrirCarrito() {
             renderCarrito();
             cartOverlay.hidden = false;
@@ -755,16 +807,14 @@
             }
         });
 
-        // Vaciar carrito
         btnVaciarCarrito?.addEventListener("click", () => {
             if (carrito.length === 0) return;
-
             carrito = [];
             guardarCarrito();
             mostrarToast("Se vació tu carrito.");
         });
 
-        // Enviar pedido a Django
+        // Procesar pedido en Efectivo o vía API de Pagos en Línea
         checkoutForm?.addEventListener("submit", async event => {
             event.preventDefault();
 
@@ -776,6 +826,7 @@
             const nombre = document.getElementById("nombreCliente").value.trim();
             const telefono = document.getElementById("telefonoCliente").value.trim();
             const direccion = document.getElementById("direccionCliente").value.trim();
+            const metodoPago = obtenerMetodoPagoSeleccionado();
 
             const csrfToken = checkoutForm.querySelector(
                 "[name=csrfmiddlewaretoken]"
@@ -791,12 +842,11 @@
                 return;
             }
 
-            const pedido = {
+            const payloadPedido = {
                 clienteNombre: nombre,
                 telefono: telefono,
                 direccion: direccion,
-
-                // El servidor calcula los precios reales.
+                metodoPago: metodoPago,
                 items: carrito.map(item => ({
                     productoId: item.id,
                     cantidad: item.cantidad
@@ -805,8 +855,12 @@
 
             try {
                 btnConfirmarPedido.disabled = true;
-                btnConfirmarPedido.textContent = "Procesando pedido...";
+                btnConfirmarPedido.textContent =
+                    metodoPago === "ONLINE"
+                        ? "Conectando con pasarela..."
+                        : "Procesando pedido...";
 
+                // 1. Registrar el pedido y descontar stock de forma atómica en Django
                 const respuesta = await fetch(URL_PEDIDOS, {
                     method: "POST",
                     credentials: "same-origin",
@@ -815,16 +869,10 @@
                         "X-CSRFToken": csrfToken,
                         "X-Requested-With": "XMLHttpRequest"
                     },
-                    body: JSON.stringify(pedido)
+                    body: JSON.stringify(payloadPedido)
                 });
 
-                let datos;
-
-                try {
-                    datos = await respuesta.json();
-                } catch {
-                    throw new Error("El servidor devolvió una respuesta no válida.");
-                }
+                const datos = await respuesta.json();
 
                 if (!respuesta.ok) {
                     throw new Error(
@@ -832,7 +880,37 @@
                     );
                 }
 
-                // Limpiar carrito y mostrar confirmación
+                // 2. Si eligió Pago en Línea, solicitar sesión/checkout a la API de Pagos
+                if (metodoPago === "ONLINE") {
+                    const respPago = await fetch(URL_INICIAR_PAGO, {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken,
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        body: JSON.stringify({
+                            pedidoId: datos.id
+                        })
+                    });
+
+                    const datosPago = await respPago.json();
+
+                    if (!respPago.ok || !datosPago.checkout_url) {
+                        throw new Error(
+                            datosPago.error || "No se pudo iniciar la pasarela de pago."
+                        );
+                    }
+
+                    // Vaciar carrito antes de salir hacia la pasarela externa
+                    carrito = [];
+                    localStorage.removeItem(STORAGE_KEY);
+                    window.location.href = datosPago.checkout_url;
+                    return;
+                }
+
+                // 3. Flujo Pago en Efectivo (confirmación inmediata)
                 carrito = [];
                 localStorage.removeItem(STORAGE_KEY);
                 checkoutForm.reset();
@@ -846,6 +924,9 @@
                 document.getElementById("successPedidoId").textContent =
                     `#${datos.id}`;
 
+                document.getElementById("successMetodoText").textContent =
+                    "Método seleccionado: Pago en efectivo contra entrega";
+
                 document.getElementById("successTotalText").textContent =
                     `Total: ${dineroCOP.format(Number(datos.total) || 0)}`;
 
@@ -855,17 +936,17 @@
 
             } catch (error) {
                 mostrarToast(
-                    error.message || "Ocurrió un error al registrar el pedido."
+                    error.message || "Ocurrió un error al procesar la solicitud."
                 );
             } finally {
                 btnConfirmarPedido.disabled = false;
-                btnConfirmarPedido.textContent = "Confirmar pedido";
+                actualizarBotonPago();
             }
         });
 
-        // Estado inicial
         renderCarrito();
         filtrarMenu();
+        actualizarBotonPago();
 
     })();
     </script>

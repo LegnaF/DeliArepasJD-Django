@@ -1,24 +1,48 @@
 
-/* =========================================================
-   DELI AREPAS JD — SISTEMA DE AUTENTICACIÓN
-   Inicio de sesión | Registro | Recuperación
-========================================================= */
+/* ============================================================
+   DELIAREPAS JD
+   AUTENTICACIÓN — DISEÑO PREMIUM 2026
+   Tipografía grande | Diseño editorial | Animaciones modernas
+============================================================ */
+
+/* ============================================================
+   01. VARIABLES
+============================================================ */
 
 :root {
-    --jd-coffee: #482817;
-    --jd-dark: #28160d;
-    --jd-orange: #e87519;
-    --jd-orange-dark: #c9570d;
-    --jd-yellow: #f5bd42;
-    --jd-cream: #fff8eb;
-    --jd-white: #ffffff;
-    --jd-text: #38291f;
-    --jd-muted: #8c8176;
-    --jd-border: #e9dfd1;
-    --jd-green: #4f7d32;
-    --jd-danger: #b52f36;
-    --jd-shadow: 0 25px 80px rgba(52, 31, 17, .12);
+    --coffee: #482817;
+    --coffee-dark: #25140c;
+    --coffee-light: #70452c;
+
+    --orange: #ed791e;
+    --orange-dark: #c95b12;
+    --orange-light: #ffab52;
+
+    --yellow: #f5c15b;
+
+    --cream: #fff9f1;
+    --white: #ffffff;
+
+    --text: #35251c;
+    --muted: #81756c;
+    --border: #eadfd4;
+
+    --success: #27834f;
+    --danger: #bd343b;
+
+    --font-body: "DM Sans", sans-serif;
+    --font-title: "Playfair Display", Georgia, serif;
+
+    --shadow:
+        0 25px 65px rgba(56, 32, 16, .12);
+
+    --transition:
+        .3s cubic-bezier(.2, .75, .25, 1);
 }
+
+/* ============================================================
+   02. REINICIO GENERAL
+============================================================ */
 
 * {
     box-sizing: border-box;
@@ -32,171 +56,220 @@ html {
 body {
     min-height: 100vh;
     margin: 0;
-    font-family: "DM Sans", sans-serif;
-    color: var(--jd-text);
-    background: var(--jd-cream);
+
+    background: var(--cream);
+    color: var(--text);
+
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+
+    line-height: 1.65;
+
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 button,
 input,
 select,
 textarea {
-    font: inherit;
+    font-family: inherit;
 }
 
 a {
+    color: inherit;
     text-decoration: none;
 }
 
 button {
-    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
 }
+
+/* ============================================================
+   03. CONTENEDOR PRINCIPAL
+============================================================ */
 
 .authPage {
     width: 100%;
     min-height: 100vh;
+
     display: grid;
-    grid-template-columns: minmax(0, 1.03fr) minmax(0, .97fr);
-    background: var(--jd-white);
+    grid-template-columns: 1.05fr .95fr;
+
+    overflow: hidden;
+
+    background: white;
 }
 
-/* =========================================================
-   PANEL VISUAL
-========================================================= */
+/* ============================================================
+   04. PANEL VISUAL
+============================================================ */
 
 .authVisual {
     position: relative;
     isolation: isolate;
-    min-width: 0;
+
     min-height: 100vh;
-    overflow: hidden;
+    padding: 55px 7%;
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 42px clamp(30px, 5vw, 75px);
+
+    overflow: hidden;
+
     color: white;
-    background: var(--jd-dark);
+    background: var(--coffee-dark);
 }
 
 .visualBackground {
     position: absolute;
-    inset: 0;
     z-index: -2;
+    inset: -3%;
+
     background:
         linear-gradient(
-            135deg,
-            rgba(35, 19, 10, .88),
-            rgba(74, 44, 26, .72),
-            rgba(35, 19, 10, .90)
+            115deg,
+            rgba(32, 17, 9, .88),
+            rgba(65, 35, 17, .65),
+            rgba(31, 16, 9, .84)
         ),
-        url("/static/deliapp/img/inicio.jpg") center / cover no-repeat;
-    transform: scale(1.02);
+        url("/static/deliapp/img/inicio.jpg")
+        center / cover no-repeat;
+
+    animation:
+        backgroundEntrance 1.4s ease both,
+        backgroundMovement 25s ease-in-out 1.4s infinite alternate;
 }
 
 .visualOverlay {
     position: absolute;
-    inset: 0;
     z-index: -1;
-    pointer-events: none;
+    inset: 0;
+
     background:
         radial-gradient(
-            circle at 85% 18%,
-            rgba(245, 189, 66, .20),
+            circle at 85% 15%,
+            rgba(245, 193, 91, .23),
             transparent 32%
+        ),
+        radial-gradient(
+            circle at 5% 90%,
+            rgba(237, 121, 30, .23),
+            transparent 35%
         ),
         linear-gradient(
             0deg,
-            rgba(25, 15, 9, .55),
+            rgba(25, 12, 6, .65),
             transparent 65%
         );
+
+    pointer-events: none;
 }
 
 .authVisual::before {
     content: "";
+
     position: absolute;
     z-index: -1;
-    width: 420px;
-    height: 420px;
-    top: -230px;
-    right: -180px;
-    border: 1px solid rgba(255, 255, 255, .2);
+
+    width: 500px;
+    height: 500px;
+
+    top: -270px;
+    right: -210px;
+
+    border: 1px solid rgba(255,255,255,.16);
     border-radius: 50%;
+
     box-shadow:
-        0 0 0 35px rgba(255, 255, 255, .035),
-        0 0 0 75px rgba(255, 255, 255, .02);
-    pointer-events: none;
+        0 0 0 35px rgba(255,255,255,.035),
+        0 0 0 75px rgba(255,255,255,.025);
+
+    animation: floatingCircle 12s ease-in-out infinite alternate;
 }
 
 .authVisual::after {
     content: "";
+
     position: absolute;
     z-index: -1;
-    width: 300px;
-    height: 300px;
-    bottom: -180px;
-    left: -140px;
+
+    width: 350px;
+    height: 350px;
+
+    left: -160px;
+    bottom: -190px;
+
     border-radius: 50%;
-    background: rgba(232, 117, 25, .2);
-    filter: blur(35px);
-    pointer-events: none;
+
+    background: rgba(237,121,30,.28);
+    filter: blur(65px);
 }
 
-/* =========================================================
-   LOGO
-========================================================= */
+/* ============================================================
+   05. LOGOTIPO
+============================================================ */
 
 .visualLogo {
     position: relative;
     z-index: 2;
-    width: fit-content;
-    max-width: 100%;
-    display: inline-flex;
-    align-items: center;
-    gap: 15px;
-    color: white;
-}
 
-.brandLogoContainer {
-    position: relative;
-    width: 78px;
-    height: 78px;
-    flex: 0 0 78px;
+    width: fit-content;
+
     display: flex;
     align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border: 2px solid rgba(245, 189, 66, .85);
-    border-radius: 18px;
-    background: #fff;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
+    gap: 17px;
+
+    color: white;
+
+    animation: slideFromLeft .8s ease both;
 }
 
 .brandLogo {
-    width: 100%;
-    height: 100%;
-    display: block;
-    padding: 5px;
+    width: 76px;
+    height: 76px;
+
+    flex: 0 0 76px;
+
+    padding: 4px;
+
     object-fit: contain;
-    border-radius: 15px;
-    background: #fff;
-    transition: transform .3s ease;
+
+    border: 2px solid var(--yellow);
+    border-radius: 19px;
+
+    background: white;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+
+    transition: var(--transition);
 }
 
 .visualLogo:hover .brandLogo {
-    transform: scale(1.05);
+    transform: translateY(-4px) rotate(-3deg);
+    box-shadow: 0 15px 35px rgba(0,0,0,.35);
 }
 
 .logoFallback {
     display: none;
-    width: 100%;
-    height: 100%;
+
+    width: 76px;
+    height: 76px;
+
+    flex: 0 0 76px;
+
     align-items: center;
     justify-content: center;
-    background: var(--jd-orange);
-    color: white;
-    font-family: "Playfair Display", serif;
-    font-size: 27px;
+
+    border: 2px solid var(--yellow);
+    border-radius: 19px;
+
+    background: var(--orange);
+
+    font-family: var(--font-title);
+    font-size: 28px;
     font-weight: 800;
 }
 
@@ -211,650 +284,893 @@ button {
 .brandName {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
 }
 
 .brandName strong {
-    color: white;
-    font-family: "Playfair Display", serif;
-    font-size: 25px;
+    font-family: var(--font-title);
+    font-size: 31px;
+    font-weight: 700;
+
     line-height: 1.1;
+    letter-spacing: -.7px;
 }
 
 .brandName small {
-    color: var(--jd-yellow);
-    font-size: 9px;
+    color: var(--yellow);
+
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 1.6px;
+
+    letter-spacing: 2.3px;
 }
 
-/* Compatibilidad con el logo de plantillas anteriores */
-
-.visualLogo > .brandLogo:not(.brandLogoContainer .brandLogo) {
-    width: 76px;
-    height: 76px;
-    flex: 0 0 76px;
-    padding: 4px;
-    object-fit: contain;
-    border: 2px solid rgba(245, 189, 66, .8);
-    border-radius: 18px;
-    background: white;
-}
-
-.visualLogo > .logoFallback {
-    width: 76px;
-    height: 76px;
-    flex: 0 0 76px;
-    border: 2px solid var(--jd-yellow);
-    border-radius: 18px;
-}
-
-/* =========================================================
-   CONTENIDO VISUAL
-========================================================= */
+/* ============================================================
+   06. MENSAJE PRINCIPAL
+============================================================ */
 
 .visualContent {
     position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 560px;
-    margin: auto 0;
-    padding: 55px 0;
-    animation: jdAppear .7s ease both;
-}
+    z-index: 2;
 
-.visualEyebrow,
-.formEyebrow {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 2px;
+    width: 100%;
+    max-width: 650px;
+
+    margin: auto 0;
+    padding: 65px 0;
+
+    animation: contentEntrance 1s .15s both;
 }
 
 .visualEyebrow {
-    margin-bottom: 24px;
-    color: var(--jd-yellow);
+    display: inline-flex;
+    align-items: center;
+
+    margin-bottom: 26px;
+
+    color: var(--yellow);
+
+    font-size: 13px;
+    font-weight: 800;
+
+    letter-spacing: 2.5px;
 }
 
 .visualEyebrow::before {
     content: "";
-    display: inline-block;
-    width: 26px;
-    height: 2px;
-    margin: 0 10px 3px 0;
-    background: var(--jd-orange);
+
+    width: 35px;
+    height: 3px;
+
+    margin-right: 13px;
+
+    border-radius: 5px;
+
+    background: var(--orange);
 }
 
 .visualContent h1 {
-    max-width: 570px;
+    max-width: 650px;
+
     margin: 0;
+
     color: white;
-    font-family: "Playfair Display", serif;
-    font-size: clamp(39px, 4.5vw, 65px);
-    line-height: 1.12;
-    letter-spacing: -1.2px;
+
+    font-family: var(--font-title);
+    font-size: clamp(54px, 5.4vw, 76px);
+    font-weight: 700;
+
+    line-height: 1.08;
+    letter-spacing: -1.8px;
 }
 
 .visualContent h1 span {
     display: block;
-    color: var(--jd-yellow);
+
+    color: var(--yellow);
+
+    text-shadow: 0 8px 30px rgba(0,0,0,.2);
 }
 
 .visualContent p {
-    max-width: 440px;
-    margin: 22px 0 0;
-    color: rgba(255, 255, 255, .84);
-    font-size: 13px;
+    max-width: 490px;
+
+    margin: 27px 0 0;
+
+    color: rgba(255,255,255,.88);
+
+    font-size: 17px;
+    font-weight: 400;
+
     line-height: 1.9;
 }
 
+/* ============================================================
+   07. DETALLES DECORATIVOS
+============================================================ */
+
 .visualDecoration {
     display: flex;
-    gap: 7px;
-    margin-top: 30px;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 35px;
 }
 
 .visualDecoration span {
-    width: 27px;
+    width: 38px;
     height: 5px;
-    border-radius: 10px;
-    background: var(--jd-orange);
+
+    border-radius: 20px;
+
+    background: var(--orange);
+
+    animation: decorationGlow 3s ease-in-out infinite;
 }
 
 .visualDecoration span:nth-child(2) {
-    width: 13px;
-    background: var(--jd-yellow);
+    width: 19px;
+    background: var(--yellow);
+    animation-delay: .3s;
 }
 
 .visualDecoration span:nth-child(3) {
-    width: 7px;
-    background: var(--jd-green);
+    width: 8px;
+    background: white;
+    animation-delay: .6s;
 }
+
+/* ============================================================
+   08. CARACTERÍSTICA DESTACADA
+============================================================ */
 
 .visualFeature {
     display: flex;
     align-items: center;
-    gap: 13px;
-    margin-top: 35px;
+    gap: 17px;
+
+    margin-top: 38px;
 }
 
 .featureIcon {
-    width: 45px;
-    height: 45px;
-    flex: 0 0 45px;
+    width: 58px;
+    height: 58px;
+
+    flex: 0 0 58px;
+
     display: grid;
     place-items: center;
-    border: 1px solid rgba(245, 189, 66, .5);
-    border-radius: 13px;
-    background: rgba(255, 255, 255, .09);
-    color: var(--jd-yellow);
-    font-family: "Playfair Display", serif;
+
+    border: 1px solid rgba(245,193,91,.6);
+    border-radius: 17px;
+
+    background: rgba(255,255,255,.11);
+
+    color: var(--yellow);
+
+    font-family: var(--font-title);
+    font-size: 20px;
     font-weight: 800;
+
+    backdrop-filter: blur(10px);
+
+    transition: var(--transition);
+}
+
+.visualFeature:hover .featureIcon {
+    transform: translateY(-5px) rotate(-4deg);
+    background: rgba(255,255,255,.2);
 }
 
 .visualFeature div {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .visualFeature strong {
     color: white;
-    font-size: 12px;
+    font-size: 16px;
+    font-weight: 800;
 }
 
 .visualFeature small {
-    color: rgba(255, 255, 255, .72);
-    font-size: 10px;
-    line-height: 1.5;
+    color: rgba(255,255,255,.78);
+    font-size: 13px;
 }
+
+/* ============================================================
+   09. PIE DEL PANEL
+============================================================ */
 
 .visualFooter {
     position: relative;
-    z-index: 1;
+    z-index: 2;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, .2);
-    color: rgba(255, 255, 255, .72);
-    font-size: 9px;
+    gap: 15px;
+
+    padding-top: 22px;
+
+    border-top: 1px solid rgba(255,255,255,.2);
+
+    color: rgba(255,255,255,.8);
+
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 1px;
+
+    letter-spacing: 1.2px;
 }
 
-/* =========================================================
-   PANEL DEL FORMULARIO
-========================================================= */
+/* ============================================================
+   10. PANEL DEL FORMULARIO
+============================================================ */
 
 .authFormSection {
+    position: relative;
+
     min-width: 0;
     min-height: 100vh;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 45px clamp(25px, 5vw, 75px);
+
+    padding: 60px clamp(35px, 6vw, 100px);
+
     background:
         radial-gradient(
             circle at 100% 0%,
-            rgba(245, 189, 66, .13),
-            transparent 30%
+            rgba(245,193,91,.15),
+            transparent 35%
         ),
-        #fff;
+        radial-gradient(
+            circle at 0% 100%,
+            rgba(237,121,30,.07),
+            transparent 35%
+        ),
+        white;
 }
 
 .authFormContainer {
     width: 100%;
-    max-width: 440px;
+    max-width: 470px;
+
     margin: auto;
-    animation: jdAppear .65s ease both;
+
+    animation: formEntrance .9s .12s both;
 }
+
+/* ============================================================
+   11. ENLACE VOLVER
+============================================================ */
 
 .backLink {
     width: fit-content;
+
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 38px;
-    color: var(--jd-muted);
-    font-size: 12px;
-    font-weight: 700;
-    transition: color .2s, transform .2s;
-}
+    gap: 11px;
 
-.backLink:hover {
-    color: var(--jd-orange-dark);
-    transform: translateX(-3px);
+    margin-bottom: 48px;
+
+    color: #8b7d72;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    transition: var(--transition);
 }
 
 .backLink span {
-    font-size: 20px;
+    font-size: 24px;
+    line-height: 1;
 }
 
+.backLink:hover {
+    color: var(--orange-dark);
+    transform: translateX(-5px);
+}
+
+/* ============================================================
+   12. ENCABEZADO
+============================================================ */
+
 .formHeading {
-    margin-bottom: 28px;
+    margin-bottom: 38px;
 }
 
 .formEyebrow {
-    margin-bottom: 12px;
-    color: var(--jd-orange-dark);
+    display: inline-block;
+
+    margin-bottom: 15px;
+
+    color: var(--orange-dark);
+
+    font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing: 2.2px;
 }
 
 .formHeading h2 {
-    margin: 0 0 12px;
-    color: var(--jd-coffee);
-    font-family: "Playfair Display", serif;
-    font-size: clamp(32px, 3.3vw, 43px);
-    line-height: 1.12;
-    letter-spacing: -.8px;
+    margin: 0 0 15px;
+
+    color: var(--coffee);
+
+    font-family: var(--font-title);
+    font-size: clamp(43px, 4vw, 52px);
+    font-weight: 700;
+
+    line-height: 1.13;
+    letter-spacing: -1.2px;
 }
 
 .formHeading p {
     margin: 0;
-    color: var(--jd-muted);
-    font-size: 13px;
-    line-height: 1.8;
+
+    color: var(--muted);
+
+    font-size: 15px;
+    font-weight: 400;
+
+    line-height: 1.85;
 }
 
-/* =========================================================
-   MENSAJES Y VALIDACIONES
-========================================================= */
+/* ============================================================
+   13. MENSAJES
+============================================================ */
 
 .messagesContainer {
     display: grid;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 12px;
+
+    margin-bottom: 25px;
+
+    animation: contentEntrance .4s ease both;
 }
 
 .message {
-    padding: 13px 15px;
+    padding: 16px 19px;
+
     border: 1px solid transparent;
-    border-radius: 12px;
-    font-size: 12px;
-    line-height: 1.6;
-}
+    border-radius: 13px;
 
-.message-success {
-    color: #287345;
-    background: #edf7ef;
-    border-color: #cfe8d4;
-}
-
-.message-error {
-    color: #b52f36;
-    background: #fff0ef;
-    border-color: #f1d1d0;
-}
-
-.message-warning {
-    color: #8b641c;
-    background: #fff8e9;
-    border-color: #f0dfb9;
-}
-
-.message-info {
-    color: #345c78;
-    background: #edf5fa;
-    border-color: #d4e5f0;
-}
-
-.message p {
-    margin: 3px 0;
-}
-
-.errorlist,
-.fieldErrors {
-    margin: 5px 0 0;
-    padding: 10px 12px;
-    border: 1px solid #f1d1d0;
-    border-radius: 10px;
-    background: #fff0ef;
-    color: var(--jd-danger);
-    font-size: 11px;
-    line-height: 1.6;
-    list-style-position: inside;
-}
-
-.fieldErrors {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.fieldHelp,
-.helptext {
-    display: block;
-    margin-top: 7px;
-    color: var(--jd-muted);
-    font-size: 10px;
+    font-size: 14px;
     line-height: 1.7;
 }
 
-.fieldHelp ul,
-.helptext ul {
-    padding-left: 18px;
+.message-success {
+    color: #246b42;
+    background: #edf8f0;
+    border-color: #cce9d3;
 }
 
-/* =========================================================
-   FORMULARIOS
-========================================================= */
+.message-error {
+    color: #a52c34;
+    background: #fff0f0;
+    border-color: #f2d0d1;
+}
+
+.message-warning {
+    color: #87601a;
+    background: #fff8e8;
+    border-color: #f0dfb8;
+}
+
+.message-info {
+    color: #315d7b;
+    background: #edf6fc;
+    border-color: #d4e7f4;
+}
+
+/* ============================================================
+   14. FORMULARIO
+============================================================ */
 
 .authForm {
     display: flex;
     flex-direction: column;
-    gap: 19px;
+    gap: 26px;
 }
 
 .formGroup {
-    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 11px;
+
+    min-width: 0;
 }
 
 .formGroup label {
-    color: var(--jd-coffee);
-    font-size: 12px;
+    color: #493324;
+
+    font-size: 15px;
     font-weight: 800;
+
+    letter-spacing: .1px;
 }
+
+/* ============================================================
+   15. INPUTS
+============================================================ */
 
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
     width: 100%;
     min-width: 0;
-    min-height: 54px;
-    padding: 0 15px;
-    border: 1px solid var(--jd-border);
-    border-radius: 13px;
+    min-height: 64px;
+
+    padding: 0 19px;
+
+    border: 1.5px solid var(--border);
+    border-radius: 15px;
+
     outline: none;
-    background: #fff;
-    color: var(--jd-text);
-    font-family: "DM Sans", sans-serif;
-    font-size: 12px;
-    transition: border-color .2s, box-shadow .2s, background .2s;
+
+    background: white;
+    color: var(--text);
+
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+
+    transition:
+        border-color .3s ease,
+        box-shadow .3s ease,
+        background .3s ease,
+        transform .3s ease;
+}
+
+.formGroup textarea {
+    min-height: 130px;
+    padding-top: 17px;
+    resize: vertical;
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+    color: #aaa097;
+    font-size: 14px;
+    font-weight: 400;
 }
 
 .formGroup input:hover,
 .formGroup select:hover,
 .formGroup textarea:hover {
-    border-color: #d8b78e;
+    border-color: #d5b38f;
+    background: #fffdfa;
 }
 
 .formGroup input:focus,
 .formGroup select:focus,
 .formGroup textarea:focus {
-    border-color: var(--jd-orange);
-    box-shadow: 0 0 0 4px rgba(232, 117, 25, .11);
-    background: #fff;
-}
+    border-color: var(--orange);
 
-.formGroup input::placeholder,
-.formGroup textarea::placeholder {
-    color: #b5aa9e;
-}
+    background: white;
 
-.formGroup textarea {
-    min-height: 110px;
-    padding-top: 13px;
-    resize: vertical;
+    box-shadow:
+        0 0 0 5px rgba(237,121,30,.11),
+        0 8px 20px rgba(56,32,16,.045);
+
+    transform: translateY(-1px);
 }
 
 .formGroup input:disabled,
 .formGroup select:disabled,
 .formGroup textarea:disabled {
-    opacity: .65;
+    opacity: .6;
     cursor: not-allowed;
 }
 
-/* =========================================================
-   CAMPOS CON ICONOS
-========================================================= */
+/* ============================================================
+   16. ICONOS DE LOS INPUTS
+============================================================ */
 
 .inputWrapper,
 .passwordWrapper {
     position: relative;
+
     width: 100%;
+
     display: flex;
     align-items: center;
 }
 
 .inputWrapper input,
 .passwordWrapper input {
-    min-width: 0;
-    padding-left: 47px;
+    padding-left: 55px;
 }
 
 .passwordWrapper input {
-    padding-right: 55px;
+    padding-right: 65px;
 }
 
 .inputIcon {
     position: absolute;
-    z-index: 1;
-    left: 15px;
-    width: 19px;
-    height: 19px;
+    z-index: 2;
+    left: 19px;
+
+    width: 21px;
+    height: 21px;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #a18d7b;
+
+    color: #9c8b7c;
+
     pointer-events: none;
+
+    transition: var(--transition);
 }
 
 .inputIcon svg {
-    width: 19px;
-    height: 19px;
+    width: 21px;
+    height: 21px;
+
     stroke: currentColor;
     stroke-width: 1.7;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
-/* =========================================================
-   ENLACES DE RECUPERACIÓN
-========================================================= */
+.inputWrapper:focus-within .inputIcon,
+.passwordWrapper:focus-within .inputIcon {
+    color: var(--orange-dark);
+    transform: scale(1.1);
+}
+
+/* ============================================================
+   17. CONTRASEÑA
+============================================================ */
+
+.togglePassword {
+    position: absolute;
+    z-index: 5;
+
+    top: 50%;
+    right: 11px;
+
+    width: 44px;
+    height: 44px;
+
+    display: grid;
+    place-items: center;
+
+    padding: 0;
+
+    transform: translateY(-50%);
+
+    border: none;
+    border-radius: 12px;
+
+    background: transparent;
+    color: #897b70;
+
+    transition: var(--transition);
+}
+
+.togglePassword:hover {
+    color: var(--orange-dark);
+    background: #fff1e3;
+}
+
+.togglePassword:active {
+    transform: translateY(-50%) scale(.92);
+}
+
+.togglePassword:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
+}
+
+.togglePassword svg {
+    width: 23px;
+    height: 23px;
+}
+
+/* ============================================================
+   18. ENLACE OLVIDÉ CONTRASEÑA
+============================================================ */
 
 .labelRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .forgotLink {
-    color: var(--jd-orange-dark);
-    font-size: 10px;
+    color: var(--orange-dark);
+
+    font-size: 13px;
     font-weight: 800;
+
+    transition: var(--transition);
 }
 
 .forgotLink:hover {
-    color: var(--jd-coffee);
+    color: var(--coffee);
     text-decoration: underline;
+    text-underline-offset: 4px;
 }
 
-/* =========================================================
-   MOSTRAR / OCULTAR CONTRASEÑA
-========================================================= */
-
-.togglePassword {
-    position: absolute;
-    z-index: 5;
-    top: 50%;
-    right: 8px;
-    width: 39px;
-    height: 39px;
-    display: grid;
-    place-items: center;
-    padding: 0;
-    transform: translateY(-50%);
-    border: 0;
-    border-radius: 10px;
-    background: transparent;
-    color: #8c8178;
-    cursor: pointer;
-    touch-action: manipulation;
-    appearance: none;
-    transition: color .2s, background .2s;
-}
-
-.togglePassword:hover {
-    color: var(--jd-orange-dark);
-    background: #fff2e4;
-}
-
-.togglePassword:focus-visible {
-    outline: 2px solid var(--jd-orange);
-    outline-offset: 2px;
-}
-
-.togglePassword svg {
-    width: 21px;
-    height: 21px;
-    display: block;
-    pointer-events: none;
-}
-
-/* =========================================================
-   BOTÓN PRINCIPAL
-========================================================= */
+/* ============================================================
+   19. BOTÓN PRINCIPAL
+============================================================ */
 
 .submitButton {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
     width: 100%;
-    min-height: 56px;
+    min-height: 66px;
+
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 13px;
-    margin-top: 5px;
-    padding: 14px 20px;
-    border: 0;
-    border-radius: 13px;
-    background: linear-gradient(110deg, #ed8428, #c9570d);
+    gap: 15px;
+
+    margin-top: 7px;
+    padding: 17px 24px;
+
+    border: none;
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            110deg,
+            #f49a43,
+            #ed791e 48%,
+            #c95b12
+        );
+
+    background-size: 200% 100%;
+
     color: white;
-    font-size: 12px;
+
+    font-size: 15px;
     font-weight: 800;
-    box-shadow: 0 10px 24px rgba(201, 87, 13, .2);
-    cursor: pointer;
-    transition: transform .2s, box-shadow .2s, filter .2s;
+
+    letter-spacing: .2px;
+
+    box-shadow:
+        0 12px 28px rgba(201,91,18,.23);
+
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease,
+        background-position .5s ease;
+}
+
+.submitButton::before {
+    content: "";
+
+    position: absolute;
+    z-index: -1;
+
+    top: -100%;
+    left: -40%;
+
+    width: 28%;
+    height: 300%;
+
+    transform: rotate(25deg);
+
+    background: rgba(255,255,255,.24);
+
+    transition: left .7s ease;
 }
 
 .submitButton:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 28px rgba(201, 87, 13, .28);
-    filter: brightness(1.05);
+    transform: translateY(-4px);
+
+    background-position: 100% 0;
+
+    box-shadow:
+        0 17px 36px rgba(201,91,18,.32);
+}
+
+.submitButton:hover::before {
+    left: 125%;
 }
 
 .submitButton:active {
-    transform: translateY(0);
+    transform: translateY(-1px) scale(.99);
 }
 
 .submitButton:focus-visible {
-    outline: 3px solid rgba(232, 117, 25, .35);
-    outline-offset: 3px;
+    outline: 3px solid rgba(237,121,30,.35);
+    outline-offset: 4px;
 }
 
 .submitButton svg {
-    width: 19px;
-    height: 19px;
+    width: 21px;
+    height: 21px;
+
     stroke: currentColor;
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
-    transition: transform .2s;
+
+    transition: transform .3s ease;
 }
 
 .submitButton:hover svg {
-    transform: translateX(4px);
+    transform: translateX(6px);
 }
 
-/* =========================================================
-   REGISTRO Y PIE DEL FORMULARIO
-========================================================= */
+/* ============================================================
+   20. REGISTRO
+============================================================ */
 
 .registerPrompt {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 6px;
-    margin-top: 25px;
-    color: var(--jd-muted);
-    font-size: 11px;
+    gap: 7px;
+
+    margin-top: 30px;
+
+    color: var(--muted);
+
+    font-size: 14px;
     text-align: center;
 }
 
 .registerPrompt a {
-    color: var(--jd-orange-dark);
+    color: var(--orange-dark);
     font-weight: 800;
+
+    transition: var(--transition);
 }
 
 .registerPrompt a:hover {
+    color: var(--coffee);
+
     text-decoration: underline;
+    text-underline-offset: 4px;
 }
+
+/* ============================================================
+   21. PIE DEL FORMULARIO
+============================================================ */
 
 .formBottom {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    margin-top: 38px;
-    padding-top: 19px;
-    border-top: 1px solid var(--jd-border);
-    color: #a39a91;
-    font-size: 9px;
+    gap: 15px;
+
+    margin-top: 45px;
+    padding-top: 22px;
+
+    border-top: 1px solid var(--border);
+
+    color: #9b9086;
+    font-size: 12px;
 }
 
 .bottomBrand {
     display: flex;
     align-items: center;
-    gap: 9px;
-    color: var(--jd-coffee);
+    gap: 11px;
+
+    color: var(--coffee);
+
+    font-size: 12px;
     font-weight: 800;
-    letter-spacing: .7px;
+
+    letter-spacing: 1px;
 }
 
 .bottomBrandMark {
-    width: 29px;
-    height: 29px;
+    width: 36px;
+    height: 36px;
+
     display: grid;
     place-items: center;
-    border-radius: 9px;
-    background: var(--jd-orange);
+
+    border-radius: 11px;
+
+    background: linear-gradient(145deg, #f49a43, #d85f12);
+
     color: white;
-    font-family: "Playfair Display", serif;
+
+    font-family: var(--font-title);
+    font-size: 16px;
     font-weight: 800;
+
+    box-shadow: 0 5px 12px rgba(201,91,18,.2);
 }
 
-/* =========================================================
-   PANTALLAS DE RECUPERACIÓN
-========================================================= */
+/* ============================================================
+   22. ERRORES Y AYUDAS
+============================================================ */
+
+.errorlist,
+.fieldErrors {
+    margin: 6px 0 0;
+    padding: 13px 16px;
+
+    border: 1px solid #f1d0d0;
+    border-radius: 12px;
+
+    background: #fff1f1;
+    color: var(--danger);
+
+    font-size: 13px;
+    line-height: 1.7;
+
+    list-style-position: inside;
+}
+
+.fieldErrors {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.helptext,
+.fieldHelp {
+    display: block;
+
+    margin-top: 8px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* ============================================================
+   23. RECUPERACIÓN DE CONTRASEÑA
+============================================================ */
 
 .authRecovery .formHeading {
-    margin-bottom: 30px;
+    margin-bottom: 36px;
 }
 
 .authRecovery .formHeading h2 {
-    max-width: 420px;
+    max-width: 500px;
 }
 
 .authRecovery .authForm {
-    gap: 22px;
+    gap: 27px;
 }
 
 .authRecovery .formBottom {
-    margin-top: 42px;
+    margin-top: 45px;
 }
 
-/* =========================================================
-   ANIMACIONES
-========================================================= */
+/* ============================================================
+   24. ANIMACIONES
+============================================================ */
 
-@keyframes jdAppear {
+@keyframes formEntrance {
     from {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(30px);
+        filter: blur(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+@keyframes contentEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
     }
 
     to {
@@ -863,131 +1179,249 @@ button {
     }
 }
 
-/* =========================================================
-   TABLET
-========================================================= */
+@keyframes slideFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
 
-@media (max-width: 1050px) {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes backgroundEntrance {
+    from {
+        opacity: .5;
+        transform: scale(1.12);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.03);
+    }
+}
+
+@keyframes backgroundMovement {
+    from {
+        transform: scale(1.03) translate(0, 0);
+    }
+
+    to {
+        transform: scale(1.1) translate(-1%, .7%);
+    }
+}
+
+@keyframes floatingCircle {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(-15px, 18px);
+    }
+}
+
+@keyframes decorationGlow {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .55;
+    }
+}
+
+/* ============================================================
+   25. TABLETS
+============================================================ */
+
+@media (max-width: 1100px) {
+
     .authPage {
-        grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+        grid-template-columns: .95fr 1.05fr;
     }
 
     .authVisual {
-        padding: 35px 7%;
+        padding: 42px 6%;
     }
 
     .authFormSection {
-        padding: 35px 6%;
+        padding: 45px 6%;
     }
 
     .visualContent h1 {
-        font-size: clamp(36px, 4.5vw, 52px);
+        font-size: clamp(46px, 5.3vw, 62px);
     }
 
-    .brandLogoContainer {
-        width: 68px;
-        height: 68px;
-        flex-basis: 68px;
+    .visualContent p {
+        font-size: 15px;
+    }
+
+    .formHeading h2 {
+        font-size: 45px;
+    }
+}
+
+/* ============================================================
+   26. MÓVILES Y TABLETS PEQUEÑAS
+============================================================ */
+
+@media (max-width: 760px) {
+
+    .authPage {
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+    }
+
+    .authVisual {
+        min-height: auto;
+
+        padding: 28px 7% 30px;
+    }
+
+    .brandLogo,
+    .logoFallback {
+        width: 59px;
+        height: 59px;
+        flex-basis: 59px;
+
+        border-radius: 15px;
+    }
+
+    .brandName strong {
+        font-size: 25px;
+    }
+
+    .brandName small {
+        font-size: 9px;
+    }
+
+    .visualContent {
+        padding: 40px 0 30px;
+    }
+
+    .visualEyebrow {
+        font-size: 10px;
+        margin-bottom: 17px;
+    }
+
+    .visualContent h1 {
+        font-size: clamp(43px, 9vw, 57px);
+        letter-spacing: -1px;
+    }
+
+    .visualContent p {
+        margin-top: 17px;
+        font-size: 15px;
+    }
+
+    .visualFeature {
+        margin-top: 23px;
+    }
+
+    .visualFooter {
+        padding-top: 17px;
+        font-size: 10px;
+    }
+
+    .authFormSection {
+        min-height: auto;
+
+        padding: 43px 7% 50px;
+    }
+
+    .authFormContainer {
+        max-width: 520px;
+    }
+
+    .backLink {
+        margin-bottom: 34px;
+    }
+
+    .formHeading {
+        margin-bottom: 30px;
+    }
+
+    .formHeading h2 {
+        font-size: 43px;
+    }
+
+    .formHeading p {
+        font-size: 15px;
+    }
+
+    .authForm {
+        gap: 23px;
+    }
+
+    .formBottom {
+        margin-top: 33px;
+    }
+}
+
+/* ============================================================
+   27. MÓVILES PEQUEÑOS
+============================================================ */
+
+@media (max-width: 420px) {
+
+    .authVisual {
+        padding: 23px 22px;
+    }
+
+    .authFormSection {
+        padding: 35px 23px 40px;
+    }
+
+    .brandLogo,
+    .logoFallback {
+        width: 52px;
+        height: 52px;
+        flex-basis: 52px;
     }
 
     .brandName strong {
         font-size: 22px;
     }
-}
-
-/* =========================================================
-   MÓVIL
-========================================================= */
-
-@media (max-width: 760px) {
-    .authPage {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .authVisual {
-        min-height: 300px;
-        height: auto;
-        padding: 24px 7%;
-    }
-
-    .brandLogoContainer {
-        width: 59px;
-        height: 59px;
-        flex-basis: 59px;
-        border-radius: 15px;
-    }
-
-    .brandLogo {
-        border-radius: 12px;
-    }
-
-    .brandName strong {
-        font-size: 20px;
-    }
 
     .brandName small {
         font-size: 8px;
-        letter-spacing: 1px;
-    }
-
-    .visualContent {
-        padding: 30px 0;
-    }
-
-    .visualEyebrow {
-        margin-bottom: 15px;
+        letter-spacing: 1.5px;
     }
 
     .visualContent h1 {
-        font-size: clamp(34px, 8vw, 46px);
+        font-size: 42px;
     }
 
     .visualContent p {
-        margin-top: 14px;
-        font-size: 12px;
-    }
-
-    .visualFeature {
-        margin-top: 22px;
-    }
-
-    .visualFooter {
-        padding-top: 15px;
-        font-size: 8px;
-    }
-
-    .authFormSection {
-        min-height: auto;
-        padding: 38px 7% 45px;
-    }
-
-    .authFormContainer {
-        max-width: 490px;
-    }
-
-    .backLink {
-        margin-bottom: 28px;
+        font-size: 14px;
     }
 
     .formHeading h2 {
-        font-size: 35px;
+        font-size: 39px;
     }
 
-    .formBottom {
-        margin-top: 30px;
+    .formHeading p {
+        font-size: 14px;
     }
-}
 
-/* =========================================================
-   MÓVILES PEQUEÑOS
-========================================================= */
+    .formGroup label {
+        font-size: 14px;
+    }
 
-@media (max-width: 390px) {
-    .visualFooter,
-    .formBottom {
-        align-items: flex-start;
-        flex-direction: column;
+    .formGroup input,
+    .formGroup select,
+    .formGroup textarea {
+        min-height: 59px;
+        font-size: 14px;
+    }
+
+    .submitButton {
+        min-height: 61px;
+        font-size: 14px;
     }
 
     .labelRow {
@@ -995,31 +1429,29 @@ button {
         flex-direction: column;
     }
 
-    .authFormSection {
-        padding-right: 22px;
-        padding-left: 22px;
+    .visualFooter,
+    .formBottom {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
-    .visualLogo {
-        gap: 10px;
-    }
-
-    .brandName strong {
-        font-size: 18px;
+    .registerPrompt {
+        font-size: 13px;
     }
 }
 
-/* =========================================================
-   ACCESIBILIDAD
-========================================================= */
+/* ============================================================
+   28. ACCESIBILIDAD Y MOVIMIENTO REDUCIDO
+============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-    .authPage *,
-    .authPage *::before,
-    .authPage *::after {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
         animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: .01ms !important;
-        scroll-behavior: auto !important;
     }
 }
