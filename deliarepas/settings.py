@@ -245,3 +245,59 @@ CSRF_COOKIE_HTTPONLY = False
 # =====================================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# =========================================================
+# SISTEMA DE REGISTROS LOG - DELI AREPAS JD
+# =========================================================
+
+import logging
+from logging.handlers import RotatingFileHandler
+
+# Carpeta donde se almacenarán los registros
+LOG_DIR = BASE_DIR / 'logs'
+
+# Crear la carpeta automáticamente si no existe
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+# Configuración general de registros
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'detallado': {
+            'format': (
+                '%(asctime)s | %(levelname)s | '
+                '%(name)s | %(message)s'
+            ),
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+
+    'handlers': {
+        'archivo': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOG_DIR / 'deliarepas.log',
+            'maxBytes': 5 * 1024 * 1024,
+            'backupCount': 5,
+            'formatter': 'detallado',
+            'encoding': 'utf-8',
+        },
+    },
+
+    'loggers': {
+        'django': {
+            'handlers': ['archivo'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+
+        'deliapp': {
+            'handlers': ['archivo'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

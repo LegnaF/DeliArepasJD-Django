@@ -1,0 +1,18 @@
+2026-11-24 16:43:13 | INFO | django.utils.autoreload | Watching for file changes with StatReloader
+2026-11-24 16:44:29 | INFO | django.utils.autoreload | Watching for file changes with StatReloader
+2026-11-24 16:59:46 | INFO | django.server | "GET /login/ HTTP/1.1" 200 6114
+2026-11-24 16:59:46 | INFO | django.server | "GET /static/deliapp/css/login.css HTTP/1.1" 200 26799
+2026-11-24 16:59:47 | WARNING | django.server | "GET /static/deliapp/js/login.js HTTP/1.1" 404 1924
+2026-11-24 16:59:47 | INFO | django.server | "GET /static/deliapp/img/inicio.jpg HTTP/1.1" 200 623276
+2026-11-24 16:59:47 | WARNING | django.request | Not Found: /favicon.ico
+2026-11-24 16:59:47 | WARNING | django.server | "GET /favicon.ico HTTP/1.1" 404 12794
+2026-11-24 17:00:14 | INFO | django.server | "GET /registro/ HTTP/1.1" 200 7305
+2026-11-24 17:00:14 | WARNING | django.server | "GET /static/deliapp/js/login.js HTTP/1.1" 404 1924
+2026-11-24 17:05:47 | INFO | django.server | "POST /registro/ HTTP/1.1" 200 7657
+2026-11-24 17:05:47 | WARNING | django.server | "GET /static/deliapp/js/login.js HTTP/1.1" 404 1924
+2026-11-24 17:17:42 | INFO | django.server | "POST /logout/ HTTP/1.1" 302 0
+2026-11-24 17:17:42 | INFO | django.server | "GET / HTTP/1.1" 200 12091
+2026-11-24 17:17:43 | INFO | django.server | "GET /login/ HTTP/1.1" 200 6114
+2026-11-24 17:17:43 | WARNING | django.server | "GET /static/deliapp/js/login.js HTTP/1.1" 404 1924
+2026-11-24 17:17:48 | INFO | django.server | "GET /registro/ HTTP/1.1" 200 7305
+2026-11-24 17:17:48 | WARNING | django.server | "GET /static/deliapp/js/login.js HTTP/1.1" 404 1924
